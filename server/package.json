@@ -1,11 +1,13 @@
 {
   "name": "gym-partner",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "drizzle:pull": "drizzle-kit introspect:pg"
   },
   "author": "",
   "license": "ISC",
