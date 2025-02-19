@@ -1,5 +1,5 @@
 import db from "../db/index.js";
-import {seed, reset} from "drizzle-seed";
+import { reset} from "drizzle-seed";
 import * as devSchemas from "../db/schemas/dev/schema.js";
 import * as mainSchemas from "../db/schemas/main/schema.js";
 import dotenv from "dotenv";

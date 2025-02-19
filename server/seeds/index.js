@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import db from "../db/index.js";
-import {reset} from "drizzle-seed";
 import * as devSchemas from "../db/schemas/dev/schema.js";
 import * as mainSchemas from "../db/schemas/main/schema.js";
 
@@ -79,7 +78,7 @@ const main = async () => {
                         carbohydratesper100G: 20 + index * 2,
                         fatper100G: 3 + index,
                         saturatedfatper100G: 1 + index,
-                        transfat: 0 + index,
+                        transfat:  index,
                         fiber: 1 + index,
                         sugar: 5 + index * 2,
                         sodium: 50 + index * 5,
@@ -188,7 +187,6 @@ const main = async () => {
             );
             await tx.insert(schema.setsOfSessionsExercises).values(setsOfSessionsExercisesMock).returning();
 
-            // todo inserting meals logs
             const mealsLogsMock = await Promise.all(
                 Array.from({length: 10}, async (_, index) => {
                     try {
@@ -209,7 +207,6 @@ const main = async () => {
             );
             const insertedMealsLogs = await tx.insert(schema.mealsLogs).values(mealsLogsMock).returning();
 
-            // todo inserting weights logs
             const weightsLogsMock = await Promise.all(
                 Array.from({length: 10}, async (_, index) => {
                     try {
