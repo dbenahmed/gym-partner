@@ -1,5 +1,4 @@
 import {
-	table,
 	check,
 	serial,
 	varchar,

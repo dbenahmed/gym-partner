@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, foods, mealsLogs, collections, plans, sessions, exercises, setsOfSessionsExercises, tasks, templatesExercises, templates, weightsLogs, plansExercises } from "./schema.js";
+import { users, foods, mealsLogs, collections, plans, sessions, exercises, setsOfSessionsExercises, templatesExercises, templates, weightsLogs, plansExercises } from "./schema";
 
 export const foodsRelations = relations(foods, ({one, many}) => ({
 	user: one(users, {
@@ -18,7 +18,7 @@ export const usersRelations = relations(users, ({many}) => ({
 
 export const mealsLogsRelations = relations(mealsLogs, ({one}) => ({
 	food: one(foods, {
-		fields: [mealsLogs.mealId],
+		fields: [mealsLogs.foodId],
 		references: [foods.id]
 	}),
 	user: one(users, {
@@ -50,7 +50,6 @@ export const sessionsRelations = relations(sessions, ({one, many}) => ({
 		references: [plans.id]
 	}),
 	setsOfSessionsExercises: many(setsOfSessionsExercises),
-	tasks: many(tasks),
 }));
 
 export const setsOfSessionsExercisesRelations = relations(setsOfSessionsExercises, ({one}) => ({
@@ -66,21 +65,10 @@ export const setsOfSessionsExercisesRelations = relations(setsOfSessionsExercise
 
 export const exercisesRelations = relations(exercises, ({many}) => ({
 	setsOfSessionsExercises: many(setsOfSessionsExercises),
-	tasks: many(tasks),
 	templatesExercises: many(templatesExercises),
 	plansExercises: many(plansExercises),
 }));
 
-export const tasksRelations = relations(tasks, ({one}) => ({
-	session: one(sessions, {
-		fields: [tasks.sessionId],
-		references: [sessions.id]
-	}),
-	exercise: one(exercises, {
-		fields: [tasks.exerciseId],
-		references: [exercises.id]
-	}),
-}));
 
 export const templatesExercisesRelations = relations(templatesExercises, ({one}) => ({
 	exercise: one(exercises, {

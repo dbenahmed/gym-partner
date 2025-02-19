@@ -17,7 +17,7 @@ const devSchema = pgSchema("dev")
 
 
 export const exercises = devSchema.table("exercises", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	name: varchar({ length: 100 }).notNull(),
 	force: varchar({ length: 10 }).default(sql`NULL`),
 	level: varchar({ length: 15 }).notNull(),
@@ -39,7 +39,7 @@ export const exercises = devSchema.table("exercises", {
 ]);
 
 export const foods = devSchema.table("foods", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	foodname: varchar({ length: 255 }).notNull(),
 	description: text().default(''),
 	calories: integer(),
@@ -77,8 +77,8 @@ export const foods = devSchema.table("foods", {
 ]);
 
 export const mealsLogs = devSchema.table("meals_logs", {
-	id: integer().primaryKey().notNull(),
-	mealId: integer("meal_id").notNull(),
+	id: serial().primaryKey(),
+	foodId: integer("meal_id").notNull(),
 	userId: integer("user_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updateddate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -86,7 +86,7 @@ export const mealsLogs = devSchema.table("meals_logs", {
 	servingsizeG: integer("servingsize_g"),
 }, (table) => [
 	foreignKey({
-			columns: [table.mealId],
+			columns: [table.foodId],
 			foreignColumns: [foods.id],
 			name: "fk_meal"
 		}).onDelete("cascade"),
@@ -99,7 +99,7 @@ export const mealsLogs = devSchema.table("meals_logs", {
 ]);
 
 export const plans = devSchema.table("plans", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	collectionId: integer("collection_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -114,7 +114,7 @@ export const plans = devSchema.table("plans", {
 ]);
 
 export const sessions = devSchema.table("sessions", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	planId: integer("plan_id"),
 	duedate: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
 	name: varchar({ length: 100 }).notNull(),
@@ -133,7 +133,7 @@ export const sessions = devSchema.table("sessions", {
 ]);
 
 export const setsOfSessionsExercises = devSchema.table("sets_of_sessions_exercises", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	sessionId: integer("session_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -158,7 +158,7 @@ export const setsOfSessionsExercises = devSchema.table("sets_of_sessions_exercis
 ]);
 
 /*export const sessionsExercises = devSchema.table("sessions_exercises", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	exerciseId: integer("exercise_id").notNull(),
 	sessionId: integer("session_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -176,7 +176,7 @@ export const setsOfSessionsExercises = devSchema.table("sets_of_sessions_exercis
 ]);*/
 
 export const collections = devSchema.table("collections", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	userId: integer("user_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -192,7 +192,7 @@ export const collections = devSchema.table("collections", {
 ]);
 
 export const templatesExercises = devSchema.table("templates_exercises", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	templateId: integer("template_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -212,7 +212,7 @@ export const templatesExercises = devSchema.table("templates_exercises", {
 ]);
 
 export const users = devSchema.table("users", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	username: varchar({ length: 50 }).notNull(),
 	password: varchar({ length: 72 }).notNull(),
 	salt: varchar({ length: 255 }).notNull(),
@@ -232,7 +232,7 @@ export const users = devSchema.table("users", {
 ]);
 
 export const weightsLogs = devSchema.table("weights_logs", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	userId: integer("user_id").notNull(),
 	weight: integer(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -249,7 +249,7 @@ export const weightsLogs = devSchema.table("weights_logs", {
 ]);
 
 export const plansExercises = devSchema.table("plans_exercises", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	planId: integer("plan_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -269,7 +269,7 @@ export const plansExercises = devSchema.table("plans_exercises", {
 ]);
 
 export const templates = devSchema.table("templates", {
-	id: integer().primaryKey().notNull(),
+	id: serial().primaryKey(),
 	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
