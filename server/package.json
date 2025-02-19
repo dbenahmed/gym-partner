@@ -7,10 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "drizzle:main:generate": "drizzle-kit migrate --config=drizzle-main.config.ts",
+    "drizzle:main:migrate": "drizzle-kit migrate --config=drizzle-main.config.ts",
+    "drizzle:main:seed": "node ./seeds/index.js --schema=main",
+    "drizzle:main:clearseed": "node ./seeds/clearSeeds.js --schema=main",
     "drizzle:dev:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
     "drizzle:dev:migrate": "drizzle-kit migrate --config=drizzle-dev.config.ts",
-    "drizzle:main:generate": "drizzle-kit migrate --config=drizzle-main.config.ts",
-    "drizzle:main:migrate": "drizzle-kit migrate --config=drizzle-main.config.ts"
+    "drizzle:dev:seed": "node ./seeds/index.js --schema=dev",
+    "drizzle:dev:clearseed": "node ./seeds/clearSeeds.js --schema=dev",
+    "drizzle:studio": "npx drizzle-kit studio --port 3000 --verbose --config=drizzle-dev.config.ts"
   },
   "author": "",
   "license": "ISC",

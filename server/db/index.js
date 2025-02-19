@@ -1,9 +1,8 @@
 // POSTGRESQL CONNECTION
 import {drizzle} from 'drizzle-orm/node-postgres';
 import dotenv from 'dotenv';
-import config from "../config.js";
-
 dotenv.config();
+import config from "../config.js";
 
 const db = drizzle(config.psqlDatabaseUrl)
 
