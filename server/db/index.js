@@ -1,15 +1,24 @@
-/*const {neon} = require('@neondatabase/serverless');
-const {drizzle} = require('drizzle-orm/neon-http');
-const dotenv = require('dotenv');*/
-import {neon} from '@neondatabase/serverless';
-import {drizzle} from 'drizzle-orm/neon-http';
+// POSTGRESQL CONNECTION
+import {drizzle} from 'drizzle-orm/node-postgres';
 import dotenv from 'dotenv';
+import config from "../config.js";
 
 dotenv.config();
 
+const db = drizzle(config.psqlDatabaseUrl)
 
-const sql = neon(process.env.DATABASE_URL);
-const db = drizzle(sql);
+export default db
 
+/*
+    // NEON CONNECTION CANCELLED
+    import {neon} from '@neondatabase/serverless';
+    import {drizzle} from 'drizzle-orm/neon-http';
+    import dotenv from 'dotenv';
 
-export default db;
+    dotenv.config();
+
+    const sql = neon(config.neonDatabaseUrl);
+    const db = drizzle(sql);
+
+    export default db;
+*/

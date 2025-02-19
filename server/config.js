@@ -1,5 +1,6 @@
 const config = {
-    DatabaseUrl: process.env.DATABASE_URL,
+    psqlDatabaseUrl: process.env.PSQL_DATABASE_URL,
+    neonDatabaseUrl: process.env.NEON_DATABASE_URL
 };
 
 export default config;

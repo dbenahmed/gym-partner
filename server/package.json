@@ -7,7 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "drizzle:pull": "drizzle-kit introspect:pg"
+    "drizzle:dev:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
+    "drizzle:dev:migrate": "drizzle-kit migrate --config=drizzle-dev.config.ts",
+    "drizzle:main:generate": "drizzle-kit migrate --config=drizzle-main.config.ts",
+    "drizzle:main:migrate": "drizzle-kit migrate --config=drizzle-main.config.ts"
   },
   "author": "",
   "license": "ISC",
@@ -19,8 +22,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.3",
+    "drizzle-seed": "^0.3.1",
     "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "drizzle-kit": "^0.30.4",
