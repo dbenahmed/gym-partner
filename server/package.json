@@ -1,24 +1,40 @@
 {
   "name": "gym-partner",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "drizzle:main:generate": "drizzle-kit migrate --config=drizzle-main.config.ts",
+    "drizzle:main:migrate": "drizzle-kit migrate --config=drizzle-main.config.ts",
+    "drizzle:main:seed": "node ./seeds/index.js --schema=main",
+    "drizzle:main:clearseed": "node ./seeds/clearSeeds.js --schema=main",
+    "drizzle:dev:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
+    "drizzle:dev:migrate": "drizzle-kit migrate --config=drizzle-dev.config.ts",
+    "drizzle:dev:seed": "node ./seeds/index.js --schema=dev",
+    "drizzle:dev:clearseed": "node ./seeds/clearSeeds.js --schema=dev",
+    "drizzle:studio": "npx drizzle-kit studio --port 3000 --verbose --config=drizzle-dev.config.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.3",
+    "drizzle-seed": "^0.3.1",
     "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "drizzle-kit": "^0.30.4",
+    "nodemon": "^3.1.9",
+    "tsx": "^4.19.2"
   }
 }
