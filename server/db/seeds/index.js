@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import db from "../db/index.js";
-import * as devSchemas from "../db/schemas/dev/schema.js";
-import * as mainSchemas from "../db/schemas/main/schema.js";
+import db from "../index.js";
+import * as devSchemas from "../schemas/dev/schema.js";
+import * as mainSchemas from "../schemas/main/schema.js";
 
 dotenv.config();
 
