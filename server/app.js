@@ -1,15 +1,7 @@
-/*const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const db = require("./db/index.js");
-const dotenv = require('dotenv');
-const {usersTable} = require("./db/schemas/userSchema");
-dotenv.config();*/
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import db from "./db/index.js";
 
 dotenv.config();
 
