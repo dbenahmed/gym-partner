@@ -15,7 +15,7 @@ import {sql} from "drizzle-orm"
 export const main = pgSchema("main");
 
 
-export const usersInMain = main.table("users", {
+export const users = main.table("users", {
    id: serial().primaryKey().notNull(),
    username: varchar({length: 50}).notNull(),
    password: varchar({length: 72}).notNull(),
@@ -37,7 +37,7 @@ export const usersInMain = main.table("users", {
                                      AND ((username)::text ~ '^[a-zA-Z0-9_]+$'::text)`),
 ]);
 
-export const collectionsInMain = main.table("collections", {
+export const collections = main.table("collections", {
    id: serial().primaryKey().notNull(),
    userId: integer("user_id").notNull(),
    title: varchar({length: 100}).notNull(),
@@ -47,14 +47,14 @@ export const collectionsInMain = main.table("collections", {
 }, (table) => [
    foreignKey({
       columns: [table.userId],
-      foreignColumns: [usersInMain.id],
+      foreignColumns: [users.id],
       name: "collections_user_id_fkey"
    }).onDelete("cascade"),
    check("collections_title_check", sql`length
    ((title)::text) >= 1`),
 ]);
 
-export const foodsInMain = main.table("foods", {
+export const foods = main.table("foods", {
    id: serial().primaryKey().notNull(),
    foodname: varchar({length: 255}).notNull(),
    description: text().default(''),
@@ -76,7 +76,7 @@ export const foodsInMain = main.table("foods", {
 }, (table) => [
    foreignKey({
       columns: [table.createdBy],
-      foreignColumns: [usersInMain.id],
+      foreignColumns: [users.id],
       name: "fk_created_by"
    }).onDelete("set null"),
    check("foods_calories_check", sql`calories
@@ -103,7 +103,7 @@ export const foodsInMain = main.table("foods", {
    >= 0`),
 ]);
 
-export const mealsLogsInMain = main.table("meals_logs", {
+export const mealsLogs = main.table("meals_logs", {
    id: serial().primaryKey().notNull(),
    mealId: integer("meal_id").notNull(),
    userId: integer("user_id").notNull(),
@@ -114,19 +114,19 @@ export const mealsLogsInMain = main.table("meals_logs", {
 }, (table) => [
    foreignKey({
       columns: [table.mealId],
-      foreignColumns: [foodsInMain.id],
+      foreignColumns: [foods.id],
       name: "fk_meal"
    }).onDelete("cascade"),
    foreignKey({
       columns: [table.userId],
-      foreignColumns: [usersInMain.id],
+      foreignColumns: [users.id],
       name: "fk_user"
    }).onDelete("cascade"),
    check("meals_logs_servingsize_g_check", sql`servingsize_g
    >= 0`),
 ]);
 
-export const plansInMain = main.table("plans", {
+export const plans = main.table("plans", {
    id: serial().primaryKey().notNull(),
    collectionId: integer("collection_id").notNull(),
    title: varchar({length: 100}).notNull(),
@@ -135,14 +135,14 @@ export const plansInMain = main.table("plans", {
 }, (table) => [
    foreignKey({
       columns: [table.collectionId],
-      foreignColumns: [collectionsInMain.id],
+      foreignColumns: [collections.id],
       name: "plans_collection_id_fkey"
    }).onDelete("cascade"),
    check("plans_title_check", sql`length
    ((title)::text) >= 1`),
 ]);
 
-export const plansExercisesInMain = main.table("plans_exercises", {
+export const plansExercises = main.table("plans_exercises", {
    id: serial().primaryKey().notNull(),
    planId: integer("plan_id").notNull(),
    exerciseId: integer("exercise_id").notNull(),
@@ -152,17 +152,17 @@ export const plansExercisesInMain = main.table("plans_exercises", {
 }, (table) => [
    foreignKey({
       columns: [table.exerciseId],
-      foreignColumns: [exercisesInMain.id],
+      foreignColumns: [exercises.id],
       name: "fk_exercise"
    }).onDelete("cascade"),
    foreignKey({
       columns: [table.planId],
-      foreignColumns: [plansInMain.id],
+      foreignColumns: [plans.id],
       name: "fk_plan"
    }).onDelete("cascade"),
 ]);
 
-export const exercisesInMain = main.table("exercises", {
+export const exercises = main.table("exercises", {
    id: serial().primaryKey().notNull(),
    name: varchar({length: 100}).notNull(),
    force: varchar({length: 10}).default(sql`NULL`),
@@ -189,7 +189,7 @@ export const exercisesInMain = main.table("exercises", {
                                          ::text = ANY (ARRAY[('isolation'::character varying)::text, ('compound'::character varying)::text])`),
 ]);
 
-export const sessionsInMain = main.table("sessions", {
+export const sessions = main.table("sessions", {
    id: serial().primaryKey().notNull(),
    planId: integer("plan_id"),
    duedate: timestamp({withTimezone: true, mode: 'string'}).notNull(),
@@ -201,7 +201,7 @@ export const sessionsInMain = main.table("sessions", {
 }, (table) => [
    foreignKey({
       columns: [table.planId],
-      foreignColumns: [plansInMain.id],
+      foreignColumns: [plans.id],
       name: "fk_plan"
    }).onDelete("cascade"),
    check("sessions_name_check", sql`length
@@ -210,7 +210,7 @@ export const sessionsInMain = main.table("sessions", {
                                       AND (rating <= 5)`),
 ]);
 
-export const setsOfSessionsExercisesInMain = main.table("sets_of_sessions_exercises", {
+export const setsOfSessionsExercises = main.table("sets_of_sessions_exercises", {
    id: serial().primaryKey().notNull(),
    sessionId: integer("session_id").notNull(),
    exerciseId: integer("exercise_id").notNull(),
@@ -222,12 +222,12 @@ export const setsOfSessionsExercisesInMain = main.table("sets_of_sessions_exerci
 }, (table) => [
    foreignKey({
       columns: [table.exerciseId],
-      foreignColumns: [exercisesInMain.id],
+      foreignColumns: [exercises.id],
       name: "fk_session_exercise_id"
    }).onDelete("cascade"),
    foreignKey({
       columns: [table.sessionId],
-      foreignColumns: [sessionsInMain.id],
+      foreignColumns: [sessions.id],
       name: "fk_session_id"
    }).onDelete("cascade"),
    check("sets_of_sessions_exercises_reps_check", sql`array_length
@@ -238,7 +238,7 @@ export const setsOfSessionsExercisesInMain = main.table("sets_of_sessions_exerci
    >= 0`),
 ]);
 
-export const templatesExercisesInMain = main.table("templates_exercises", {
+export const templatesExercises = main.table("templates_exercises", {
    id: serial().primaryKey().notNull(),
    templateId: integer("template_id").notNull(),
    exerciseId: integer("exercise_id").notNull(),
@@ -248,17 +248,17 @@ export const templatesExercisesInMain = main.table("templates_exercises", {
 }, (table) => [
    foreignKey({
       columns: [table.exerciseId],
-      foreignColumns: [exercisesInMain.id],
+      foreignColumns: [exercises.id],
       name: "fk_exercise"
    }).onDelete("cascade"),
    foreignKey({
       columns: [table.templateId],
-      foreignColumns: [templatesInMain.id],
+      foreignColumns: [templates.id],
       name: "fk_template"
    }).onDelete("cascade"),
 ]);
 
-export const templatesInMain = main.table("templates", {
+export const templates = main.table("templates", {
    id: serial().primaryKey().notNull(),
    title: varchar({length: 100}).notNull(),
    creationdate: timestamp({withTimezone: true, mode: 'string'}).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -268,7 +268,7 @@ export const templatesInMain = main.table("templates", {
    ((title)::text) >= 1`),
 ]);
 
-export const weightsLogsInMain = main.table("weights_logs", {
+export const weightsLogs = main.table("weights_logs", {
    id: serial().primaryKey().notNull(),
    userId: integer("user_id").notNull(),
    weight: integer(),
@@ -278,7 +278,7 @@ export const weightsLogsInMain = main.table("weights_logs", {
 }, (table) => [
    foreignKey({
       columns: [table.userId],
-      foreignColumns: [usersInMain.id],
+      foreignColumns: [users.id],
       name: "fk_user"
    }).onDelete("cascade"),
    check("weights_logs_unit_check", sql`(unit)
