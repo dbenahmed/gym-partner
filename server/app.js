@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import collectionsRouter from "./routes/gymTracking/collectionsRoutes.js";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ app.use(cors())
 app.use(cookieParser())
 
 
+app.use(collectionsRouter)
+
 app.get('/', async (req, res) => {
 
 
@@ -22,7 +25,7 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(port, async () => {
-    console.log(`server started port https://localhose/${port}`);
+    console.log(`server started port http://localhost:${port}`);
 })
 
 
