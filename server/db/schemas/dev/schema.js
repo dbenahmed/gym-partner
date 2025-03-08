@@ -1,45 +1,47 @@
-import {
-	check,
-	serial,
-	varchar,
-	text,
-	timestamp,
-	foreignKey,
-	integer,
-	boolean,
-	unique,
-	pgSchema
-} from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, unique, check, serial, varchar, timestamp, foreignKey, integer, text, boolean } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
+export const schema = pgSchema("dev");
 
-const devSchema = pgSchema("dev")
 
-
-export const exercises = devSchema.table("exercises", {
-	id: serial().primaryKey(),
-	name: varchar({ length: 100 }).notNull(),
-	force: varchar({ length: 10 }).default(sql`NULL`),
-	level: varchar({ length: 15 }).notNull(),
-	mechanic: varchar({ length: 15 }).default(sql`NULL`),
-	equipment: varchar({ length: 30 }).default(sql`NULL`),
-	primarymuscles: text().array().notNull(),
-	secondarymuscles: text().array(),
-	instructions: text().array().notNull(),
-	category: varchar({ length: 30 }).notNull(),
-	images: text().array().notNull(),
+export const users = schema.table("users", {
+	id: serial().primaryKey().notNull(),
+	username: varchar({ length: 50 }).notNull(),
+	password: varchar({ length: 72 }).notNull(),
+	salt: varchar({ length: 255 }).notNull(),
+	refreshtoken: varchar({ length: 255 }),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	avatar: varchar({ length: 255 }),
+	email: varchar({ length: 100 }).notNull(),
+	firstname: varchar({ length: 50 }),
+	lastname: varchar({ length: 50 }),
 }, (table) => [
-	check("exercises_category_check", sql`(category)::text = ANY (ARRAY[('powerlifting'::character varying)::text, ('strength'::character varying)::text, ('stretching'::character varying)::text, ('cardio'::character varying)::text, ('olympic weightlifting'::character varying)::text, ('strongman'::character varying)::text, ('plyometrics'::character varying)::text])`),
-	check("exercises_equipment_check", sql`(equipment)::text = ANY (ARRAY[('medicine ball'::character varying)::text, ('dumbbell'::character varying)::text, ('body only'::character varying)::text, ('bands'::character varying)::text, ('kettlebells'::character varying)::text, ('foam roll'::character varying)::text, ('cable'::character varying)::text, ('machine'::character varying)::text, ('barbell'::character varying)::text, ('exercise ball'::character varying)::text, ('e-z curl bar'::character varying)::text, ('other'::character varying)::text])`),
-	check("exercises_force_check", sql`(force)::text = ANY (ARRAY[('static'::character varying)::text, ('pull'::character varying)::text, ('push'::character varying)::text])`),
-	check("exercises_level_check", sql`(level)::text = ANY (ARRAY[('beginner'::character varying)::text, ('intermediate'::character varying)::text, ('expert'::character varying)::text])`),
-	check("exercises_mechanic_check", sql`(mechanic)::text = ANY (ARRAY[('isolation'::character varying)::text, ('compound'::character varying)::text])`),
+	unique("users_username_key").on(table.username),
+	unique("users_refreshtoken_key").on(table.refreshtoken),
+	unique("users_email_key").on(table.email),
+	check("users_email_check", sql`(email)::text ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$'::text`),
+	check("users_username_check", sql`(length((username)::text) > 3) AND ((username)::text ~ '^[a-zA-Z0-9_]+$'::text)`),
 ]);
 
-export const foods = devSchema.table("foods", {
-	id: serial().primaryKey(),
+export const collections = schema.table("collections", {
+	id: serial().primaryKey().notNull(),
+	userId: integer("user_id").notNull(),
+	title: varchar({ length: 100 }).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	description: text(),
+}, (table) => [
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "collections_user_id_fkey"
+		}).onDelete("cascade"),
+	check("collections_title_check", sql`length((title)::text) >= 1`),
+]);
+
+export const foods = schema.table("foods", {
+	id: serial().primaryKey().notNull(),
 	foodname: varchar({ length: 255 }).notNull(),
 	description: text().default(''),
 	calories: integer(),
@@ -54,7 +56,7 @@ export const foods = devSchema.table("foods", {
 	cholesterol: integer(),
 	brand: varchar({ length: 255 }),
 	custom: boolean().default(false),
-	createdBy: serial("created_by").notNull(),
+	createdBy: integer("created_by"),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
@@ -76,9 +78,9 @@ export const foods = devSchema.table("foods", {
 	check("foods_transfat_check", sql`transfat >= 0`),
 ]);
 
-export const mealsLogs = devSchema.table("meals_logs", {
-	id: serial().primaryKey(),
-	foodId: integer("meal_id").notNull(),
+export const mealsLogs = schema.table("meals_logs", {
+	id: serial().primaryKey().notNull(),
+	mealId: integer("meal_id").notNull(),
 	userId: integer("user_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updateddate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -86,7 +88,7 @@ export const mealsLogs = devSchema.table("meals_logs", {
 	servingsizeG: integer("servingsize_g"),
 }, (table) => [
 	foreignKey({
-			columns: [table.foodId],
+			columns: [table.mealId],
 			foreignColumns: [foods.id],
 			name: "fk_meal"
 		}).onDelete("cascade"),
@@ -98,8 +100,8 @@ export const mealsLogs = devSchema.table("meals_logs", {
 	check("meals_logs_servingsize_g_check", sql`servingsize_g >= 0`),
 ]);
 
-export const plans = devSchema.table("plans", {
-	id: serial().primaryKey(),
+export const plans = schema.table("plans", {
+	id: serial().primaryKey().notNull(),
 	collectionId: integer("collection_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -113,8 +115,50 @@ export const plans = devSchema.table("plans", {
 	check("plans_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const sessions = devSchema.table("sessions", {
-	id: serial().primaryKey(),
+export const plansExercises = schema.table("plans_exercises", {
+	id: serial().primaryKey().notNull(),
+	planId: integer("plan_id").notNull(),
+	exerciseId: integer("exercise_id").notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	order: integer().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.exerciseId],
+			foreignColumns: [exercises.id],
+			name: "fk_exercise"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.planId],
+			foreignColumns: [plans.id],
+			name: "fk_plan"
+		}).onDelete("cascade"),
+]);
+
+export const exercises = schema.table("exercises", {
+	id: serial().primaryKey().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	force: varchar({ length: 10 }).default(sql`NULL`),
+	level: varchar({ length: 15 }).notNull(),
+	mechanic: varchar({ length: 15 }).default(sql`NULL`),
+	equipment: varchar({ length: 30 }).default(sql`NULL`),
+	primarymuscles: text().array().notNull(),
+	secondarymuscles: text().array(),
+	instructions: text().array().notNull(),
+	category: varchar({ length: 30 }).notNull(),
+	images: text().array().notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	check("exercises_category_check", sql`(category)::text = ANY (ARRAY[('powerlifting'::character varying)::text, ('strength'::character varying)::text, ('stretching'::character varying)::text, ('cardio'::character varying)::text, ('olympic weightlifting'::character varying)::text, ('strongman'::character varying)::text, ('plyometrics'::character varying)::text])`),
+	check("exercises_equipment_check", sql`(equipment)::text = ANY (ARRAY[('medicine ball'::character varying)::text, ('dumbbell'::character varying)::text, ('body only'::character varying)::text, ('bands'::character varying)::text, ('kettlebells'::character varying)::text, ('foam roll'::character varying)::text, ('cable'::character varying)::text, ('machine'::character varying)::text, ('barbell'::character varying)::text, ('exercise ball'::character varying)::text, ('e-z curl bar'::character varying)::text, ('other'::character varying)::text])`),
+	check("exercises_force_check", sql`(force)::text = ANY (ARRAY[('static'::character varying)::text, ('pull'::character varying)::text, ('push'::character varying)::text])`),
+	check("exercises_level_check", sql`(level)::text = ANY (ARRAY[('beginner'::character varying)::text, ('intermediate'::character varying)::text, ('expert'::character varying)::text])`),
+	check("exercises_mechanic_check", sql`(mechanic)::text = ANY (ARRAY[('isolation'::character varying)::text, ('compound'::character varying)::text])`),
+]);
+
+export const sessions = schema.table("sessions", {
+	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id"),
 	duedate: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
 	name: varchar({ length: 100 }).notNull(),
@@ -132,8 +176,8 @@ export const sessions = devSchema.table("sessions", {
 	check("sessions_rating_check", sql`(rating >= 0) AND (rating <= 5)`),
 ]);
 
-export const setsOfSessionsExercises = devSchema.table("sets_of_sessions_exercises", {
-	id: serial().primaryKey(),
+export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises", {
+	id: serial().primaryKey().notNull(),
 	sessionId: integer("session_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -157,42 +201,8 @@ export const setsOfSessionsExercises = devSchema.table("sets_of_sessions_exercis
 	check("sets_of_sessions_exercises_weight_check", sql`weight >= 0`),
 ]);
 
-/*export const sessionsExercises = devSchema.table("sessions_exercises", {
-	id: serial().primaryKey(),
-	exerciseId: integer("exercise_id").notNull(),
-	sessionId: integer("session_id").notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-}, (table) => [
-	foreignKey({
-			columns: [table.sessionId],
-			foreignColumns: [sessions.id],
-			name: "fk_sesions"
-		}).onDelete("cascade"),
-	foreignKey({
-			columns: [table.exerciseId],
-			foreignColumns: [exercises.id],
-			name: "fk_database"
-		}).onDelete("cascade"),
-]);*/
-
-export const collections = devSchema.table("collections", {
-	id: serial().primaryKey(),
-	userId: integer("user_id").notNull(),
-	title: varchar({ length: 100 }).notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	description: text(),
-}, (table) => [
-	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "collections_user_id_fkey"
-		}).onDelete("cascade"),
-	check("collections_title_check", sql`length((title)::text) >= 1`),
-]);
-
-export const templatesExercises = devSchema.table("templates_exercises", {
-	id: serial().primaryKey(),
+export const templatesExercises = schema.table("templates_exercises", {
+	id: serial().primaryKey().notNull(),
 	templateId: integer("template_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -211,28 +221,17 @@ export const templatesExercises = devSchema.table("templates_exercises", {
 		}).onDelete("cascade"),
 ]);
 
-export const users = devSchema.table("users", {
-	id: serial().primaryKey(),
-	username: varchar({ length: 50 }).notNull(),
-	password: varchar({ length: 72 }).notNull(),
-	salt: varchar({ length: 255 }).notNull(),
-	refreshtoken: varchar({ length: 255 }),
+export const templates = schema.table("templates", {
+	id: serial().primaryKey().notNull(),
+	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	avatar: varchar({ length: 255 }),
-	email: varchar({ length: 100 }).notNull(),
-	firstname: varchar({ length: 50 }),
-	lastname: varchar({ length: 50 }),
 }, (table) => [
-	unique("users_username_key").on(table.username),
-	unique("users_refreshtoken_key").on(table.refreshtoken),
-	unique("users_email_key").on(table.email),
-	check("users_email_check", sql`(email)::text ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'::text`),
-	check("users_username_check", sql`(length((username)::text) > 3) AND ((username)::text ~ '^[a-zA-Z0-9_]+$'::text)`),
+	check("templates_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const weightsLogs = devSchema.table("weights_logs", {
-	id: serial().primaryKey(),
+export const weightsLogs = schema.table("weights_logs", {
+	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	weight: integer(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -246,33 +245,4 @@ export const weightsLogs = devSchema.table("weights_logs", {
 		}).onDelete("cascade"),
 	check("weights_logs_unit_check", sql`(unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])`),
 	check("weights_logs_weight_check", sql`weight >= 0`),
-]);
-
-export const plansExercises = devSchema.table("plans_exercises", {
-	id: serial().primaryKey(),
-	planId: integer("plan_id").notNull(),
-	exerciseId: integer("exercise_id").notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	order: integer().notNull(),
-}, (table) => [
-	foreignKey({
-			columns: [table.planId],
-			foreignColumns: [plans.id],
-			name: "fk_plan"
-		}).onDelete("cascade"),
-	foreignKey({
-			columns: [table.exerciseId],
-			foreignColumns: [exercises.id],
-			name: "fk_exercise"
-		}).onDelete("cascade"),
-]);
-
-export const templates = devSchema.table("templates", {
-	id: serial().primaryKey(),
-	title: varchar({ length: 100 }).notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-}, (table) => [
-	check("templates_title_check", sql`length((title)::text) >= 1`),
 ]);
