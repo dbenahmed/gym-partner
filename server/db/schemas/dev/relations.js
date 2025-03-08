@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, collections, foods, mealsLogs, plans, exercises, plansExercises, sessions, setsOfSessionsExercises, templatesExercises, templates, weightsLogs } from "./schema";
+import { users, collections, foods, mealsLogs, plans, exercises, plansExercises, sessions, setsOfSessionsExercises, templatesExercises, templates, weightsLogs } from "./schema.js";
 
 export const collectionsRelations = relations(collections, ({one, many}) => ({
 	users: one(users, {

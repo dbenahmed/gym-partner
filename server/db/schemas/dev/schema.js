@@ -1,10 +1,10 @@
 import { pgTable, pgSchema, unique, check, serial, varchar, timestamp, foreignKey, integer, text, boolean } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-export const dev = pgSchema("dev");
+export const schema = pgSchema("dev");
 
 
-export const users = dev.table("users", {
+export const users = schema.table("users", {
 	id: serial().primaryKey().notNull(),
 	username: varchar({ length: 50 }).notNull(),
 	password: varchar({ length: 72 }).notNull(),
@@ -24,7 +24,7 @@ export const users = dev.table("users", {
 	check("users_username_check", sql`(length((username)::text) > 3) AND ((username)::text ~ '^[a-zA-Z0-9_]+$'::text)`),
 ]);
 
-export const collections = dev.table("collections", {
+export const collections = schema.table("collections", {
 	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
@@ -40,7 +40,7 @@ export const collections = dev.table("collections", {
 	check("collections_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const foods = dev.table("foods", {
+export const foods = schema.table("foods", {
 	id: serial().primaryKey().notNull(),
 	foodname: varchar({ length: 255 }).notNull(),
 	description: text().default(''),
@@ -56,7 +56,7 @@ export const foods = dev.table("foods", {
 	cholesterol: integer(),
 	brand: varchar({ length: 255 }),
 	custom: boolean().default(false),
-	createdBy: serial("created_by").notNull(),
+	createdBy: integer("created_by"),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
@@ -78,7 +78,7 @@ export const foods = dev.table("foods", {
 	check("foods_transfat_check", sql`transfat >= 0`),
 ]);
 
-export const mealsLogs = dev.table("meals_logs", {
+export const mealsLogs = schema.table("meals_logs", {
 	id: serial().primaryKey().notNull(),
 	mealId: integer("meal_id").notNull(),
 	userId: integer("user_id").notNull(),
@@ -100,7 +100,7 @@ export const mealsLogs = dev.table("meals_logs", {
 	check("meals_logs_servingsize_g_check", sql`servingsize_g >= 0`),
 ]);
 
-export const plans = dev.table("plans", {
+export const plans = schema.table("plans", {
 	id: serial().primaryKey().notNull(),
 	collectionId: integer("collection_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
@@ -115,7 +115,7 @@ export const plans = dev.table("plans", {
 	check("plans_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const plansExercises = dev.table("plans_exercises", {
+export const plansExercises = schema.table("plans_exercises", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
@@ -135,7 +135,7 @@ export const plansExercises = dev.table("plans_exercises", {
 		}).onDelete("cascade"),
 ]);
 
-export const exercises = dev.table("exercises", {
+export const exercises = schema.table("exercises", {
 	id: serial().primaryKey().notNull(),
 	name: varchar({ length: 100 }).notNull(),
 	force: varchar({ length: 10 }).default(sql`NULL`),
@@ -157,7 +157,7 @@ export const exercises = dev.table("exercises", {
 	check("exercises_mechanic_check", sql`(mechanic)::text = ANY (ARRAY[('isolation'::character varying)::text, ('compound'::character varying)::text])`),
 ]);
 
-export const sessions = dev.table("sessions", {
+export const sessions = schema.table("sessions", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id"),
 	duedate: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
@@ -176,7 +176,7 @@ export const sessions = dev.table("sessions", {
 	check("sessions_rating_check", sql`(rating >= 0) AND (rating <= 5)`),
 ]);
 
-export const setsOfSessionsExercises = dev.table("sets_of_sessions_exercises", {
+export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises", {
 	id: serial().primaryKey().notNull(),
 	sessionId: integer("session_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
@@ -201,7 +201,7 @@ export const setsOfSessionsExercises = dev.table("sets_of_sessions_exercises", {
 	check("sets_of_sessions_exercises_weight_check", sql`weight >= 0`),
 ]);
 
-export const templatesExercises = dev.table("templates_exercises", {
+export const templatesExercises = schema.table("templates_exercises", {
 	id: serial().primaryKey().notNull(),
 	templateId: integer("template_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
@@ -221,7 +221,7 @@ export const templatesExercises = dev.table("templates_exercises", {
 		}).onDelete("cascade"),
 ]);
 
-export const templates = dev.table("templates", {
+export const templates = schema.table("templates", {
 	id: serial().primaryKey().notNull(),
 	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -230,7 +230,7 @@ export const templates = dev.table("templates", {
 	check("templates_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const weightsLogs = dev.table("weights_logs", {
+export const weightsLogs = schema.table("weights_logs", {
 	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	weight: integer(),
