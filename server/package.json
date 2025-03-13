@@ -17,7 +17,6 @@
     "drizzle:main:clearseed": "node ./db/seeds/clearSeeds.js --schema=main",
     "drizzle:main:studio": "npx drizzle-kit studio --port 3000 --verbose --config=drizzle-main.config.ts",
     "drizzle:dev:studio": "npx drizzle-kit studio --port 3000 --verbose --config=drizzle-dev.config.ts",
-
     "drizzle:dev:push": "npx drizzle-kit push --config=drizzle-dev.config.ts --strict --verbose"
   },
   "author": "",
