@@ -4,21 +4,17 @@ import express from 'express';
 const authRouter = express.Router();
 app.use(express.json());
 
-import {registerUser} from '../controllers/authControllers'
+import {registerUser,loginUser} from '../controllers/authControllers'
 
 
 
 
 
 // Registration
-authRouter.route('/register').get(registerUser);
+authRouter.route('/register').post(registerUser);
 
 // Login
 authRouter.route('/login').get(loginUser);
-
-// Logout 
-// there is more talk about it 
-authRouter.post('/logout', protect, logoutUser);
 
 
 
