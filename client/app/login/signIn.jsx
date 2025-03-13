@@ -7,10 +7,15 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import { AuthContext } from "@/app/contex/authcontex";
 import { useRouter } from "expo-router";
 import Color from "@/constants/Color";
+import {useState , useContext} from "react";
 export default function TabTwoScreen() {
   const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const { isLouding,login } = useContext(AuthContext);
   return (
     <View
       style={{
@@ -29,12 +34,14 @@ export default function TabTwoScreen() {
       >
         Welcome Back
       </Text>
-
-      <TextInput placeholder="Email" style={styles.textInput} />
+      
+      <TextInput placeholder="Email" value={email} style={styles.textInput} onChangeText={text=>setEmail(text)} />
       <TextInput
         placeholder="password"
+        value={password}
         secureTextEntry={true}
         style={styles.textInput}
+        onChangeText={text=>setPassword(text)}
       />
       <TouchableOpacity
         style={{
@@ -44,6 +51,7 @@ export default function TabTwoScreen() {
           marginTop: 20,
           borderRadius: 15,
         }}
+        onPress={()=>{login(email,password)}}
       >
         <Text
           style={{
