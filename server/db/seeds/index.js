@@ -22,7 +22,7 @@ const main = async () => {
     await db.transaction(async (tx) => {
         try {
             // filling the exercises db
-            console.log('here 1')
+            //console.log('here 1')
             const exercisesMock = await Promise.all(
                 Array.from({length: 10}, async (_, index) => {
                     try {
@@ -45,7 +45,7 @@ const main = async () => {
                     }
                 }))
             const insertedExercises = await tx.insert(schema.exercises).values(exercisesMock).returning();
-            console.log(insertedExercises)
+            //console.log(insertedExercises)
 
             // filling the users
             const usersMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
@@ -69,16 +69,16 @@ const main = async () => {
             // filling the food db
             const foodMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
                 try {
-                    const userId = insertedUsers[index % insertedUsers.length]?.id; // Random user from the array
+                    const userId = index % 2 === 0 ? insertedUsers[index % insertedUsers.length]?.id : null; // Random user from the array
                     return {
                         foodname: `Food Item ${index + 1}`,
                         description: `This is a description for food item ${index + 1}`,
                         calories: 100 + index * 10,
-                        proteinper100G: 5 + index,
-                        carbohydratesper100G: 20 + index * 2,
-                        fatper100G: 3 + index,
-                        saturatedfatper100G: 1 + index,
-                        transfat:  index,
+                        proteinper100g: 5 + index,
+                        carbohydratesper100g: 20 + index * 2,
+                        fatper100g: 3 + index,
+                        saturatedfatper100g: 1 + index,
+                        transfat: index,
                         fiber: 1 + index,
                         sugar: 5 + index * 2,
                         sodium: 50 + index * 5,
@@ -191,9 +191,9 @@ const main = async () => {
                 Array.from({length: 10}, async (_, index) => {
                     try {
                         const userId = insertedUsers[index % insertedUsers.length]?.id; // Assign userId from existing users
-                        const foodId = insertedFood[index % insertedFood.length]?.id; // Assign mealId from existing foods
+                        const mealId = insertedFood[index % insertedFood.length]?.id; // Assign mealId from existing foods
                         return {
-                            foodId,
+                            mealId,
                             userId,
                             creationdate: new Date().toISOString(),
                             updateddate: new Date().toISOString(),
@@ -224,12 +224,13 @@ const main = async () => {
                 })
             );
             const insertedWeightsLogs = await tx.insert(schema.weightsLogs).values(weightsLogsMock).returning();
-
+            // throw ('new error')
+            console.log("seeding finished")
         } catch (e) {
             console.error(e);
-            //tx.rollback()
+            await tx.rollback()
         }
     })
 }
 await main()
-console.log("seeding finished")
+

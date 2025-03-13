@@ -22,7 +22,7 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(port, async () => {
-    console.log('server started port ', port);
+    console.log(`server started port https://localhose/${port}`);
 })
 
 

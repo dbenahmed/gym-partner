@@ -1,93 +1,91 @@
 import { relations } from "drizzle-orm/relations";
-import { users, foods, mealsLogs, collections, plans, sessions, exercises, setsOfSessionsExercises, tasks, templatesExercises, templates, weightsLogs, plansExercises } from "./schema.js";
+import { users, collections, foods, mealsLogs, plans, exercises, plansExercises, sessions, setsOfSessionsExercises, templatesExercises, templates, weightsLogs } from "./schema.js";
+
+export const collectionsRelations = relations(collections, ({one, many}) => ({
+	users: one(users, {
+		fields: [collections.userId],
+		references: [users.id]
+	}),
+	plans: many(plans),
+}));
+
+export const usersRelations = relations(users, ({many}) => ({
+	collections: many(collections),
+	foods: many(foods),
+	mealsLogs: many(mealsLogs),
+	weightsLogs: many(weightsLogs),
+}));
 
 export const foodsRelations = relations(foods, ({one, many}) => ({
-	user: one(users, {
+	users: one(users, {
 		fields: [foods.createdBy],
 		references: [users.id]
 	}),
 	mealsLogs: many(mealsLogs),
 }));
 
-export const usersRelations = relations(users, ({many}) => ({
-	foods: many(foods),
-	mealsLogs: many(mealsLogs),
-	collections: many(collections),
-	weightsLogs: many(weightsLogs),
-}));
-
 export const mealsLogsRelations = relations(mealsLogs, ({one}) => ({
-	food: one(foods, {
+	foods: one(foods, {
 		fields: [mealsLogs.mealId],
 		references: [foods.id]
 	}),
-	user: one(users, {
+	users: one(users, {
 		fields: [mealsLogs.userId],
 		references: [users.id]
 	}),
 }));
 
 export const plansRelations = relations(plans, ({one, many}) => ({
-	collection: one(collections, {
+	collections: one(collections, {
 		fields: [plans.collectionId],
 		references: [collections.id]
 	}),
-	sessions: many(sessions),
 	plansExercises: many(plansExercises),
+	sessions: many(sessions),
 }));
 
-export const collectionsRelations = relations(collections, ({one, many}) => ({
-	plans: many(plans),
-	user: one(users, {
-		fields: [collections.userId],
-		references: [users.id]
+export const plansExercisesRelations = relations(plansExercises, ({one}) => ({
+	exercises: one(exercises, {
+		fields: [plansExercises.exerciseId],
+		references: [exercises.id]
+	}),
+	plans: one(plans, {
+		fields: [plansExercises.planId],
+		references: [plans.id]
 	}),
 }));
 
+export const exercisesRelations = relations(exercises, ({many}) => ({
+	plansExercises: many(plansExercises),
+	setsOfSessionsExercises: many(setsOfSessionsExercises),
+	templatesExercises: many(templatesExercises),
+}));
+
 export const sessionsRelations = relations(sessions, ({one, many}) => ({
-	plan: one(plans, {
+	plans: one(plans, {
 		fields: [sessions.planId],
 		references: [plans.id]
 	}),
 	setsOfSessionsExercises: many(setsOfSessionsExercises),
-	tasks: many(tasks),
 }));
 
 export const setsOfSessionsExercisesRelations = relations(setsOfSessionsExercises, ({one}) => ({
-	exercise: one(exercises, {
+	exercises: one(exercises, {
 		fields: [setsOfSessionsExercises.exerciseId],
 		references: [exercises.id]
 	}),
-	session: one(sessions, {
+	sessions: one(sessions, {
 		fields: [setsOfSessionsExercises.sessionId],
 		references: [sessions.id]
 	}),
 }));
 
-export const exercisesRelations = relations(exercises, ({many}) => ({
-	setsOfSessionsExercises: many(setsOfSessionsExercises),
-	tasks: many(tasks),
-	templatesExercises: many(templatesExercises),
-	plansExercises: many(plansExercises),
-}));
-
-export const tasksRelations = relations(tasks, ({one}) => ({
-	session: one(sessions, {
-		fields: [tasks.sessionId],
-		references: [sessions.id]
-	}),
-	exercise: one(exercises, {
-		fields: [tasks.exerciseId],
-		references: [exercises.id]
-	}),
-}));
-
 export const templatesExercisesRelations = relations(templatesExercises, ({one}) => ({
-	exercise: one(exercises, {
+	exercises: one(exercises, {
 		fields: [templatesExercises.exerciseId],
 		references: [exercises.id]
 	}),
-	template: one(templates, {
+	templates: one(templates, {
 		fields: [templatesExercises.templateId],
 		references: [templates.id]
 	}),
@@ -98,19 +96,8 @@ export const templatesRelations = relations(templates, ({many}) => ({
 }));
 
 export const weightsLogsRelations = relations(weightsLogs, ({one}) => ({
-	user: one(users, {
+	users: one(users, {
 		fields: [weightsLogs.userId],
 		references: [users.id]
-	}),
-}));
-
-export const plansExercisesRelations = relations(plansExercises, ({one}) => ({
-	plan: one(plans, {
-		fields: [plansExercises.planId],
-		references: [plans.id]
-	}),
-	exercise: one(exercises, {
-		fields: [plansExercises.exerciseId],
-		references: [exercises.id]
 	}),
 }));
