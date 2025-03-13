@@ -10,7 +10,7 @@ export const registerUser = async (req,res) =>  {
     const {username, password } = req.body;
     // checkinng if the user is already exist
  const existUser  = await db.select().from(users).where(eq(users.username,username)).limit(1);
- if (existexistUser.length > 0 ){ 
+ if (existUser.length > 0 ){ 
     res.status(409).json({
     success:false,
     message : "the username is not valide "
@@ -43,20 +43,20 @@ try {
          const {username,password} = req.body;
        //checking if the user is exist
        const existUser  = await db.select().from(users).where(eq(users.username,username)).limit(1);
-       if (existexistUser.length === 0 ){ 
-          res.status(409).json({
+       if (existUser.length === 0 ){ 
+          res.status(401).json({
           success:false,
           message : "the username is not valide "
        })}else{
          const  user = existUser[0];
           // compare if the password is correct 
           
-          const passwdCorrect = await bcrypt.compare(password,User.password);
-          if (!passwdCorrect) 
+          const passwdCorrect = await bcrypt.compare(password,user.password);
+          if (!passwdCorrect) {
             res.status(401).json({
             success:false,
             message:"the username or password is not correct !"
-          });
+          })} else {
             
           // Genetrate JWT Token for the authentification
           const token = jwt.sign(
@@ -70,11 +70,11 @@ try {
         res.status(200).json({
             success:true,
             message:"the login is complete successfuly",
-            Token : token, 
+            token : token, 
             username:user.username,
             id :user.id
         })
-    }}
+    }}}
         catch (err){
          res.status(401).json({
             success : false,
