@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv"
-import bcrypt from "bcryptjs";
-import { users } from '../db/schemas/main/schema';
-import {eq} from 'drizzle-orm'
+import bcrypt from "bcrypt";
+import { users } from '../db/schemas/main/schema.js';
+import {eq} from 'drizzle-orm';
 import db from "../../db/index.js";
+
+
 
 //the registration controller 
 export const registerUser = async (req,res) =>  {

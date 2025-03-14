@@ -1,10 +1,10 @@
 import express from 'express'; 
+import {registerUser,loginUser} from '../controllers/authControllers.js'
 
 
 const authRouter = express.Router();
-app.use(express.json());
 
-import {registerUser,loginUser} from '../controllers/authControllers'
+
 
 
 
@@ -14,34 +14,7 @@ import {registerUser,loginUser} from '../controllers/authControllers'
 authRouter.route('/register').post(registerUser);
 
 // Login
-authRouter.route('/login').get(loginUser);
+authRouter.route('/login').post(loginUser);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Define your routes here
-
-module.exports = router;
+export default authRouter

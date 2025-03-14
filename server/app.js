@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import collectionsRouter from "./routes/gymTracking/collectionsRoutes.js";
+import authRouter from "./routes/authRoutes.js"
 // import router from './routes/authRoutes.js'
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cookieParser())
 
 
 app.use(collectionsRouter);
+app.use(authRouter);
 
 app.get('/', async (req, res) => {
 
