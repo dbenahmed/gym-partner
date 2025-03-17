@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { startWorkoutSession, getWorkoutSessions, getWorkoutSessionDetails, addExerciseToSession, logSetForExercise, updateWorkoutSession, deleteWorkoutSession } = require('../../controllers/gymTracking/workoutSessionsControllers.js');
+const { startWorkoutSession, getWorkoutSessions, getWorkoutSessionDetails, addExerciseToSession, logSetForExercise, updateWorkoutSession, deleteWorkoutSession } = require('../controllers/workoutSessionsControllers.js');
 
 // Start a new workout session
 router.post('/workout/sessions', startWorkoutSession);

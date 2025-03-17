@@ -1,6 +1,6 @@
 // Get a list of all workout collections for the user
-import db from "../../db/index.js";
-import {plans} from "../../db/schemas/dev/schema.js";
+import db from "../db/index.js";
+import {plans} from "../db/schemas/dev/schema.js";
 import {eq} from "drizzle-orm";
 
 export const getWorkoutCollections = (req, res) => {

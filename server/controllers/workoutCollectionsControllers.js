@@ -1,5 +1,5 @@
-import db from "../../db/index.js";
-import {collections} from "../../db/schemas/dev/schema.js";
+import db from "../db/index.js";
+import {collections} from "../db/schemas/dev/schema.js";
 import {eq} from "drizzle-orm";
 
 export const getUserCollections = async (req, res) => {

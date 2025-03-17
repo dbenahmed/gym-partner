@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import collectionsRouter from "./routes/gymTracking/collectionsRoutes.js";
+import collectionsRouter from "./routes/workoutCollectionsRoutes.js";
 import authRouter from "./routes/authRoutes.js"
 import plansRouter from "./routes/gymTracking/plansRoutes.js";
 

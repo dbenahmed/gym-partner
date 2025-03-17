@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getWorkoutCollections, createWorkoutCollection, updateWorkoutCollection, deleteWorkoutCollection, getWorkoutPlans, createWorkoutPlan, getWorkoutPlanDetails, updateWorkoutPlan, deleteWorkoutPlan, addExerciseToPlan, updateExerciseInPlan, removeExerciseFromPlan } = require('../../controllers/gymTracking/workoutPlansControllers.js');
+const { getWorkoutCollections, createWorkoutCollection, updateWorkoutCollection, deleteWorkoutCollection, getWorkoutPlans, createWorkoutPlan, getWorkoutPlanDetails, updateWorkoutPlan, deleteWorkoutPlan, addExerciseToPlan, updateExerciseInPlan, removeExerciseFromPlan } = require('../controllers/workoutPlansControllers.js');
 
 // Get a list of all workout collections for the user
 router.get('/workout/collections', getWorkoutCollections);
