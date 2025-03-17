@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getAllMeals, getMealDetails } = require('../controllers/mealDatabaseControllers.js');
 
@@ -8,4 +8,4 @@ router.get('/explore/meals', getAllMeals);
 // Get detailed nutritional info for a specific meal
 router.get('/explore/meals/:mealId', getMealDetails);
 
-module.exports = router; 
+export default router; 

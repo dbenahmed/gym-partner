@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import collectionsRouter from "./routes/workoutCollectionsRoutes.js";
 import authRouter from "./routes/authRoutes.js"
-import plansRouter from "./routes/gymTracking/plansRoutes.js";
+import plansRouter from "./routes/workoutPlansRoutes.js";
 
 dotenv.config();
 

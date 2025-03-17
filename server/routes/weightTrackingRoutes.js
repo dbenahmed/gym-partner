@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getWeightLogs, logWeightEntry, updateWeightEntry, deleteWeightEntry } = require('../controllers/weightTrackingControllers.js');
 
@@ -14,4 +14,4 @@ router.put('/weight/:entryId', updateWeightEntry);
 // Delete a specific weight entry
 router.delete('/weight/:entryId', deleteWeightEntry);
 
-module.exports = router; 
+export default router; 

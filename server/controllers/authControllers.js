@@ -2,7 +2,7 @@
   import bcrypt from "bcrypt";
   import { users } from '../db/schemas/main/schema.js';
   import {eq} from 'drizzle-orm';
-  import db from "../../db/index.js";
+  import db from "../db/index.js";
   import dotenv from "dotenv"
 
 

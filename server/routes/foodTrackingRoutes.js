@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getTodayMeals, addTodayMeal, updateTodayMeal, deleteTodayMeal } = require('../controllers/foodTrackingControllers.js');
 
@@ -14,4 +14,4 @@ router.put('/meals/today/:mealId', updateTodayMeal);
 // Delete a meal from today's log
 router.delete('/meals/today/:mealId', deleteTodayMeal);
 
-module.exports = router; 
+export default router; 

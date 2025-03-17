@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getNutritionGoals, setNutritionGoals, getRemainingNutrition } = require('../controllers/nutritionGoalsControllers.js');
 
@@ -11,4 +11,4 @@ router.put('/nutrition/goals', setNutritionGoals);
 // Get remaining calories/macros for today
 router.get('/nutrition/remaining', getRemainingNutrition);
 
-module.exports = router; 
+export default router; 

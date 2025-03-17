@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getWorkoutHistory, getExerciseHistory } = require('../controllers/workoutHistoryControllers.js');
 
@@ -8,4 +8,4 @@ router.get('/workout/history', getWorkoutHistory);
 // Get performance history for a specific exercise
 router.get('/workout/history/exercises/:exerciseId', getExerciseHistory);
 
-module.exports = router; 
+export default router;

@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { startWorkoutSession, getWorkoutSessions, getWorkoutSessionDetails, addExerciseToSession, logSetForExercise, updateWorkoutSession, deleteWorkoutSession } = require('../controllers/workoutSessionsControllers.js');
 
@@ -23,4 +23,4 @@ router.put('/workout/sessions/:sessionId', updateWorkoutSession);
 // Delete a session
 router.delete('/workout/sessions/:sessionId', deleteWorkoutSession);
 
-module.exports = router; 
+export default router;

@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getWorkoutTemplates, createWorkoutTemplate, updateWorkoutTemplate, deleteWorkoutTemplate } = require('../controllers/adminDashboardControllers.js');
 
@@ -14,4 +14,4 @@ router.put('/admin/templates/:templateId', updateWorkoutTemplate);
 // Delete a workout template
 router.delete('/admin/templates/:templateId', deleteWorkoutTemplate);
 
-module.exports = router; 
+export default router; 

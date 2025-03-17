@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { createCustomMeal, getCustomMeals, updateCustomMeal, deleteCustomMeal } = require('../controllers/customFoodTrackingControllers.js');
 
@@ -14,4 +14,4 @@ router.put('/meals/custom/:mealId', updateCustomMeal);
 // Delete a custom meal
 router.delete('/meals/custom/:mealId', deleteCustomMeal);
 
-module.exports = router; 
+export default router; 

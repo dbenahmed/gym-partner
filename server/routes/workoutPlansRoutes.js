@@ -1,6 +1,19 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { getWorkoutCollections, createWorkoutCollection, updateWorkoutCollection, deleteWorkoutCollection, getWorkoutPlans, createWorkoutPlan, getWorkoutPlanDetails, updateWorkoutPlan, deleteWorkoutPlan, addExerciseToPlan, updateExerciseInPlan, removeExerciseFromPlan } = require('../controllers/workoutPlansControllers.js');
+const {
+    getWorkoutCollections,
+    createWorkoutCollection,
+    updateWorkoutCollection,
+    deleteWorkoutCollection,
+    getWorkoutPlans,
+    createWorkoutPlan,
+    getWorkoutPlanDetails,
+    updateWorkoutPlan,
+    deleteWorkoutPlan,
+    addExerciseToPlan,
+    updateExerciseInPlan,
+    removeExerciseFromPlan
+} = require('../controllers/workoutPlansControllers.js');
 
 // Get a list of all workout collections for the user
 router.get('/workout/collections', getWorkoutCollections);
@@ -38,4 +51,4 @@ router.put('/workout/plans/:planId/exercises/:exerciseId', updateExerciseInPlan)
 // Remove an exercise from a workout plan
 router.delete('/workout/plans/:planId/exercises/:exerciseId', removeExerciseFromPlan);
 
-module.exports = router; 
+export default router;

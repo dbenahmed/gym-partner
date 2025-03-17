@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 const { getAllExercises, getExerciseDetails } = require('../controllers/exerciseDatabaseControllers.js');
 
@@ -8,4 +8,4 @@ router.get('/explore/exercises', getAllExercises);
 // Get details for a specific exercise
 router.get('/explore/exercises/:exerciseId', getExerciseDetails);
 
-module.exports = router; 
+export default router; 
