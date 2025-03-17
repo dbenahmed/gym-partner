@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-const {
+import {
     getWorkoutCollections,
     createWorkoutCollection,
     updateWorkoutCollection,
@@ -13,7 +13,7 @@ const {
     addExerciseToPlan,
     updateExerciseInPlan,
     removeExerciseFromPlan
-} = require('../controllers/workoutPlansControllers.js');
+} from '../controllers/workoutPlansControllers.js'
 
 // Get a list of all workout collections for the user
 router.get('/workout/collections', getWorkoutCollections);
