@@ -167,18 +167,37 @@ export const deleteWorkoutCollection = async (req, res) => {
 // Get a list of all workout plans across collections
 export const getWorkoutPlans = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const { collectionId } = req.body;
-    console.log(collectionId);
+    const userId = req.user;
+    const user = req.userData
+    const {
+      collectionId
+    } = req.body
 
+    // check if this collections exists and user authorized
+    const foundCollections = await db.select().from(collections).where(
+      and(
+        eq(collections.id, collectionId),
+        eq(collections.userId, userId)
+      )
+    ).limit(1)
+    if (foundCollections.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: 'Collection does not exist or user is unauthorized'
+      })
+    }
+
+    // response with the plans of this collection
     const foundPlans = await db.select({
       id: plans.id,
-      title: plans.title,
-      collectionId: plans.collectionId
-    }).from(plans).where(eq(plans.collectionId, collectionId));
+      collectionId: plans.collectionId,
+      title: plans.title
+    }).from(plans).where(eq(plans.collectionId, collectionId))
 
-    console.log(foundPlans);
-    res.send('done');
+    res.status(200).json({
+      success: true,
+      data: foundPlans
+    })
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving workout plans', error: error.message });
   }
@@ -198,7 +217,7 @@ export const createWorkoutPlan = async (req, res) => {
 export const getWorkoutPlanDetails = async (req, res) => {
   try {
     const { userId } = req.user;
-    // ... existing code ...
+    // ... existing code ..
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving workout plan details', error: error.message });
   }
