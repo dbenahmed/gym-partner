@@ -78,10 +78,9 @@ export const loginUser = async (req, res) => {
       const token = jwt.sign(
         {
           id: user.id,
-          username: user.username,
         }
         , process.env.JWT_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
       )
       console.log('here')
       res.cookie("accesstoken", token, {
@@ -95,7 +94,6 @@ export const loginUser = async (req, res) => {
         success: true,
         message: "the login is complete successfuly",
         data: {
-          username: user.username,
           id: user.id
         }
       })

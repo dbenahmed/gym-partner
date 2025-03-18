@@ -2,9 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import collectionsRouter from "./routes/workoutCollectionsRoutes.js";
 import authRouter from "./routes/authRoutes.js"
-import plansRouter from "./routes/workoutPlansRoutes.js";
+import workoutPlansRouter from "./routes/workoutPlansRoutes.js";
 import workoutTemplatesRouter from './routes/workoutTemplatesRoutes.js';
 import workoutSessionsRouter from './routes/workoutSessionsRoutes.js';
 import workoutHistoryRouter from './routes/workoutHistoryRoutes.js';
@@ -30,9 +29,8 @@ app.use(cors())
 app.use(cookieParser())
 
 
-app.use(collectionsRouter);
 app.use(authRouter);
-app.use(plansRouter)
+app.use(workoutPlansRouter)
 app.use(workoutTemplatesRouter);
 app.use(workoutSessionsRouter);
 app.use(workoutHistoryRouter);

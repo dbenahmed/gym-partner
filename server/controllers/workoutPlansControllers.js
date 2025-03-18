@@ -1,44 +1,166 @@
 // Get a list of all workout collections for the user
 import db from "../db/index.js";
-import {plans} from "../db/schemas/dev/schema.js";
-import {eq} from "drizzle-orm";
+import { collections, plans } from "../db/schemas/dev/schema.js";
+import { and, eq } from "drizzle-orm";
 
-export const getWorkoutCollections = (req, res) => {
+// *done
+export const getWorkoutCollections = async (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
-  } catch (error) {
-    res.status(500).json({ message: 'Error retrieving workout collections', error: error.message });
+    const userId = req.user;
+
+    const foundCollections = await db.select({
+      collectionId: collections.id,
+      description: collections.description,
+      title: collections.title
+    }).from(collections).where(
+      eq(collections.userId, userId)
+    )
+
+    res.status(202).json({
+      success: true,
+      data: foundCollections,
+      message: "Collection Found Successfully"
+    })
+  } catch (e) {
+    res.status(400).json({
+      success: false,
+      errors: e.message,
+      message: "An error occurred while fetching the collections"
+    })
   }
 };
 
 // Create a new workout collection
-export const createWorkoutCollection = (req, res) => {
+export const createWorkoutCollection = async (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
+    const user = req.userData
+    console.log(user)
+    const {
+      title,
+      description
+    } = req.body
+
+    // verify collection title does not exist
+    const exists = await db.select().from(collections).where(eq(collections.title, title)).limit(1)
+    if (exists.length > 0) {
+      res.status(400).json({
+        success: false,
+        message: "Collection title already used"
+      })
+    }
+
+    console.log(user.id)
+    const inserted = await db.insert(collections).values({ title, description, userId: user.id }).returning({
+      id: collections.id, title: collections.title, description: collections.description
+    })
+
+    res.status(201).json({
+      success: true,
+      message: 'Collection created successfully',
+      data: {
+        ...inserted[0]
+      }
+    })
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error creating workout collection', error: error.message });
   }
 };
 
 // Update a collection's name
-export const updateWorkoutCollection = (req, res) => {
+// todo : turn from changint only title into changing other things
+export const updateWorkoutCollection = async (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating workout collection', error: error.message });
+    const user = req.userData;
+    const { collectionId } = req.params
+    const { title, description } = req.body
+
+    // at least title or description is given
+    if (
+      (title === (null || undefined))
+      &&
+      (description === (null || undefined))
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "no data is given to update"
+      })
+    }
+
+    // collection id is given in the request
+    if (!collectionId) {
+      return res.status(400).json({ success: false, message: "Collection ID is required" });
+    }
+
+    // the collection does exist and user is authorized to update it
+    const collectionExists = await db.select().from(collections).where(
+      and(eq(collections.id, collectionId), eq(collections.userId, user.id))
+    ).limit(1)
+    if (collectionExists.length === 0) {
+      return res.status(404).json({ success: false, message: "Collection does not exist" });
+    }
+
+    // remove the undefined or null data ( not included in the body => not changed )
+    const newData = Object.fromEntries(Object.entries({ title, description }).filter((v, i) => v !== (undefined || null)))
+
+
+    // update the collection infos
+    const updated = await db.update(collections).set(newData)
+      .where(and(eq(collections.id, collectionId), eq(collections.userId, user.id)))
+      .returning({
+        id: collections.id,
+        title: collections.title,
+        descriptions: collections.description
+      })
+    res.status(202).json({
+      success: true,
+      data: updated[0],
+      message: "Updated Collection Title Successfully"
+    })
+  } catch (e) {
+    res.status(400).json({
+      success: false,
+      errors: e.message,
+      message: "An error occurred while updating the collection"
+    })
   }
 };
 
 // Delete a collection
-export const deleteWorkoutCollection = (req, res) => {
+export const deleteWorkoutCollection = async (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting workout collection', error: error.message });
+    const userId = req.user;
+    const { collectionId } = req.params
+
+    // verify if the collection id is given in the request
+    if (!collectionId) {
+      return res.status(400).json({ success: false, message: "Collection ID is required" });
+    }
+
+    // verify if the collection does exist and user is authorized
+    const collectionExists = await db.select().from(collections).where(
+      and(eq(collections.id, collectionId), eq(collections.userId, userId))
+    ).limit(1)
+    if (collectionExists.length === 0) {
+      return res.status(404).json({ success: false, message: "Collection does not exist" });
+    }
+
+    await db.delete(collections).where(
+      and(
+        eq(collections.id, collectionId),
+        eq(collections.userId, userId)
+      )
+    )
+    res.status(202).json({
+      success: true,
+      message: "Removed Collection Successfully"
+    })
+  } catch (e) {
+    res.status(400).json({
+      success: false,
+      errors: e.message,
+      message: "An error occurred while updating the collection"
+    })
   }
 };
 
@@ -46,13 +168,13 @@ export const deleteWorkoutCollection = (req, res) => {
 export const getWorkoutPlans = async (req, res) => {
   try {
     const { userId } = req.user;
-    const {collectionId} = req.body;
+    const { collectionId } = req.body;
     console.log(collectionId);
 
     const foundPlans = await db.select({
-        id: plans.id,
-        title: plans.title,
-        collectionId: plans.collectionId
+      id: plans.id,
+      title: plans.title,
+      collectionId: plans.collectionId
     }).from(plans).where(eq(plans.collectionId, collectionId));
 
     console.log(foundPlans);
@@ -63,7 +185,7 @@ export const getWorkoutPlans = async (req, res) => {
 };
 
 // Create a new workout plan inside a collection
-export const createWorkoutPlan = (req, res) => {
+export const createWorkoutPlan = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -73,7 +195,7 @@ export const createWorkoutPlan = (req, res) => {
 };
 
 // Get details of a specific workout plan
-export const getWorkoutPlanDetails = (req, res) => {
+export const getWorkoutPlanDetails = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -83,7 +205,7 @@ export const getWorkoutPlanDetails = (req, res) => {
 };
 
 // Update a workout plan's name or collection
-export const updateWorkoutPlan = (req, res) => {
+export const updateWorkoutPlan = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -93,7 +215,7 @@ export const updateWorkoutPlan = (req, res) => {
 };
 
 // Delete a workout plan
-export const deleteWorkoutPlan = (req, res) => {
+export const deleteWorkoutPlan = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -103,7 +225,7 @@ export const deleteWorkoutPlan = (req, res) => {
 };
 
 // Add an exercise to a workout plan
-export const addExerciseToPlan = (req, res) => {
+export const addExerciseToPlan = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -113,7 +235,7 @@ export const addExerciseToPlan = (req, res) => {
 };
 
 // Update an exercise in a workout plan
-export const updateExerciseInPlan = (req, res) => {
+export const updateExerciseInPlan = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -123,7 +245,7 @@ export const updateExerciseInPlan = (req, res) => {
 };
 
 // Remove an exercise from a workout plan
-export const removeExerciseFromPlan = (req, res) => {
+export const removeExerciseFromPlan = async (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...

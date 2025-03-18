@@ -15,7 +15,7 @@ import {
     removeExerciseFromPlan
 } from '../controllers/workoutPlansControllers.js'
 import authMiddleware from '../middleware/authMiddlewares.js';
-
+// ! done
 // Get a list of all workout collections for the user
 router.get('/workout/collections', authMiddleware, getWorkoutCollections);
 
@@ -27,6 +27,7 @@ router.put('/workout/collections/:collectionId', authMiddleware, updateWorkoutCo
 
 // Delete a collection
 router.delete('/workout/collections/:collectionId', authMiddleware, deleteWorkoutCollection);
+// ! done
 
 // Get a list of all workout plans across collections
 router.get('/workout/plans', authMiddleware, getWorkoutPlans);
