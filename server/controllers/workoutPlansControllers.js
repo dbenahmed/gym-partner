@@ -1,9 +1,28 @@
 // Get a list of all workout collections for the user
 import db from "../db/index.js";
-import { collections, plans } from "../db/schemas/dev/schema.js";
+import { collections, plans, users } from "../db/schemas/dev/schema.js";
 import { and, eq } from "drizzle-orm";
 
-// *done
+const verifyPlanOwnership = async (userId, planId) => {
+  try {
+    const foundPlan = await db.select()
+      .from(plans)
+      .innerJoin(collections, eq(collections.id, plans.collectionId))
+      .innerJoin(users, eq(collections.userId, users.id))
+      .where(and(eq(plans.id, planId), eq(users.id, userId)))
+      .limit(1)
+
+    return foundPlan.length > 0
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error
+    })
+  }
+}
+
 export const getWorkoutCollections = async (req, res) => {
   try {
     const userId = req.user;
@@ -185,7 +204,7 @@ export const getWorkoutPlans = async (req, res) => {
       )
     ).limit(1)
     if (foundCollections.length === 0) {
-      res.status(404).json({
+      res.status(401).json({
         success: false,
         message: 'Collection does not exist or user is unauthorized'
       })
@@ -262,12 +281,10 @@ export const createWorkoutPlan = async (req, res) => {
   }
 };
 
-// *done
-
-// todo : Get details of a specific workout plan
+// Get details of a specific workout plan
 export const getWorkoutPlanDetails = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ..
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving workout plan details', error: error.message });
@@ -277,8 +294,44 @@ export const getWorkoutPlanDetails = async (req, res) => {
 // ! doing Update a workout plan's name or collection
 export const updateWorkoutPlan = async (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
+    const userId = req.user;
+    const { title } = req.body
+    const { planId } = req.params
+
+    // check if new title is given
+    if (title === (null || undefined)) {
+      res.status(400).json({
+        success: false,
+        message: "no data is given to update"
+      })
+    }
+    const newData = { title }
+    // planId is given in request 
+    if (!planId) {
+      return res.status(400).json({ success: false, message: "Plan ID is required" });
+    }
+
+    // the plan does exist and user is authorized to update it
+    const authorized = await verifyPlanOwnership(userId, planId)
+    if (!authorized) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authorized or plan does not exists'
+      })
+    }
+
+    const updated = await db.update(plans).set(newData).where(eq(plans.id, planId)).returning({
+      id: plans.id,
+      title: plans.title,
+      collectionId: plans.collectionId
+    })
+    res.status(200).json({
+      success: true,
+      message: 'Plan updated successfully',
+      data: updated[0]
+    })
+
+
   } catch (error) {
     res.status(500).json({ message: 'Error updating workout plan', error: error.message });
   }
@@ -287,8 +340,24 @@ export const updateWorkoutPlan = async (req, res) => {
 // Delete a workout plan
 export const deleteWorkoutPlan = async (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
+    const userId = req.user;
+    const { planId } = req.params;
+
+    const authorized = await verifyPlanOwnership(userId, planId)
+    if (!authorized) {
+      res.status(401).json({
+        success: false,
+        message: 'User unauthorized or plan does not exist'
+      })
+    }
+    await db.delete(plans).where(
+      eq(plans.id, planId)
+    )
+
+    res.status(200).json({
+      success: true,
+      message: 'Plan deleted successfully'
+    })
   } catch (error) {
     res.status(500).json({ message: 'Error deleting workout plan', error: error.message });
   }
@@ -297,7 +366,7 @@ export const deleteWorkoutPlan = async (req, res) => {
 // Add an exercise to a workout plan
 export const addExerciseToPlan = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error adding exercise to plan', error: error.message });
@@ -307,7 +376,7 @@ export const addExerciseToPlan = async (req, res) => {
 // Update an exercise in a workout plan
 export const updateExerciseInPlan = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error updating exercise in plan', error: error.message });
@@ -317,7 +386,7 @@ export const updateExerciseInPlan = async (req, res) => {
 // Remove an exercise from a workout plan
 export const removeExerciseFromPlan = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error removing exercise from plan', error: error.message });

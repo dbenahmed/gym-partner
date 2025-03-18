@@ -30,19 +30,21 @@ router.delete('/workout/collections/:collectionId', authMiddleware, deleteWorkou
 
 // Get a list of all workout plans across collections
 router.get('/workout/plans', authMiddleware, getWorkoutPlans);
-// ! done
 
 // Create a new workout plan inside a collection
 router.post('/workout/plans', authMiddleware, createWorkoutPlan);
+// ! done
 
-// Get details of a specific workout plan
+// todo ( مانحتاجوهاش نورمالمو ): Get details of a specific workout plan
 router.get('/workout/plans/:planId', authMiddleware, getWorkoutPlanDetails);
 
+// ! done
 // Update a workout plan's name or collection
 router.put('/workout/plans/:planId', authMiddleware, updateWorkoutPlan);
 
 // Delete a workout plan
 router.delete('/workout/plans/:planId', authMiddleware, deleteWorkoutPlan);
+// ! done
 
 // Add an exercise to a workout plan
 router.post('/workout/plans/:planId/exercises', authMiddleware, addExerciseToPlan);
