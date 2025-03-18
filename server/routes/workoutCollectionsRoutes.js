@@ -3,7 +3,7 @@ import {
     getUserCollections,
     removeUserCollection,
     updateUserCollection
-} from "../../controllers/gymTracking/collectionsControllers.js";
+} from "../controllers/workoutCollectionsControllers.js";
 
 const collectionsRouter = express.Router()
 

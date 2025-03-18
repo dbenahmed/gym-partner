@@ -2,7 +2,7 @@
   import bcrypt from "bcrypt";
   import { users } from '../db/schemas/main/schema.js';
   import {eq} from 'drizzle-orm';
-  import db from "../../db/index.js";
+  import db from "../db/index.js";
   import dotenv from "dotenv"
 
 
@@ -98,7 +98,17 @@
 
 
 
-      } 
+      }
 
+
+
+  // Get the authenticated user's profile data
+  export const getUserProfile = (req, res) => {};
+
+  // Update the authenticated user's profile
+  export const updateUserProfile = (req, res) => {};
+
+  // Log out the user
+  export const logoutUser = (req, res) => {};
 
 
