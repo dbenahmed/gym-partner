@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { getNutritionGoals, setNutritionGoals, getRemainingNutrition } = require('../controllers/nutritionGoalsControllers.js');
+import { getNutritionGoals, setNutritionGoals, getRemainingNutrition } from '../controllers/nutritionGoalsControllers.js';
 
 // Get the user's daily nutrition goals
 router.get('/nutrition/goals', authMiddleware, getNutritionGoals);

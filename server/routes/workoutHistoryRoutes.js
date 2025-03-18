@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { getWorkoutHistory, getExerciseHistory } = require('../controllers/workoutHistoryControllers.js');
+import { getWorkoutHistory, getExerciseHistory } from '../controllers/workoutHistoryControllers.js';
 
 // Get a detailed history of all past sessions
 router.get('/workout/history', authMiddleware, getWorkoutHistory);

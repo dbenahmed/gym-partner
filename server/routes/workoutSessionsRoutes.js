@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { startWorkoutSession, getWorkoutSessions, getWorkoutSessionDetails, addExerciseToSession, logSetForExercise, updateWorkoutSession, deleteWorkoutSession } = require('../controllers/workoutSessionsControllers.js');
+import { startWorkoutSession, getWorkoutSessions, getWorkoutSessionDetails, addExerciseToSession, logSetForExercise, updateWorkoutSession, deleteWorkoutSession } from '../controllers/workoutSessionsControllers.js';
 
 // Start a new workout session
 router.post('/workout/sessions', authMiddleware, startWorkoutSession);

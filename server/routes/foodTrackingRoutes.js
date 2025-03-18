@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { getTodayMeals, addTodayMeal, updateTodayMeal, deleteTodayMeal } = require('../controllers/foodTrackingControllers.js');
+import { getTodayMeals, addTodayMeal, updateTodayMeal, deleteTodayMeal } from '../controllers/foodTrackingControllers.js';
 
 // Get a list of meals logged for today
 router.get('/meals/today', authMiddleware, getTodayMeals);

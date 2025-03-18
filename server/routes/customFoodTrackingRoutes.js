@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { createCustomMeal, getCustomMeals, updateCustomMeal, deleteCustomMeal } = require('../controllers/customFoodTrackingControllers.js');
+import { createCustomMeal, getCustomMeals, updateCustomMeal, deleteCustomMeal } from '../controllers/customFoodTrackingControllers.js';
 
 // Create a new custom meal
 router.post('/meals/custom', authMiddleware, createCustomMeal);

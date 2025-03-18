@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { voteForMeal, getMealVotes } = require('../controllers/mealVotingControllers.js');
+import { voteForMeal, getMealVotes } from '../controllers/mealVotingControllers.js';
 
 // Vote for a meal
 router.post('/meals/:mealId/vote', authMiddleware, voteForMeal);

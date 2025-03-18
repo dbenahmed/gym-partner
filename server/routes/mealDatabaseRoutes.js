@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { getAllMeals, getMealDetails } = require('../controllers/mealDatabaseControllers.js');
+import { getAllMeals, getMealDetails } from '../controllers/mealDatabaseControllers.js';
 
 // Get a list of all available meals
 router.get('/explore/meals', authMiddleware, getAllMeals);

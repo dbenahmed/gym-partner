@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-const { getWorkoutTemplates, createWorkoutTemplate, updateWorkoutTemplate, deleteWorkoutTemplate } = require('../controllers/adminDashboardControllers.js');
+import { getWorkoutTemplates, createWorkoutTemplate, updateWorkoutTemplate, deleteWorkoutTemplate } from '../controllers/adminDashboardControllers.js';
 
 // Get a list of all workout templates
 router.get('/admin/templates', authMiddleware, getWorkoutTemplates);
