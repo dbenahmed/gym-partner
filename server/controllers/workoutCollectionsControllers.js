@@ -4,7 +4,7 @@ import {eq} from "drizzle-orm";
 
 export const getUserCollections = async (req, res) => {
     try {
-        const userId = 80
+        const { userId } = req.user;
 
         const foundCollections = await db.select({
             collectionId: collections.id,
@@ -23,7 +23,7 @@ export const getUserCollections = async (req, res) => {
         res.status(400).json({
             success: false,
             errors: e.message,
-            message: "An error occurred while fetching the collections the collection"
+            message: "An error occurred while fetching the collections"
         })
     }
 }
@@ -31,7 +31,7 @@ export const getUserCollections = async (req, res) => {
 
 export const updateUserCollection = async (req, res) => {
     try {
-        const userId = 73
+        const { userId } = req.user;
         const collectionId = req.params.collectionId
         const {title} = req.body
 
@@ -85,7 +85,7 @@ export const updateUserCollection = async (req, res) => {
 
 export const removeUserCollection = async (req, res) => {
     try {
-        const userId = 73
+        const { userId } = req.user;
         const collectionId = req.params.collectionId
         // verify if the collection id is given in the request
         if (!collectionId) {
