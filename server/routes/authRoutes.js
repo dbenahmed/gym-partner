@@ -1,5 +1,6 @@
 import express from 'express'; 
 import {registerUser,loginUser,getUserProfile,updateUserProfile,logoutUser} from '../controllers/authControllers.js'
+import authMiddleware from '../middleware/authMiddlewares.js';
 
 
 const router = express.Router();
@@ -17,13 +18,13 @@ router.route('/register').post(registerUser);
 router.route('/login').post(loginUser);
 
 // Get the authenticated user's profile data
-router.get('/me', getUserProfile);
+router.get('/me', authMiddleware, getUserProfile);
 
 // Update the authenticated user's profile
-router.put('/me', updateUserProfile);
+router.put('/me', authMiddleware, updateUserProfile);
 
 // Log out the user
-router.post('/logout', logoutUser);
+router.post('/logout', authMiddleware, logoutUser);
 
 
 export default router
