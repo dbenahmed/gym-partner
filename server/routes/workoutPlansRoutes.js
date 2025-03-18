@@ -27,10 +27,10 @@ router.put('/workout/collections/:collectionId', authMiddleware, updateWorkoutCo
 
 // Delete a collection
 router.delete('/workout/collections/:collectionId', authMiddleware, deleteWorkoutCollection);
-// ! done
 
 // Get a list of all workout plans across collections
 router.get('/workout/plans', authMiddleware, getWorkoutPlans);
+// ! done
 
 // Create a new workout plan inside a collection
 router.post('/workout/plans', authMiddleware, createWorkoutPlan);
