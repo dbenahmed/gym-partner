@@ -46,6 +46,7 @@ router.put('/workout/plans/:planId', authMiddleware, updateWorkoutPlan);
 router.delete('/workout/plans/:planId', authMiddleware, deleteWorkoutPlan);
 // ! done
 
+// todo : make the routes bellow later
 // Add an exercise to a workout plan
 router.post('/workout/plans/:planId/exercises', authMiddleware, addExerciseToPlan);
 
