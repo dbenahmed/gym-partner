@@ -59,6 +59,15 @@ export const createWorkoutCollection = async (req, res) => {
       description
     } = req.body
 
+    if (
+      !!title || !!description
+    ) {
+      res.status(401).json({
+        success: false,
+        message: 'Title or Description are not given'
+      })
+    }
+
     // verify collection title does not exist
     const exists = await db.select().from(collections).where(
       and(
@@ -75,7 +84,7 @@ export const createWorkoutCollection = async (req, res) => {
 
     console.log(user.id)
     const inserted = await db.insert(collections).values({ title, description, userId: user.id }).returning({
-      id: collections.id, title: collections.title, description: collections.description
+      id: collections.id, title: collections.title, description: collections.description, userId: collections.userId
     })
 
     res.status(201).json({
@@ -100,9 +109,9 @@ export const updateWorkoutCollection = async (req, res) => {
 
     // at least title or description is given
     if (
-      (title === (null || undefined))
+      (!!title)
       &&
-      (description === (null || undefined))
+      (!!description)
     ) {
       res.status(400).json({
         success: false,
@@ -165,7 +174,7 @@ export const deleteWorkoutCollection = async (req, res) => {
       and(eq(collections.id, collectionId), eq(collections.userId, userId))
     ).limit(1)
     if (collectionExists.length === 0) {
-      return res.status(404).json({ success: false, message: "Collection does not exist" });
+      return res.status(401).json({ success: false, message: "Collection does not exist or user is unauthorized" });
     }
 
     await db.delete(collections).where(
