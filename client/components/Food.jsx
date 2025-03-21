@@ -1,0 +1,60 @@
+export const foods = [
+  { id: 1, name: "Apple", kcal: 52, protein: 0.3, fat: 0.2, carbs: 14 },
+  { id: 2, name: "Banana", kcal: 89, protein: 1.1, fat: 0.3, carbs: 23 },
+  { id: 3, name: "Pizza", kcal: 266, protein: 11, fat: 10, carbs: 33 },
+  { id: 4, name: "Burger", kcal: 295, protein: 17, fat: 14, carbs: 30 },
+  { id: 5, name: "Rice", kcal: 130, protein: 2.7, fat: 0.3, carbs: 28 },
+  { id: 6, name: "Chicken", kcal: 165, protein: 31, fat: 3.6, carbs: 0 },
+  { id: 7, name: "Eggs", kcal: 155, protein: 13, fat: 11, carbs: 1.1 },
+  { id: 8, name: "Milk", kcal: 42, protein: 3.4, fat: 1, carbs: 5 },
+  { id: 9, name: "Chocolate", kcal: 546, protein: 7.8, fat: 31, carbs: 61 },
+  { id: 10, name: "Pasta", kcal: 157, protein: 5.8, fat: 0.9, carbs: 30 },
+];
+
+export const meals = [
+  {
+    id: 1,
+    name: "Breakfast Combo",
+    foods: ["Eggs", "Milk", "Banana"],
+    kcal: [155, 42, 89],
+    protein: [13, 3.4, 1.1],
+    fat: [11, 1, 0.3],
+    carbs: [1.1, 5, 23],
+  },
+  {
+    id: 2,
+    name: "Chicken Rice Bowl",
+    foods: ["Chicken Breast", "Rice"],
+    kcal: [165, 130],
+    protein: [31, 2.7],
+    fat: [3.6, 0.3],
+    carbs: [0, 28],
+  },
+  {
+    id: 3,
+    name: "Burger Meal",
+    foods: ["Burger", "Milk"],
+    kcal: [295, 42],
+    protein: [17, 3.4],
+    fat: [14, 1],
+    carbs: [30, 5],
+  },
+  {
+    id: 4,
+    name: "Pasta Delight",
+    foods: ["Pasta", "Cheese"],
+    kcal: [157, 402], // Assuming cheese has ~402 kcal
+    protein: [5.8, 25],
+    fat: [0.9, 33],
+    carbs: [30, 1.3],
+  },
+  {
+    id: 5,
+    name: "Sweet Treat",
+    foods: ["Chocolate", "Milk"],
+    kcal: [546, 42],
+    protein: [7.8, 3.4],
+    fat: [31, 1],
+    carbs: [61, 5],
+  },
+];
