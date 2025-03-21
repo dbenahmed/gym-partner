@@ -34,7 +34,7 @@ export default function Profile() {
     address: address,
     height: height, 
     weight: weight, 
-    avatarUrl: "https://robohash.org/lf.png",
+    avatarUrl: `https://robohash.org/${username}.png`,
       })
     }
   }
@@ -51,6 +51,7 @@ export default function Profile() {
     weight: "75 kg", // User weight});
   });
 
+  const [vatarUrl,setvatarUrl] = useState("https://robohash.org/lf.png");
   const [visible, setVisible] = useState(false);
   const [username, setusername] = useState("JohnDoe");
   const [fullName, setfullName] = useState("John Doe");
