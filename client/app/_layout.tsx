@@ -1,6 +1,8 @@
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { NavigationContainer } from "@react-navigation/native";
+import  {AuthProvider}  from "@/app/contex/authcontex";
+
+
 
 export default function RootLayout() {
   
@@ -10,7 +12,9 @@ export default function RootLayout() {
   });
 
   return (
-  <Stack screenOptions={{ headerShown: false }}>
-  </Stack>
+    <AuthProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+      </Stack>
+    </AuthProvider>
   );
 }
