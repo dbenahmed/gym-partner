@@ -17,7 +17,7 @@ export const getAllExercises = async (req, res) => {
       "category": req.query.category,
     }
     const { page } = req.query
-    const limit = (req.query.limit) ? parseInt(req.query.limit) : 1;
+    const limit = (req.query.limit) ? parseInt(req.query.limit) : 10;
 
     const filteredQueries = Object.fromEntries(Object.entries(queries).filter((v, i) => v[1] !== ""))
 
@@ -27,16 +27,20 @@ export const getAllExercises = async (req, res) => {
     })
     const foundExercises = await db.select({
       ...exercises,
-      exosCount: db.$count(exercises, and(...andConditions))
     }).from(exercises).where(
       and(
         ...andConditions
       )
     ).limit(limit).offset(page)
 
-    console.log(foundExercises.length)
+    const count = await db.$count(exercises, and(...andConditions))
 
-    res.status(200).json({ success: true, data: foundExercises })
+    res.status(200).json({
+      success: true, data: {
+        count,
+        exercises: foundExercises
+      }
+    })
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Error retrieving all exercises', error: error.message });
@@ -44,10 +48,25 @@ export const getAllExercises = async (req, res) => {
 };
 
 // Get details for a specific exercise
-export const getExerciseDetails = (req, res) => {
+export const getExerciseDetails = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+    const { exerciseId } = req.params
+
+    const foundExercise = await db.select().from(exercises).where(eq(exercises.id, exerciseId)).limit(1)
+
+    if (!foundExercise || foundExercise.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: 'Exercise Not Found'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: foundExercise[0]
+    })
+
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving exercise details', error: error.message });
   }
