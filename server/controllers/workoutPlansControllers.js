@@ -1,7 +1,7 @@
 // Get a list of all workout collections for the user
 import db from "../db/index.js";
-import { collections, plans, users } from "../db/schemas/dev/schema.js";
-import { and, eq } from "drizzle-orm";
+import { collections, exercises, plans, plansExercises, schema, users } from "../db/schemas/dev/schema.js";
+import { and, eq, exists, sql } from "drizzle-orm";
 
 const verifyPlanOwnership = async (userId, planId) => {
   try {
@@ -376,8 +376,58 @@ export const deleteWorkoutPlan = async (req, res) => {
 export const addExerciseToPlan = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+    const userData = req.userData;
+    const { planId } = req.params
+    const { exerciseId } = req.body
+
+    // find the plan if exists
+    // check if the plan created by the user ( authorized to add exercise to it )
+    const foundPlans = await db.select().from(plans).where(eq(plans.id, planId))
+      .innerJoin(collections, and(eq(plans.collectionId, collections.id), eq(collections.userId, userId)))
+    const plan = foundPlans[0]
+    // get the exercise id and verify it exists in the db
+    const foundExercises = await db.select().from(exercises).where(eq(exercises.id, exerciseId)).limit(1)
+    if (foundExercises.length === 0) {
+      res.status(401).json({
+        success: false,
+        message: "Exercise does not exist"
+      })
+    }
+    const exercise = foundExercises[0]
+
+    // verify if this exercise is not already inside of this plan
+    const exerciseNotAlreadyAdded = await db.select().from(plansExercises).where(and(
+      eq(plansExercises.planId, planId),
+      eq(plansExercises.exerciseId, exerciseId)
+    )).limit(1)
+    if (exerciseNotAlreadyAdded.length > 0) {
+      res.status(401).json({
+        success: false,
+        message: "Exercise already exists in this plan"
+      })
+    }
+
+    // todo : get maximum order to insert the exercise above
+
+    // add the exercise to the plan
+    await db.insert(plansExercises).values({
+      planId,
+      exerciseId,
+      order: 0
+    })
+
+    res.json({
+      success: true,
+      message: "Exercise successfully added to the plan"
+    })
+
+
+
   } catch (error) {
+    console.log("")
+    console.log("")
+    console.log("")
+    console.error(error)
     res.status(500).json({ message: 'Error adding exercise to plan', error: error.message });
   }
 };
