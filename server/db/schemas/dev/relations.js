@@ -26,7 +26,7 @@ export const foodsRelations = relations(foods, ({one, many}) => ({
 
 export const mealsLogsRelations = relations(mealsLogs, ({one}) => ({
 	foods: one(foods, {
-		fields: [mealsLogs.mealId],
+		fields: [mealsLogs.foodId],
 		references: [foods.id]
 	}),
 	users: one(users, {
