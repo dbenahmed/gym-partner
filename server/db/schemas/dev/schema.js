@@ -33,10 +33,10 @@ export const collections = schema.table("collections", {
 	description: text(),
 }, (table) => [
 	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "collections_user_id_fkey"
-		}).onDelete("cascade"),
+		columns: [table.userId],
+		foreignColumns: [users.id],
+		name: "collections_user_id_fkey"
+	}).onDelete("cascade"),
 	check("collections_title_check", sql`length((title)::text) >= 1`),
 ]);
 
@@ -59,12 +59,15 @@ export const foods = schema.table("foods", {
 	createdBy: integer("created_by"),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	likes: integer().default(0),
+	dislikes: integer().default(0),
+	status: varchar({ length: 50 }).default("pending")
 }, (table) => [
 	foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [users.id],
-			name: "fk_created_by"
-		}).onDelete("set null"),
+		columns: [table.createdBy],
+		foreignColumns: [users.id],
+		name: "fk_created_by"
+	}).onDelete("set null"),
 	check("foods_calories_check", sql`calories >= 0`),
 	check("foods_carbohydratesper100g_check", sql`carbohydratesper100g >= 0`),
 	check("foods_cholesterol_check", sql`cholesterol >= 0`),
@@ -76,11 +79,12 @@ export const foods = schema.table("foods", {
 	check("foods_sodium_check", sql`sodium >= 0`),
 	check("foods_sugar_check", sql`sugar >= 0`),
 	check("foods_transfat_check", sql`transfat >= 0`),
+	check("foods_status_check", sql`(status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('refused'::character varying)::text])`)
 ]);
 
-export const mealsLogs = schema.table("meals_logs", {
+export const foodsLogs = schema.table("foods_logs", {
 	id: serial().primaryKey().notNull(),
-	mealId: integer("meal_id").notNull(),
+	foodId: integer("food_id").notNull(),
 	userId: integer("user_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updateddate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -88,16 +92,16 @@ export const mealsLogs = schema.table("meals_logs", {
 	servingsizeG: integer("servingsize_g"),
 }, (table) => [
 	foreignKey({
-			columns: [table.mealId],
-			foreignColumns: [foods.id],
-			name: "fk_meal"
-		}).onDelete("cascade"),
+		columns: [table.foodId],
+		foreignColumns: [foods.id],
+		name: "fk_food"
+	}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "fk_user"
-		}).onDelete("cascade"),
-	check("meals_logs_servingsize_g_check", sql`servingsize_g >= 0`),
+		columns: [table.userId],
+		foreignColumns: [users.id],
+		name: "fk_user"
+	}).onDelete("cascade"),
+	check("foods_logs_servingsize_g_check", sql`servingsize_g >= 0`),
 ]);
 
 export const plans = schema.table("plans", {
@@ -108,10 +112,10 @@ export const plans = schema.table("plans", {
 	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.collectionId],
-			foreignColumns: [collections.id],
-			name: "plans_collection_id_fkey"
-		}).onDelete("cascade"),
+		columns: [table.collectionId],
+		foreignColumns: [collections.id],
+		name: "plans_collection_id_fkey"
+	}).onDelete("cascade"),
 	check("plans_title_check", sql`length((title)::text) >= 1`),
 ]);
 
@@ -124,15 +128,15 @@ export const plansExercises = schema.table("plans_exercises", {
 	order: integer().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.exerciseId],
-			foreignColumns: [exercises.id],
-			name: "fk_exercise"
-		}).onDelete("cascade"),
+		columns: [table.exerciseId],
+		foreignColumns: [exercises.id],
+		name: "fk_exercise"
+	}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.planId],
-			foreignColumns: [plans.id],
-			name: "fk_plan"
-		}).onDelete("cascade"),
+		columns: [table.planId],
+		foreignColumns: [plans.id],
+		name: "fk_plan"
+	}).onDelete("cascade"),
 ]);
 
 export const exercises = schema.table("exercises", {
@@ -168,10 +172,10 @@ export const sessions = schema.table("sessions", {
 	rating: integer(),
 }, (table) => [
 	foreignKey({
-			columns: [table.planId],
-			foreignColumns: [plans.id],
-			name: "fk_plan"
-		}).onDelete("cascade"),
+		columns: [table.planId],
+		foreignColumns: [plans.id],
+		name: "fk_plan"
+	}).onDelete("cascade"),
 	check("sessions_name_check", sql`length((name)::text) >= 1`),
 	check("sessions_rating_check", sql`(rating >= 0) AND (rating <= 5)`),
 ]);
@@ -187,15 +191,15 @@ export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises"
 	reps: integer().array().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.exerciseId],
-			foreignColumns: [exercises.id],
-			name: "fk_session_exercise_id"
-		}).onDelete("cascade"),
+		columns: [table.exerciseId],
+		foreignColumns: [exercises.id],
+		name: "fk_session_exercise_id"
+	}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.sessionId],
-			foreignColumns: [sessions.id],
-			name: "fk_session_id"
-		}).onDelete("cascade"),
+		columns: [table.sessionId],
+		foreignColumns: [sessions.id],
+		name: "fk_session_id"
+	}).onDelete("cascade"),
 	check("sets_of_sessions_exercises_reps_check", sql`array_length(reps, 1) > 0`),
 	check("sets_of_sessions_exercises_unit_check", sql`(unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])`),
 	check("sets_of_sessions_exercises_weight_check", sql`weight >= 0`),
@@ -210,15 +214,15 @@ export const templatesExercises = schema.table("templates_exercises", {
 	order: integer().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.exerciseId],
-			foreignColumns: [exercises.id],
-			name: "fk_exercise"
-		}).onDelete("cascade"),
+		columns: [table.exerciseId],
+		foreignColumns: [exercises.id],
+		name: "fk_exercise"
+	}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.templateId],
-			foreignColumns: [templates.id],
-			name: "fk_template"
-		}).onDelete("cascade"),
+		columns: [table.templateId],
+		foreignColumns: [templates.id],
+		name: "fk_template"
+	}).onDelete("cascade"),
 ]);
 
 export const templates = schema.table("templates", {
@@ -239,10 +243,10 @@ export const weightsLogs = schema.table("weights_logs", {
 	unit: varchar({ length: 3 }),
 }, (table) => [
 	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "fk_user"
-		}).onDelete("cascade"),
+		columns: [table.userId],
+		foreignColumns: [users.id],
+		name: "fk_user"
+	}).onDelete("cascade"),
 	check("weights_logs_unit_check", sql`(unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])`),
 	check("weights_logs_weight_check", sql`weight >= 0`),
 ]);
