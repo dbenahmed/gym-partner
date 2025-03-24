@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, collections, foods, mealsLogs, plans, exercises, plansExercises, sessions, setsOfSessionsExercises, templatesExercises, templates, weightsLogs } from "./schema.js";
+import { users, collections, foods, foodsLogs, plans, exercises, plansExercises, sessions, setsOfSessionsExercises, templatesExercises, templates, weightsLogs } from "./schema.js";
 
 export const collectionsRelations = relations(collections, ({one, many}) => ({
 	users: one(users, {
@@ -12,7 +12,7 @@ export const collectionsRelations = relations(collections, ({one, many}) => ({
 export const usersRelations = relations(users, ({many}) => ({
 	collections: many(collections),
 	foods: many(foods),
-	mealsLogs: many(mealsLogs),
+	foodsLogs: many(foodsLogs),
 	weightsLogs: many(weightsLogs),
 }));
 
@@ -21,16 +21,16 @@ export const foodsRelations = relations(foods, ({one, many}) => ({
 		fields: [foods.createdBy],
 		references: [users.id]
 	}),
-	mealsLogs: many(mealsLogs),
+	foodsLogs: many(foodsLogs),
 }));
 
-export const mealsLogsRelations = relations(mealsLogs, ({one}) => ({
+export const foodsLogsRelations = relations(foodsLogs, ({one}) => ({
 	foods: one(foods, {
-		fields: [mealsLogs.mealId],
+		fields: [foodsLogs.foodId],
 		references: [foods.id]
 	}),
 	users: one(users, {
-		fields: [mealsLogs.userId],
+		fields: [foodsLogs.userId],
 		references: [users.id]
 	}),
 }));
