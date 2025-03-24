@@ -84,7 +84,7 @@ export const foods = schema.table("foods", {
 
 export const mealsLogs = schema.table("meals_logs", {
 	id: serial().primaryKey().notNull(),
-	mealId: integer("meal_id").notNull(),
+	foodId: integer("food_id").notNull(),
 	userId: integer("user_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updateddate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
