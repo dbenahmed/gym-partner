@@ -47,9 +47,10 @@ router.delete('/workout/plans/:planId', authMiddleware, deleteWorkoutPlan);
 
 // Add an exercise to a workout plan
 router.post('/workout/plans/:planId/exercises', authMiddleware, addExerciseToPlan);
+// ! done
 
 // Update an exercise in a workout plan
-// ! CANCELLED - مانحتاجوهاش حاليا
+// * CANCELLED - مانحتاجوهاش حاليا
 // FOR UPDATING THE ORDER OF THE EXERCISES INSIDE A PLAN
 router.put('/workout/plans/:planId/exercises/:exerciseId', authMiddleware, updateExerciseInPlan);
 
