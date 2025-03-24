@@ -15,6 +15,13 @@
       "when": 1742780867528,
       "tag": "0001_secret_gressill",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742782163618,
+      "tag": "0002_fluffy_mongu",
+      "breakpoints": true
     }
   ]
 }

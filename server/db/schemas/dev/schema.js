@@ -82,7 +82,7 @@ export const foods = schema.table("foods", {
 	check("foods_status_check", sql`(status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('refused'::character varying)::text])`)
 ]);
 
-export const mealsLogs = schema.table("meals_logs", {
+export const foodsLogs = schema.table("foods_logs", {
 	id: serial().primaryKey().notNull(),
 	foodId: integer("food_id").notNull(),
 	userId: integer("user_id").notNull(),
@@ -92,16 +92,16 @@ export const mealsLogs = schema.table("meals_logs", {
 	servingsizeG: integer("servingsize_g"),
 }, (table) => [
 	foreignKey({
-		columns: [table.mealId],
+		columns: [table.foodId],
 		foreignColumns: [foods.id],
-		name: "fk_meal"
+		name: "fk_food"
 	}).onDelete("cascade"),
 	foreignKey({
 		columns: [table.userId],
 		foreignColumns: [users.id],
 		name: "fk_user"
 	}).onDelete("cascade"),
-	check("meals_logs_servingsize_g_check", sql`servingsize_g >= 0`),
+	check("foods_logs_servingsize_g_check", sql`servingsize_g >= 0`),
 ]);
 
 export const plans = schema.table("plans", {
