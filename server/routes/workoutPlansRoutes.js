@@ -15,7 +15,7 @@ import {
     removeExerciseFromPlan
 } from '../controllers/workoutPlansControllers.js'
 import authMiddleware from '../middleware/authMiddlewares.js';
-// ! done
+// ! > done
 // Get a list of all workout collections for the user
 router.get('/workout/collections', authMiddleware, getWorkoutCollections);
 
@@ -33,12 +33,12 @@ router.get('/workout/plans', authMiddleware, getWorkoutPlans);
 
 // Create a new workout plan inside a collection
 router.post('/workout/plans', authMiddleware, createWorkoutPlan);
-// ! done
+// ! < done
 
 // todo ( مانحتاجوهاش نورمالمو ): Get details of a specific workout plan
 router.get('/workout/plans/:planId', authMiddleware, getWorkoutPlanDetails);
 
-// ! done
+// ! done >
 // Update a workout plan's name or collection
 router.put('/workout/plans/:planId', authMiddleware, updateWorkoutPlan);
 
@@ -47,14 +47,14 @@ router.delete('/workout/plans/:planId', authMiddleware, deleteWorkoutPlan);
 
 // Add an exercise to a workout plan
 router.post('/workout/plans/:planId/exercises', authMiddleware, addExerciseToPlan);
-// ! done
 
 // Update an exercise in a workout plan
-// * CANCELLED - مانحتاجوهاش حاليا
+// ! CANCELLED - مانحتاجوهاش حاليا
 // FOR UPDATING THE ORDER OF THE EXERCISES INSIDE A PLAN
 router.put('/workout/plans/:planId/exercises/:exerciseId', authMiddleware, updateExerciseInPlan);
 
 // Remove an exercise from a workout plan
 router.delete('/workout/plans/:planId/exercises/:exerciseId', authMiddleware, removeExerciseFromPlan);
+// ! < done
 
 export default router;

@@ -446,7 +446,38 @@ export const updateExerciseInPlan = async (req, res) => {
 export const removeExerciseFromPlan = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+    const userData = req.userData;
+    const { planId, exerciseId } = req.params
+
+    // find the plan if exists
+    // check if the plan created by the user ( authorized to add exercise to it )
+    const foundPlans = await db.select().from(plans).where(eq(plans.id, planId))
+      .innerJoin(collections, and(eq(plans.collectionId, collections.id), eq(collections.userId, userId)))
+    const plan = foundPlans[0]
+
+    // verify if this exercise is not inside of this plan
+    const exerciseNotAlreadyAdded = await db.select().from(plansExercises).where(and(
+      eq(plansExercises.planId, planId),
+      eq(plansExercises.exerciseId, exerciseId)
+    )).limit(1)
+    if (exerciseNotAlreadyAdded.length = 0) {
+      res.status(401).json({
+        success: false,
+        message: "Exercise does not exist in this plan"
+      })
+    }
+
+    // remove the exercise to the plan
+    await db.delete(plansExercises).where(and(
+      eq(plansExercises.planId, planId),
+      eq(plansExercises.exerciseId, exerciseId)
+    ))
+
+    res.json({
+      success: true,
+      message: "Exercise successfully removed from the plan"
+    })
+
   } catch (error) {
     res.status(500).json({ message: 'Error removing exercise from plan', error: error.message });
   }
