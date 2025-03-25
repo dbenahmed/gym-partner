@@ -1,5 +1,5 @@
 // Start a new workout session
-export const startWorkoutSession = (req, res) => {
+export const createWorkoutSession = (req, res) => {
   try {
     const { userId } = req.user;
     // ... existing code ...
@@ -29,10 +29,15 @@ export const getWorkoutSessionDetails = (req, res) => {
 };
 
 // Add an exercise to an active session
-export const addExerciseToSession = (req, res) => {
+export const saveExerciseToSession = (req, res) => {
   try {
     const { userId } = req.user;
-    // ... existing code ...
+    // verify if user authorized 
+
+    // if exists already update changes
+
+    // if does not exist add new exercise to the session
+
   } catch (error) {
     res.status(500).json({ message: 'Error adding exercise to session', error: error.message });
   }
