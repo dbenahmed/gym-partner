@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, unique, check, serial, varchar, timestamp, foreignKey, integer, text, boolean } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, unique, check, serial, varchar, timestamp, foreignKey, integer, text, boolean, time, date } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const schema = pgSchema("dev");
@@ -164,10 +164,10 @@ export const exercises = schema.table("exercises", {
 export const sessions = schema.table("sessions", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id"),
-	duedate: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	duedate: date().notNull(),
 	name: varchar({ length: 100 }).notNull(),
-	starttime: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-	endtime: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	starttime: time(),
+	endtime: time(),
 	note: text(),
 	rating: integer(),
 }, (table) => [
