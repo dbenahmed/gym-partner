@@ -161,8 +161,8 @@ const main = async () => {
                         planId: null, // Since the planId is undefined as per your request
                         duedate: new Date().toISOString(),
                         name: `Session ${index + 1}`,
-                        starttime: new Date().toISOString(),
-                        endtime: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(), // 1 hour later
+                        starttime: new Date().toISOString().slice(11, 19).toString(),
+                        endtime: new Date(new Date().getTime() + 60 * 60 * 1000 ).toISOString().slice(11, 19).toString(), // 1 hour later
                         note: `This is a note for session ${index + 1}`,
                         rating: Math.floor(Math.random() * 6), // Random rating between 0 and 5
                     };
