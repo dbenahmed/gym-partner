@@ -1,7 +1,7 @@
 // Get a list of meals logged for today
-export const getTodayMeals = (req, res) => {
+export const getMeals = (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving today meals', error: error.message });
@@ -9,9 +9,9 @@ export const getTodayMeals = (req, res) => {
 };
 
 // Add a new meal to today's log
-export const addTodayMeal = (req, res) => {
+export const addMeal = (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error adding today meal', error: error.message });
@@ -19,9 +19,9 @@ export const addTodayMeal = (req, res) => {
 };
 
 // Update an existing meal in today's log
-export const updateTodayMeal = (req, res) => {
+export const updateMeal = (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error updating today meal', error: error.message });
@@ -29,9 +29,9 @@ export const updateTodayMeal = (req, res) => {
 };
 
 // Delete a meal from today's log
-export const deleteTodayMeal = (req, res) => {
+export const deleteMeal = (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error deleting today meal', error: error.message });
