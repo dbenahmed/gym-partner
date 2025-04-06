@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import db from "../db/index.js";
 import { exercises, plansExercises, sessions } from "../db/schemas/dev/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
+import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 
 // Start a new workout session
 // In this route I did not add the exercises to the sessionsExercises table,
@@ -25,18 +26,15 @@ export const createWorkoutSession = async (req, res) => {
       })
     }
     // verify format of the dueDate
-    const isoRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-    const isISO8601 = isoRegex.test(dueDate)
-    if (!isISO8601) {
+    const isYYYYMMDD = isYYYYMMDD(dueDate)
+    if (!isYYYYMMDD.success) {
       res.status(401).json({
         message: "Due Date does not follow the format YYYY-MM-DD"
       })
     }
     // verify format of the startDate
-    const timeRegex = /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/;
-    const startTimeIsUndefined = startTime === null || startTime === undefined;
-    const isTime = timeRegex.test(startTime)
-    if (!isTime || startTimeIsUndefined) {
+    const isHHMMSS = isHHMMSS(dueDate)
+    if (!isHHMMSS.success) {
       res.status(401).json({
         message: "Start Time does not follow the format HH-MM-SS"
       })
