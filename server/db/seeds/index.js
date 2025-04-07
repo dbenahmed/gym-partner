@@ -24,7 +24,7 @@ const main = async () => {
             // filling the exercises db
             //console.log('here 1')
             const exercisesMock = await Promise.all(
-                Array.from({length: 10}, async (_, index) => {
+                Array.from({ length: 10 }, async (_, index) => {
                     try {
                         return ({
                             name: `Exercise ${index + 1}`,
@@ -48,7 +48,7 @@ const main = async () => {
             //console.log(insertedExercises)
 
             // filling the users
-            const usersMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
+            const usersMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
                     const password = await bcrypt.hash(`password${index + 1}`, parseInt(process.env.BCRYPT_SALT_ROUNDS))
                     return ({
@@ -67,9 +67,14 @@ const main = async () => {
             }))
             const insertedUsers = await tx.insert(schema.users).values(usersMock).returning();
             // filling the food db
-            const foodMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
+            const getRandomInt = (max) => {
+                return Math.floor(Math.random() * max);
+            }
+            const foodMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
                     const userId = index % 2 === 0 ? insertedUsers[index % insertedUsers.length]?.id : null; // Random user from the array
+                    const statuspossible = ["refused", "pending", "verified"]
+                    const status = statuspossible[index % 3];
                     return {
                         foodname: `Food Item ${index + 1}`,
                         description: `This is a description for food item ${index + 1}`,
@@ -88,6 +93,9 @@ const main = async () => {
                         createdBy: userId,
                         creationdate: new Date().toISOString(),
                         updationdate: new Date().toISOString(),
+                        likes: getRandomInt(10),
+                        dislikes: getRandomInt(10),
+                        status
                     };
                 } catch (e) {
                     console.error(e);
@@ -95,7 +103,7 @@ const main = async () => {
             }))
             const insertedFood = await tx.insert(schema.foods).values(foodMock).returning();
             // creating the collections
-            const collectionsMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
+            const collectionsMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
                     const userId = insertedUsers[index % insertedUsers.length]?.id; // Random user from the array
                     return {
@@ -112,7 +120,7 @@ const main = async () => {
             const insertedCollections = await tx.insert(schema.collections).values(collectionsMock).returning();
 
             // creating the plans
-            const plansMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
+            const plansMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
                     const collectionId = insertedCollections[index % insertedCollections.length]?.id; // Random collection from the array
                     return {
@@ -128,7 +136,7 @@ const main = async () => {
             const insertedPlans = await tx.insert(schema.plans).values(plansMock).returning();
 
             // creating exercises for each plan from the exercises db
-            const plansExercisesMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
+            const plansExercisesMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
                     const planId = insertedPlans[index % insertedPlans.length]?.id; // Random plan from the array
                     const exerciseId = insertedExercises[index % insertedExercises.length]?.id; // Random exercise from the array
@@ -146,15 +154,15 @@ const main = async () => {
             const insertedPlansExercises = await tx.insert(schema.plansExercises).values(plansExercisesMock).returning();
 
             // inserting sessions from plans
-            const sessionsMock = await Promise.all(Array.from({length: 10}, async (_, index) => {
+            const sessionsMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
                     const userId = insertedUsers[index % insertedUsers.length]?.id; // Random user from the array
                     return {
                         planId: null, // Since the planId is undefined as per your request
                         duedate: new Date().toISOString(),
                         name: `Session ${index + 1}`,
-                        starttime: new Date().toISOString(),
-                        endtime: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(), // 1 hour later
+                        starttime: new Date().toISOString().slice(11, 19).toString(),
+                        endtime: new Date(new Date().getTime() + 60 * 60 * 1000 ).toISOString().slice(11, 19).toString(), // 1 hour later
                         note: `This is a note for session ${index + 1}`,
                         rating: Math.floor(Math.random() * 6), // Random rating between 0 and 5
                     };
@@ -166,7 +174,7 @@ const main = async () => {
 
             // insert sessions_exercises
             const setsOfSessionsExercisesMock = await Promise.all(
-                Array.from({length: 10}, async (_, index) => {
+                Array.from({ length: 10 }, async (_, index) => {
                     try {
                         const sessionId = insertedSessions[index % insertedSessions.length]?.id; // Random session
                         const exerciseId = insertedExercises[index % insertedExercises.length]?.id; // Random exercise
@@ -187,17 +195,17 @@ const main = async () => {
             );
             await tx.insert(schema.setsOfSessionsExercises).values(setsOfSessionsExercisesMock).returning();
 
-            const mealsLogsMock = await Promise.all(
-                Array.from({length: 10}, async (_, index) => {
+            const foodsLogsMock = await Promise.all(
+                Array.from({ length: 10 }, async (_, index) => {
                     try {
                         const userId = insertedUsers[index % insertedUsers.length]?.id; // Assign userId from existing users
-                        const mealId = insertedFood[index % insertedFood.length]?.id; // Assign mealId from existing foods
+                        const foodId = insertedFood[index % insertedFood.length]?.id; // Assign foodId from existing foods
                         return {
-                            mealId,
+                            foodId,
                             userId,
                             creationdate: new Date().toISOString(),
                             updateddate: new Date().toISOString(),
-                            description: `Meal log ${index + 1}`,
+                            description: `Food log ${index + 1}`,
                             servingsizeG: 100 + index * 50, // Varying serving sizes
                         };
                     } catch (e) {
@@ -205,10 +213,10 @@ const main = async () => {
                     }
                 })
             );
-            const insertedMealsLogs = await tx.insert(schema.mealsLogs).values(mealsLogsMock).returning();
+            const insertedFoodsLogs = await tx.insert(schema.foodsLogs).values(foodsLogsMock).returning();
 
             const weightsLogsMock = await Promise.all(
-                Array.from({length: 10}, async (_, index) => {
+                Array.from({ length: 10 }, async (_, index) => {
                     try {
                         const userId = insertedUsers[index % insertedUsers.length]?.id; // Assign userId from existing users
                         return {

@@ -9,8 +9,17 @@ import {
 } from "react-native";
 import Color from "@/constants/Color";
 import { useRouter } from "expo-router";
+import { useState, useContext } from "react";
+
+import { AuthContext } from "@/app/contex/authcontex";
 export default function SignUp() {
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const { isLouding,register } = useContext(AuthContext);
+
+
   return (
     <View
       style={{
@@ -20,6 +29,7 @@ export default function SignUp() {
         padding: 20,
       }}
     >
+     
       <Image
         source={require("@/assets/images/logo.jpg")}
         style={{ width: 180, height: 180, margin: 50 }}
@@ -29,12 +39,25 @@ export default function SignUp() {
       >
         Create new account
       </Text>
-      <TextInput placeholder="Full name" style={styles.textInput} />
-      <TextInput placeholder="Email" style={styles.textInput} />
+
+      <TextInput
+        placeholder="Full name"
+        value={name}
+        style={styles.textInput}
+        onChangeText={(text) => setName(text)}
+      />
+      <TextInput
+        placeholder="Email"
+        value={email}
+        style={styles.textInput}
+        onChangeText={(text) => setEmail(text)}
+      />
       <TextInput
         placeholder="password"
         secureTextEntry={true}
+        value={password}
         style={styles.textInput}
+        onChangeText={(text) => setPassword(text)}
       />
       <TouchableOpacity
         style={{
@@ -51,6 +74,9 @@ export default function SignUp() {
             color: Color.first,
             fontSize: 18,
             fontFamily: "outfitb",
+          }}
+          onPress={() => {
+            register(name, email, password);
           }}
         >
           Create account
