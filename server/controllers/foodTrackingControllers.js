@@ -1,12 +1,29 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import db from "../db/index.js";
 import { isYYYYMMDD } from "./functions/isDate.js";
 import { foods, foodsLogs } from "../db/schemas/dev/schema.js";
 
 // Get a list of meals logged for today
-export const getMeals = (req, res) => {
+export const getMeals = async (req, res) => {
   try {
     const userId = req.user;
+    const userData = req.userData
+    const {
+      date
+    } = req.body
+
+    const foundMeals = await db.query.foodsLogs.findMany({
+      where: and(
+        eq(date, foodsLogs.date),
+        eq(foodsLogs.userId, userId)
+      )
+    })
+
+    res.status(202).json({
+      success: true,
+      message: "found food successfully",
+      data: foundMeals
+    })
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving today meals', error: error.message });
@@ -41,7 +58,6 @@ export const addMeal = async (req, res) => {
     const foundFood = await db.query.foods.findFirst({
       where: eq(foods.id, foodId)
     })
-    console.log("found food", foundFood)
     if (!foundFood) {
       res.status(404).json({
         success: false,
@@ -63,10 +79,22 @@ export const addMeal = async (req, res) => {
       description: desc,
       servingsizeG: servingSize
     }
-    await db.insert(foodsLogs).values(inserts)
+    const insertedFood = await db.insert(foodsLogs).values(inserts).returning({
+      id: foodsLogs.id,
+      foodId: foodsLogs.foodId,
+      servingsizeG: foodsLogs.servingsizeG,
+      description: foodsLogs.description,
+      date: foodsLogs.date,
+      creationDate: foodsLogs.creationdate,
+    })
 
-    res.json({ success: true, message: "Meal added successfully" })
+    res.json({
+      success: true, message: "Meal added successfully", data: {
+        insertedFood
+      }
+    })
   } catch (error) {
+    console.error(error)
     res.status(500).json({ message: 'Error adding meal', error: error.message });
   }
 };
@@ -82,11 +110,41 @@ export const updateMeal = (req, res) => {
 };
 
 // Delete a meal from today's log
-export const deleteMeal = (req, res) => {
+export const deleteMeal = async (req, res) => {
   try {
     const userId = req.user;
     const userDate = req.userData;
-    
+
+    const {
+      mealId
+    } = req.query
+
+    const foundFood = await db.query.foodsLogs.findFirst({
+      where: eq(foodsLogs.id, mealId)
+    })
+
+    if (!foundFood) {
+      res.status(404).json({
+        success: false,
+        message: "unfound food"
+      })
+      return;
+    }
+
+    if (foundFood.userId !== userId) {
+      res.status(401).json({
+        success: false,
+        message: 'not authorized'
+      })
+    }
+
+    await db.delete(foodsLogs).where(eq(foodsLogs.id, mealId))
+
+    res.status(200).json({
+      success: true,
+      message: 'food deleted successfuly'
+    })
+
   } catch (error) {
     res.status(500).json({ message: 'Error deleting meal', error: error.message });
   }
