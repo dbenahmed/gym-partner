@@ -90,6 +90,7 @@ export const foodsLogs = schema.table("foods_logs", {
 	updateddate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	description: text(),
 	servingsizeG: integer("servingsize_g"),
+	date: date().notNull(),
 }, (table) => [
 	foreignKey({
 		columns: [table.foodId],
