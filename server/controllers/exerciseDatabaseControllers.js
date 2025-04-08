@@ -1,6 +1,6 @@
 import db from "../db/index.js";
 import { collections, exercises, plans, users } from "../db/schemas/dev/schema.js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ilike, like } from "drizzle-orm";
 
 // Get a list of all available exercises
 export const getAllExercises = async (req, res) => {
@@ -8,6 +8,7 @@ export const getAllExercises = async (req, res) => {
     const userId = req.user;
     const userData = req.userData
     const queries = {
+      "name": req.query.name,
       "force": req.query.force,
       "level": req.query.level,
       "mechanic": req.query.mechanic,
@@ -23,6 +24,9 @@ export const getAllExercises = async (req, res) => {
 
     console.log('filteredQueries', filteredQueries)
     const andConditions = Object.entries(filteredQueries).map(([key, value]) => {
+      if (key === "name") {
+        return ilike(exercises[key], `%${value}%`)
+      }
       return eq(exercises[key], value)
     })
     const foundExercises = await db.select({
