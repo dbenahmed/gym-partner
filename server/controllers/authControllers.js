@@ -186,14 +186,12 @@ export const loginUser = async (req, res) => {
         , process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
       )
-      console.log('here')
       res.cookie("accesstoken", token, {
         httpOnly: true,          // Prevents XSS attacks
         secure: process.env.NODE_ENV === "production" || false // Ensures it's HTTPS in production
         // sameSite: "Strict",      // Prevents CSRF attacks
         // maxAge: 60 * 60 * 1000   // Token expires in 1 hour (60 minutes * 60 seconds * 1000 ms)
       })
-      console.log('here')
       res.status(200).json({
         success: true,
         message: "the login is complete successfuly",

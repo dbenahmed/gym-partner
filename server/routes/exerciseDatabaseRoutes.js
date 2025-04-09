@@ -6,7 +6,7 @@ import { createNewExercise, deleteExercise, getAllExercises, getExerciseDetails,
 
 //* done
 // Get a list of all available exercises
-router.get('/explore/exercises', authMiddleware, getAllExercises);
+router.get('/explore/exercises', getAllExercises);
 
 // Get details for a specific exercise
 router.get('/explore/exercises/:exerciseId', authMiddleware, getExerciseDetails);

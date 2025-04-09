@@ -162,7 +162,7 @@ const main = async () => {
                         duedate: new Date().toISOString(),
                         name: `Session ${index + 1}`,
                         starttime: new Date().toISOString().slice(11, 19).toString(),
-                        endtime: new Date(new Date().getTime() + 60 * 60 * 1000 ).toISOString().slice(11, 19).toString(), // 1 hour later
+                        endtime: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString().slice(11, 19).toString(), // 1 hour later
                         note: `This is a note for session ${index + 1}`,
                         rating: Math.floor(Math.random() * 6), // Random rating between 0 and 5
                     };
@@ -200,9 +200,11 @@ const main = async () => {
                     try {
                         const userId = insertedUsers[index % insertedUsers.length]?.id; // Assign userId from existing users
                         const foodId = insertedFood[index % insertedFood.length]?.id; // Assign foodId from existing foods
+                        const date = new Date().toISOString().split('T')[0]
                         return {
                             foodId,
                             userId,
+                            date: date,
                             creationdate: new Date().toISOString(),
                             updateddate: new Date().toISOString(),
                             description: `Food log ${index + 1}`,

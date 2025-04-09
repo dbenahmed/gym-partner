@@ -1,0 +1,1 @@
+ALTER TABLE "dev"."foods_logs" ADD COLUMN "date" date NOT NULL;
