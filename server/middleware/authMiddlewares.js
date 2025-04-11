@@ -1,10 +1,5 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-<<<<<<< HEAD
- 
-dotenv.config();
-expot
-=======
 import db from '../db/index.js';
 import { users } from '../db/schemas/dev/schema.js';
 import { eq } from 'drizzle-orm';
@@ -44,4 +39,3 @@ const authMiddleware = async (req, res, next) => {
 }
 
 export default authMiddleware;
->>>>>>> 4387c64987cf4b92dc58458823fa2e0329ece5b8
