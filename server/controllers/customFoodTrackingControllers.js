@@ -7,7 +7,7 @@ export const createCustomMeal = async (req, res) =>{
     const  {foodname  , calories,  proteinper100g ,carbohydratesper100g, fatper100g } = req.body ;
 //    check if the meal is already exist 
 
-    const existMeal = await db.select().from(foods).where(eq(foods.foodname,foodname)).limit(1);
+    const existMeal = await db.select().from(foods).where(eq(foods.id,mealId)).limit(1);
     if (existMeal.length > 0 )
 {
   return res.status(400).json({
@@ -23,7 +23,7 @@ export const createCustomMeal = async (req, res) =>{
         carbohydratesper100g,
         fatper100g,
         custom:true,
-        created_by:userID, 
+        createdBy:userID, 
     })
     res.status(201).json({
      message : "the meals is added succesfuly",
@@ -40,8 +40,8 @@ catch (err){
 // Get a list of all custom meals created by the user
 export const getCustomMeals = async (req, res) => {
     try{
-   const {foodname}= req.body;
-   const ExistFood = await db.select().from(foods).where(eq(foods.foodname,foodname));
+        const {mealId}= req.params.mealId
+   const ExistFood = await db.select().from(foods).where(eq((foods.id,mealId)));
   if (ExistFood.length === 0){
 
    return res.status(404).json({
@@ -68,9 +68,9 @@ catch (err) {
 // Delete a custom meal
 export const deleteCustomMeal = async (req, res) => {
     try{
-        const {foodname}= req.body;
+        const {mealId}= req.params.mealId ;
         const userID = req.user.id;
-        const ExistFood = await db.select().from(foods).where(and(eq(foods.foodname,foodname),eq(foods.custom,true),eq(foods.created_by,userID))).limit(1);
+        const ExistFood = await db.select().from(foods).where(and(eq(foods.id,mealId),eq(foods.custom,true),eq(foods.createdBy,userID))).limit(1);
        if (ExistFood.length === 0){
      
         return res.status(404).json({
@@ -78,7 +78,7 @@ export const deleteCustomMeal = async (req, res) => {
              message : "this meal is not exist"
          })
        } 
-        await db.delete(foods).where(and(eq(foods.foodname,foodname),eq(foods.custom,true),eq(foods.created_by,userID)));
+        await db.delete(foods).where(and(eq((foods.id,mealId),eq(foods.custom,true),eq(foods.createdBy,userID))));
             return res.status(200).json({
                 success:true,
                 message:"the food is deleted successfully"
