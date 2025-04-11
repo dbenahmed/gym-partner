@@ -10,6 +10,7 @@ import {
   Modal,
   FlatList,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import food from "@/components/Food";
@@ -189,11 +190,15 @@ export default function mealsHome() {
     }
   ] */);
 
+  const [loading, setLoading] = useState(true);
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+
 
   useEffect(() => {
-    console.log('starting')
     const run = async () => {
-      const dateStr = new Date('2025-06-04').toISOString().split('T')[0]
+      setLoading(true);
+      const dateStr = new Date(currentDate).toISOString().split('T')[0]
       const url = `${fetchUri}/meals?date=${dateStr}`
       const res = await fetch(url, {
         method: "GET",
@@ -205,9 +210,10 @@ export default function mealsHome() {
       const json = await res.json()
       console.log(json)
       setMeals(json.data)
+      setLoading(false);
     }
     run()
-  }, []);
+  }, [currentDate]);
 
 
   const [foods, setFoods] = useState([
@@ -378,7 +384,6 @@ export default function mealsHome() {
   let nbFood = 10;
   //time
 
-  const [currentDate, setCurrentDate] = useState(new Date());
   /* 
     useEffect(() => {
       const date = new Date();
@@ -394,6 +399,19 @@ export default function mealsHome() {
   const [nbProt, setNbProt] = useState(0);
   const [nbFat, setNbFat] = useState(0);
   const [nabCarbs, setNbCarbs] = useState(0);
+
+
+  const goToPreviousDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
+
+  const goToNextDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
 
 
   const createMeal = () => {
@@ -579,10 +597,11 @@ export default function mealsHome() {
     }
   }
   const searchForFood = async () => {
-    
+
   }
   return (
     <>
+
       <View style={styles.header}>
 
         <View>
@@ -639,21 +658,65 @@ export default function mealsHome() {
         </View>
       </View>
 
-      <ScrollView>
-        {meals ? meals.map((e) => (
-          <Meal key={e.id} data={e} onDlate={delateMeal} />
-        )) : <View></View>}
-      </ScrollView>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => setModalVisible(true)}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: 10,
+        }}
       >
-        <Text style={{ fontWeight: "700", color: Color.first }}>
-          Add a new meal
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity>
+          <Text
+            style={{ color: Color.second, fontWeight: "900", fontSize: 30 }}
+            onPress={goToPreviousDay}
+          >
+            &lt;
+          </Text>
+        </TouchableOpacity>
+        {currentDate.getDate() == new Date().getDate() ? (
+          <Text style={{ fontSize: 15, fontWeight: "700" }}>Today meals</Text>
+        ) : (
+          <Text style={{ fontSize: 15, fontWeight: "700" }}>
+            Your menu for day : {currentDate.toDateString()}
+          </Text>
+        )}
+        <TouchableOpacity>
+          <Text
+            style={{ color: Color.second, fontWeight: "900", fontSize: 30 }}
+            onPress={goToNextDay}
+          >
+            &gt;
+          </Text>
+        </TouchableOpacity>
+      </View>
 
+
+
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <>
+          <ScrollView>
+            {meals ? meals.map((e) => (
+              <Meal key={e.id} data={e} onDlate={delateMeal} />
+            )) : <View></View>}
+          </ScrollView>
+
+
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={{ fontWeight: "700", color: Color.first }}>
+              Add a new meal
+            </Text>
+          </TouchableOpacity>
+        </>)}
       <Modal
         animationType="fade"
         transparent={true}
@@ -846,7 +909,7 @@ export default function mealsHome() {
         </View>
       </Modal>
     </>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
