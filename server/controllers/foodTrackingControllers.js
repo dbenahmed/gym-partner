@@ -10,7 +10,7 @@ export const getMeals = async (req, res) => {
     const userData = req.userData
     const {
       date
-    } = req.body
+    } = req.query
 
     const foundMeals = await db.query.foodsLogs.findMany({
       where: and(
@@ -18,6 +18,13 @@ export const getMeals = async (req, res) => {
         eq(foodsLogs.userId, userId)
       )
     })
+
+    const foundMealsWithFood = await Promise.all(foundMeals.map(async (meal) => {
+      meal.food = await db.query.foods.findFirst({
+        where: eq(foods.id, meal.foodId)
+      })
+      return meal
+    }))
 
     res.status(202).json({
       success: true,
@@ -89,9 +96,7 @@ export const addMeal = async (req, res) => {
     })
 
     res.json({
-      success: true, message: "Meal added successfully", data: {
-        insertedFood
-      }
+      success: true, message: "Meal added successfully", insertedFood
     })
   } catch (error) {
     console.error(error)
@@ -117,7 +122,7 @@ export const deleteMeal = async (req, res) => {
 
     const {
       mealId
-    } = req.query
+    } = req.params
 
     const foundFood = await db.query.foodsLogs.findFirst({
       where: eq(foodsLogs.id, mealId)
