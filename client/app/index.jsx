@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import Face from "@/app/login/Face";
 import Home from "@/app/login/home";
 import Splash from "@/app/login/splash";
@@ -16,7 +16,7 @@ export default function HomeScreen() {
         <Face />
       )}
       */}
-      <Home/>
+        <Home />
     </>
   );
 }
