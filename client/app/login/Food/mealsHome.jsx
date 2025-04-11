@@ -75,7 +75,7 @@ export default function mealsHome() {
   const [foods, setFoods] = useState([]);
 
   //the content of vitamine in meals of this day
-  const prot = 100;
+  const prot = 0;
   const kcal = meals ? parseFloat(
     meals
       .reduce((sum, meal) => {
