@@ -6,8 +6,8 @@ export const createCustomMeal = async (req, res) =>{
     try {
     const  {foodname  , calories,  proteinper100g ,carbohydratesper100g, fatper100g } = req.body ;
 //    check if the meal is already exist 
-
-    const existMeal = await db.select().from(foods).where(eq(foods.id,mealId)).limit(1);
+     const userID = req.user.id;
+    const existMeal = await db.select().from(foods).where(and(eq(foods.foodname,foodname),eq(foods.custom,true),eq(foods.createdBy,userID))).limit(1);
     if (existMeal.length > 0 )
 {
   return res.status(400).json({
@@ -15,7 +15,7 @@ export const createCustomMeal = async (req, res) =>{
     message : "this meals is already exist"
  })}  
 
-    const userID = req.user.id; 
+     const userId = req.user.id;
     const result = await db.insert(foods).values({
         foodname,
         calories,
@@ -40,8 +40,8 @@ catch (err){
 // Get a list of all custom meals created by the user
 export const getCustomMeals = async (req, res) => {
     try{
-        const {mealId}= req.params.mealId
-   const ExistFood = await db.select().from(foods).where(eq((foods.id,mealId)));
+        const { mealId }= req.params.mealId
+   const ExistFood = await db.select().from(foods).where(eq(foods.id,mealId));
   if (ExistFood.length === 0){
 
    return res.status(404).json({
@@ -68,7 +68,7 @@ catch (err) {
 // Delete a custom meal
 export const deleteCustomMeal = async (req, res) => {
     try{
-        const {mealId}= req.params.mealId ;
+        const { mealId }= req.params.mealId ;
         const userID = req.user.id;
         const ExistFood = await db.select().from(foods).where(and(eq(foods.id,mealId),eq(foods.custom,true),eq(foods.createdBy,userID))).limit(1);
        if (ExistFood.length === 0){
@@ -83,7 +83,7 @@ export const deleteCustomMeal = async (req, res) => {
                 success:true,
                 message:"the food is deleted successfully"
             })
-         } catch (err )
+         } catch (err)
          {
             res.status(500).json({
             success:false,
