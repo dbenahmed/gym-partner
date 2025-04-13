@@ -11,15 +11,36 @@ import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
 import { useState, useContext } from "react";
 import { AuthContext } from "@/app/contex/authcontex";
+import useAuth from "@/app/contex/authcontex";
+import SplashScreen from "@/components/SplashScreen";
+import { Alert } from "react-native";
+
+
 
 export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const { register } = useContext(AuthContext);
+  const [password, setPassword] = useState("password1");
+  const [username, setUsername] = useState("user1");
+  const { register, splashLoading, setSplashLoading } = useAuth()
 
 
+  const handleRegister = async () => {
+    setSplashLoading(true)
+    const res = await register(username, password)
+    if (res.success) {
+      Alert.alert("Success", res.message)
+      router.push("/(auth)/signIn")
+    } else {
+      Alert.alert("Error", res.message)
+    }
+    setSplashLoading(false)
+  };
+
+
+  if (splashLoading) {
+    return <SplashScreen />
+  }
   return (
     <View
       style={{
@@ -41,16 +62,10 @@ export default function SignUp() {
       </Text>
 
       <TextInput
-        placeholder="Full name"
-        value={name}
+        placeholder="username"
+        value={username}
         style={styles.textInput}
-        onChangeText={(text) => setName(text)}
-      />
-      <TextInput
-        placeholder="Email"
-        value={email}
-        style={styles.textInput}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => setUsername(text)}
       />
       <TextInput
         placeholder="password"
@@ -76,7 +91,7 @@ export default function SignUp() {
             fontFamily: "outfitb",
           }}
           onPress={() => {
-            register(name, email, password);
+            handleRegister()
           }}
         >
           Create account

@@ -13,12 +13,12 @@ import Color from "@/constants/Colors.ts";
 import { useState, useContext } from "react";
 export default function TabTwoScreen() {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("password1");
+  const [username, setUsername] = useState("user1");
   const { isLouding, login } = useContext(AuthContext);
 
   const handleLogin = async () => {
-    login(email, password)
+    login(username, password)
 
   }
 
@@ -38,10 +38,10 @@ export default function TabTwoScreen() {
       <Text
         style={{ fontSize: 25, textAlign: "center", fontFamily: "outfitb" }}
       >
-        Welcome Back
+        Sign In Page
       </Text>
 
-      <TextInput placeholder="Email" value={email} style={styles.textInput} onChangeText={text => setEmail(text)} />
+      <TextInput placeholder="username" value={username} style={styles.textInput} onChangeText={text => setUsername(text)} />
       <TextInput
         placeholder="password"
         value={password}

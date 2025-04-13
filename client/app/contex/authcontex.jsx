@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { BASE_URL } from "@/app/config";
+import React, { useEffect, useState, useContext } from "react";
+import { defaultUrl } from "@/constants/constants";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreen from "@/components/SplashScreen";
@@ -9,24 +9,37 @@ export const AuthProvider = ({ children }) => {
     const [userId, setUserId] = useState();
     const [splashLoading, setSplashLoading] = useState(false);
 
-    const register = (name, email, pasword) => {
-        /* axios
-    .post(`${BASE_URL}/register`,{
-        name,email,pasword
-    })
-    .then(
-        res=>{
-            let userInfo = res.data;
-            setUserInfo(userInfo);
-            AsyncStorage.setItem('userInsfo',JSON.stringify(userInfo));
-            setIsLoading(false)
-            console.log(userInfo);
-        })
-        .catch(
-            e=>{
-                console.log(`register error ${e}`)
-                setIsLoading(false)
-            }) */
+    const register = async (username, password) => {
+        try {
+            const { data, headers } = await axios.post(`${defaultUrl}/auth/register`, {
+                username, password
+            })
+            if (data.success) {
+                return {
+                    success: true,
+                    message: data.message,
+                }
+            } else {
+                return {
+                    success: false,
+                    message: data.message,
+                }
+            }
+
+        } catch (e) {
+            if (e.name === 'AxiosError') {
+                return {
+                    success: false,
+                    message: e.response.data.message,
+                }
+            } else {
+                console.error(`register error ${e}`)
+                return {
+                    success: false,
+                    message: e.message,
+                }
+            }
+        }
     }
     const login = (email, pasword) => {
         /* setIsLoading(true);
@@ -81,11 +94,10 @@ export const AuthProvider = ({ children }) => {
         } */
     }
 
-    if (splashLoading) {
-        return <SplashScreen />
-    }
-    
+
     return (
         <AuthContext.Provider value={{ splashLoading, setSplashLoading, register, login, logout }}>{children}</AuthContext.Provider>
     )
 }
+
+export default useAuth = () => { return useContext(AuthContext) }
