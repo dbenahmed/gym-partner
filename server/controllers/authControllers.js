@@ -85,6 +85,7 @@ export const loginUser = async (req, res) => {
         , process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
       )
+      res.setHeader("Authorization", `Bearer ${accessToken}`);
       res.cookie("accesstoken", token, {
         httpOnly: true,          // Prevents XSS attacks
         secure: process.env.NODE_ENV === "production" || false // Ensures it's HTTPS in production
