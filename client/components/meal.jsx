@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import React from "react";
-import Color from "@/constants/Color";
+import Color from "@/constants/Colors.ts";
 
 
 export default function Meal({ data, onDlate }) {
@@ -8,7 +8,7 @@ export default function Meal({ data, onDlate }) {
   let i
   return (
     <View style={style.parent}>
-      <Text style={{ color: Color.first, fontSize: 20, fontWeight: 'bold' }}>MEAL</Text>
+      <Text style={{ color: Color.light.background, fontSize: 20, fontWeight: 'bold' }}>MEAL</Text>
       <View style={{ gap: 0 }}>
         <Text>{data.id}</Text>
         <Text>{data.food.foodname}</Text>
@@ -30,7 +30,7 @@ export default function Meal({ data, onDlate }) {
 
 const style = StyleSheet.create({
   parent: {
-    backgroundColor: Color.second,
+    backgroundColor: Color.light.tint,
     margin: (50, 30),
     padding: 15,
     borderRadius: 10,

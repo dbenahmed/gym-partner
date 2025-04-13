@@ -7,18 +7,20 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import Color from "@/constants/Color";
-import { useRouter } from "expo-router";
-import { useState, useContext } from "react";
-
 import { AuthContext } from "@/app/contex/authcontex";
-export default function SignUp() {
+import { useRouter } from "expo-router";
+import Color from "@/constants/Colors.ts";
+import { useState, useContext } from "react";
+export default function TabTwoScreen() {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const { isLouding,register } = useContext(AuthContext);
+  const { isLouding, login } = useContext(AuthContext);
 
+  const handleLogin = async () => {
+    login(email, password)
+
+  }
 
   return (
     <View
@@ -29,7 +31,6 @@ export default function SignUp() {
         padding: 20,
       }}
     >
-     
       <Image
         source={require("@/assets/images/logo.jpg")}
         style={{ width: 180, height: 180, margin: 50 }}
@@ -37,46 +38,33 @@ export default function SignUp() {
       <Text
         style={{ fontSize: 25, textAlign: "center", fontFamily: "outfitb" }}
       >
-        Create new account
+        Welcome Back
       </Text>
 
-      <TextInput
-        placeholder="Full name"
-        value={name}
-        style={styles.textInput}
-        onChangeText={(text) => setName(text)}
-      />
-      <TextInput
-        placeholder="Email"
-        value={email}
-        style={styles.textInput}
-        onChangeText={(text) => setEmail(text)}
-      />
+      <TextInput placeholder="Email" value={email} style={styles.textInput} onChangeText={text => setEmail(text)} />
       <TextInput
         placeholder="password"
-        secureTextEntry={true}
         value={password}
+        secureTextEntry={true}
         style={styles.textInput}
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={text => setPassword(text)}
       />
       <TouchableOpacity
         style={{
           padding: 15,
-          backgroundColor: Color.second,
+          backgroundColor: Color.light.background,
           width: "100%",
           marginTop: 20,
           borderRadius: 15,
         }}
+        onPress={() => { handleLogin() }}
       >
         <Text
           style={{
             textAlign: "center",
-            color: Color.first,
+            color: Color.light.tint,
             fontSize: 18,
             fontFamily: "outfitb",
-          }}
-          onPress={() => {
-            register(name, email, password);
           }}
         >
           Create account
@@ -90,17 +78,16 @@ export default function SignUp() {
           gap: 10,
         }}
       >
-        <Text>Already have an account?</Text>
-        <Pressable onPress={() => router.push("/login/signIn")}>
-          <Text style={{ color: Color.second, fontFamily: "outfitb" }}>
-            sign In Here
+        <Text>Don't have an account?</Text>
+        <Pressable onPress={() => router.push("/(auth)/signUp")}>
+          <Text style={{ color: Color.light.background, fontFamily: "outfitb" }}>
+            sign Up Here
           </Text>
         </Pressable>
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   textInput: {
     borderWidth: 1,

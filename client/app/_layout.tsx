@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { AuthProvider } from "@/app/contex/authcontex";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -12,7 +12,7 @@ export default function RootLayout() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}></Stack>
+        <Slot />
       </AuthProvider>
     </SafeAreaView>
   );

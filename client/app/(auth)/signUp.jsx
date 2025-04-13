@@ -7,15 +7,19 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import { AuthContext } from "@/app/contex/authcontex";
+import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
-import Color from "@/constants/Color";
-import {useState , useContext} from "react";
-export default function TabTwoScreen() {
+import { useState, useContext } from "react";
+import { AuthContext } from "@/app/contex/authcontex";
+
+export default function SignUp() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const { isLouding,login } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
+
+
   return (
     <View
       style={{
@@ -25,6 +29,7 @@ export default function TabTwoScreen() {
         padding: 20,
       }}
     >
+
       <Image
         source={require("@/assets/images/logo.jpg")}
         style={{ width: 180, height: 180, margin: 50 }}
@@ -32,33 +37,46 @@ export default function TabTwoScreen() {
       <Text
         style={{ fontSize: 25, textAlign: "center", fontFamily: "outfitb" }}
       >
-        Welcome Back
+        Create new account
       </Text>
-      
-      <TextInput placeholder="Email" value={email} style={styles.textInput} onChangeText={text=>setEmail(text)} />
+
+      <TextInput
+        placeholder="Full name"
+        value={name}
+        style={styles.textInput}
+        onChangeText={(text) => setName(text)}
+      />
+      <TextInput
+        placeholder="Email"
+        value={email}
+        style={styles.textInput}
+        onChangeText={(text) => setEmail(text)}
+      />
       <TextInput
         placeholder="password"
-        value={password}
         secureTextEntry={true}
+        value={password}
         style={styles.textInput}
-        onChangeText={text=>setPassword(text)}
+        onChangeText={(text) => setPassword(text)}
       />
       <TouchableOpacity
         style={{
           padding: 15,
-          backgroundColor: Color.second,
+          backgroundColor: Color.light.background,
           width: "100%",
           marginTop: 20,
           borderRadius: 15,
         }}
-        onPress={()=>{login(email,password)}}
       >
         <Text
           style={{
             textAlign: "center",
-            color: Color.first,
+            color: Color.light.tint,
             fontSize: 18,
             fontFamily: "outfitb",
+          }}
+          onPress={() => {
+            register(name, email, password);
           }}
         >
           Create account
@@ -72,16 +90,17 @@ export default function TabTwoScreen() {
           gap: 10,
         }}
       >
-        <Text>Don't have an account?</Text>
-        <Pressable onPress={() => router.push("/login/signUp")}>
-          <Text style={{ color: Color.second, fontFamily: "outfitb" }}>
-            sign Up Here
+        <Text>Already have an account?</Text>
+        <Pressable onPress={() => router.push("/(auth)/signIn")}>
+          <Text style={{ color: Color.light.background, fontFamily: "outfitb" }}>
+            sign In Here
           </Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   textInput: {
     borderWidth: 1,

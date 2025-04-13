@@ -13,10 +13,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React from "react";
-import food from "@/components/Food";
 import Color from "@/constants/Colors.ts";
 import { useState, useEffect } from "react";
-import Meal from "../../../components/Meal";
+import Meal from "@/components/Meal";
 import { defaultUrl } from "@/constants/constants.ts"
 import { fetchSearchFood, fetchAddFoodToUser } from "@/lib/api";
 

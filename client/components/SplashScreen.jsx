@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from "react-native";
 
 
 
-const splashScreen = ()=> {
+const SplashScreen = ()=> {
     return(
         <View style={{flex:1,justifyContent:'center',backgroundColor:"green"}}>
             <ActivityIndicator size="large" color="red"/>
@@ -13,4 +13,4 @@ const splashScreen = ()=> {
 
 
 
-export default splashScreen;
+    export default SplashScreen;
