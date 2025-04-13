@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useState, useEffect } from "react";
-import Color from "@/constants/Color";
+import Color from "@/constants/Colors.ts";
 import { useContext } from "react";
 import { AuthContext } from "../contex/authcontex";
 
@@ -79,7 +79,7 @@ export default function Profile() {
         <Text
           style={{
             fontSize: 30,
-            color: Color.second,
+            color: Color.light.tint,
             fontWeight: "900",
             letterSpacing: 2,
             marginTop: 30,
@@ -89,7 +89,7 @@ export default function Profile() {
         </Text>
         <View
           style={{
-            backgroundColor: Color.second,
+            backgroundColor: Color.light.tint,
             width: "100%",
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
@@ -98,13 +98,13 @@ export default function Profile() {
         >
           <Text
             style={{
-              color: Color.first,
+              color: Color.light.background,
               textAlign: "center",
               margin: 10,
               fontSize: 40,
               fontWeight: "500",
               borderBottomWidth: 2,
-              borderColor: Color.first,
+              borderColor: Color.light.background,
             }}
           >
             {" "}
@@ -121,7 +121,7 @@ export default function Profile() {
           >
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 18,
                 fontWeight: "500",
                 letterSpacing: 1,
@@ -132,7 +132,7 @@ export default function Profile() {
             </Text>
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 16,
                 fontWeight: "400",
                 textAlign: "center",
@@ -151,7 +151,7 @@ export default function Profile() {
           >
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 18,
                 fontWeight: "500",
                 letterSpacing: 1,
@@ -162,7 +162,7 @@ export default function Profile() {
             </Text>
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 16,
                 fontWeight: "400",
                 textAlign: "center",
@@ -181,7 +181,7 @@ export default function Profile() {
           >
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 18,
                 fontWeight: "500",
                 letterSpacing: 1,
@@ -192,7 +192,7 @@ export default function Profile() {
             </Text>
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 16,
                 fontWeight: "400",
                 textAlign: "center",
@@ -211,7 +211,7 @@ export default function Profile() {
           >
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 18,
                 fontWeight: "500",
                 letterSpacing: 1,
@@ -222,7 +222,7 @@ export default function Profile() {
             </Text>
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 16,
                 fontWeight: "400",
                 textAlign: "center",
@@ -241,7 +241,7 @@ export default function Profile() {
           >
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 18,
                 fontWeight: "500",
                 letterSpacing: 1,
@@ -252,7 +252,7 @@ export default function Profile() {
             </Text>
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 16,
                 fontWeight: "400",
                 textAlign: "center",
@@ -271,7 +271,7 @@ export default function Profile() {
           >
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 18,
                 fontWeight: "500",
                 letterSpacing: 1,
@@ -282,7 +282,7 @@ export default function Profile() {
             </Text>
             <Text
               style={{
-                color: Color.first,
+                color: Color.light.background,
                 fontSize: 16,
                 fontWeight: "400",
                 textAlign: "center",
@@ -294,7 +294,7 @@ export default function Profile() {
           <View style={{ alignItems: "center", padding: 20 }}>
             <TouchableOpacity
               style={{
-                backgroundColor: Color.first,
+                backgroundColor: Color.light.background,
                 width: 200,
                 borderRadius: 10,
               }}
@@ -302,7 +302,7 @@ export default function Profile() {
             >
               <Text
                 style={{
-                  color: Color.second,
+                  color: Color.light.tint,
                   fontSize: 20,
                   fontWeight: "500",
                   letterSpacing: 1,
@@ -329,7 +329,7 @@ export default function Profile() {
         >
           <Text
             style={{
-              color: Color.first,
+              color: Color.light.background,
               fontSize: 10,
               fontWeight: "500",
               letterSpacing: 1,
@@ -354,7 +354,7 @@ export default function Profile() {
               style={{
                 textAlign: "center",
                 fontSize: 25,
-                color: Color.first,
+                color: Color.light.background,
                 fontWeight: "600",
                 letterSpacing: 2,
               }}
@@ -406,7 +406,7 @@ export default function Profile() {
             <View style={{ alignItems: "center", padding: 20 }}>
               <TouchableOpacity
                 style={{
-                  backgroundColor: Color.first,
+                  backgroundColor: Color.light.background,
                   width: 200,
                   borderRadius: 10,
                 }}
@@ -414,7 +414,7 @@ export default function Profile() {
               >
                 <Text
                   style={{
-                    color: Color.second,
+                    color: Color.light.tint,
                     fontSize: 20,
                     fontWeight: "500",
                     letterSpacing: 1,
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     width: "40%",
     height: 100,
     borderRadius: "50%",
-    borderColor: Color.second,
+    borderColor: Color.light.tint,
     borderWidth: 3,
     overflow: "hidden",
     marginTop: 30,
@@ -453,11 +453,11 @@ const styles = StyleSheet.create({
   },
   modeleContent: {
     padding: 20,
-    backgroundColor: Color.second,
+    backgroundColor: Color.light.tint,
     borderRadius: 20,
   },
   InfoInput: {
-    backgroundColor: Color.first,
+    backgroundColor: Color.light.background,
     marginTop: 10,
     borderRadius: 4,
   },

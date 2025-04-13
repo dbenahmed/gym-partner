@@ -13,25 +13,29 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React from "react";
-import food from "@/components/Food";
 import Color from "@/constants/Colors.ts";
-import { useState, useEffect } from "react";
-import Meal from "../../../components/Meal";
+import { useState, useEffect, useContext } from "react";
+import Meal from "@/components/Meal";
 import { defaultUrl } from "@/constants/constants.ts"
 import { fetchSearchFood, fetchAddFoodToUser } from "@/lib/api";
+import useAuth from "@/app/contex/authcontex";
 
 export default function mealsHome() {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ODQsImlhdCI6MTc0NDM2Mjg0NiwiZXhwIjoxNzQ0NDQ5MjQ2fQ.IXm3R9gYZSIOnIiTk4q34RIvyncQw7uE7RZJGGiIDL8'
   const [meals, setMeals] = useState([]);
 
+  const { authenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false)
+
+
+  console.log('auth', authenticated)
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const renderUserMealsOnDate = async () => {
     try {
       setLoading(true);
+      const token = authenticated
       const dateStr = new Date(currentDate).toISOString().split('T')[0]
       console.log('defatul', defaultUrl)
       const url = `${defaultUrl}/meals?date=${dateStr}`
@@ -188,7 +192,7 @@ export default function mealsHome() {
   const [servingSize, setServingSize] = useState(0)
   const delateMeal = async (id) => {
     console.log(id)
-
+    const token = authenticated
     const url = `${defaultUrl}/meals/${id}`
     const res = await fetch(url, {
       method: "DELETE",

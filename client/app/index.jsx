@@ -1,22 +1,18 @@
-import { Image, StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from "react-native";
-import Face from "@/app/login/Face";
-import Home from "@/app/login/home";
-import Splash from "@/app/login/splash";
-import { AuthContext } from "./contex/authcontex";
-import { useContext } from "react";
-export default function HomeScreen() {
-  const { userInfo, splashLouding } = useContext(AuthContext);
-  return (
-    <>
-      {/*{splashLouding ? (
-        <Splash />
-      ) : userInfo.accsess_token ? (
-        <Home />
-      ) : (
-        <Face />
-      )}
-      */}
-        <Home />
-    </>
-  );
+// app/index.js
+import { Redirect } from "expo-router";
+import { useEffect } from "react";
+import useAuth from "@/app/contex/authcontex";
+
+
+
+export default function Index() {
+
+  const { authenticated } = useAuth();
+  if (authenticated) { // logged in 
+    return <Redirect href="/(protected)/home" />;
+  }
+
+  return <Redirect href="/(auth)/landing" />;
 }
+
+

@@ -1,16 +1,16 @@
 import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import Color from "@/constants/Color";
+import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
 
 
-export default function Face({ navigation }) {
+export default function Landing({ navigation }) {
   const router = useRouter();
     
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: Color.first,
+        backgroundColor: Color.light.background,
       }}
     >
       <Image
@@ -23,7 +23,7 @@ export default function Face({ navigation }) {
       <View
         style={{
           padding: 25,
-          backgroundColor: Color.second,
+          backgroundColor: Color.light.background,
           height: "100%",
           borderTopRightRadius: 35,
           borderTopLeftRadius: 35,
@@ -33,7 +33,7 @@ export default function Face({ navigation }) {
           style={{
             fontSize: 25,
             textAlign: "center",
-            color: Color.first,
+            color: Color.light.tint,
             fontFamily: "outfitb",
           }}
         >
@@ -43,7 +43,7 @@ export default function Face({ navigation }) {
           style={{
             fontSize: 15,
             textAlign: "center",
-            color: Color.first,
+            color: Color.light.tint,
             marginTop: 20,
             fontFamily: "outfitr",
           }}
@@ -53,9 +53,9 @@ export default function Face({ navigation }) {
         </Text>
         <TouchableOpacity
           style={styles.botton}
-          onPress={() => router.push("/login/signUp")}
+          onPress={() => router.push("/(auth)/signUp")}
         >
-          <Text style={[styles.bottonText, { color: Color.second }]}>
+          <Text style={[styles.bottonText]}>
             Get Started 
           </Text>
         </TouchableOpacity>
@@ -63,14 +63,14 @@ export default function Face({ navigation }) {
           style={[
             styles.botton,
             {
-              backgroundColor: Color.second,
+              backgroundColor: Color.light.tint,
               borderWidth: 1,
-              borderColor: Color.first,
+              borderColor: Color.light.tint,
             },
           ]}
-          onPress={() => router.push("/login/signIn")}
+          onPress={() => router.push("/(auth)/signIn")}
         >
-          <Text style={[styles.bottonText, { color: Color.first }]}>
+          <Text style={[styles.bottonText, { color: Color.light.background }]}>
             already have an account?
           </Text>
         </TouchableOpacity>
@@ -82,12 +82,13 @@ export default function Face({ navigation }) {
 const styles = StyleSheet.create({
   botton: {
     padding: 20,
-    backgroundColor: Color.first,
+    backgroundColor: Color.light.tint,
     marginTop: 20,
     borderRadius: 10,
   },
   bottonText: {
     textAlign: "center",
     fontSize: 18,
+    color: Color.light.background,
   },
 });
