@@ -19,22 +19,22 @@ import { useContext } from "react";
 import { AuthContext } from "../contex/authcontex";
 
 export default function Profile() {
-  const { userInsfo, isLoding, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
 
   const modification = () => {
-    if (username.length == 0 || email.length == 0 || fullName.length ==0 || phone.length == 0 || address.length == 0 || height.length == 0 || weight.length == 0) {
+    if (username.length == 0 || email.length == 0 || fullName.length == 0 || phone.length == 0 || address.length == 0 || height.length == 0 || weight.length == 0) {
       Alert.alert('there empty input')
-    }else{
+    } else {
       setVisible(false);
       setUserInfo({
-        username:username,
-        email:email,
+        username: username,
+        email: email,
         fullName: fullName,
         phone: phone,
-    address: address,
-    height: height, 
-    weight: weight, 
-    avatarUrl: `https://robohash.org/${username}.png`,
+        address: address,
+        height: height,
+        weight: weight,
+        avatarUrl: `https://robohash.org/${username}.png`,
       })
     }
   }
@@ -51,7 +51,7 @@ export default function Profile() {
     weight: "75 kg", // User weight});
   });
 
-  const [vatarUrl,setvatarUrl] = useState("https://robohash.org/lf.png");
+  const [vatarUrl, setvatarUrl] = useState("https://robohash.org/lf.png");
   const [visible, setVisible] = useState(false);
   const [username, setusername] = useState("JohnDoe");
   const [fullName, setfullName] = useState("John Doe");
@@ -326,6 +326,7 @@ export default function Profile() {
             borderTopLeftRadius: 10,
             borderBottomLeftRadius: 10,
           }}
+          onPress={logout}
         >
           <Text
             style={{
@@ -410,7 +411,7 @@ export default function Profile() {
                   width: 200,
                   borderRadius: 10,
                 }}
-                onPress={()=>modification()}
+                onPress={() => modification()}
               >
                 <Text
                   style={{
@@ -421,7 +422,7 @@ export default function Profile() {
                     padding: 10,
                     textAlign: "center",
                   }}
-                  
+
                 >
                   OK
                 </Text>

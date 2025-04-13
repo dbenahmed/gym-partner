@@ -188,8 +188,17 @@ export const updateUserProfile = async (req, res) => {
 // Log out the user  ماتخدمهاش مانحتاجوهاش
 export const logoutUser = (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: (process.env.NODE_ENV === "production"),
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 0,
+      path: "/"
+    })
+    res.status(200).json({
+      success: true,
+      message: 'The user is logged out successfully'
+    })
   } catch (error) {
     res.status(500).json({ message: 'Error updating user profile', error: error.message });
   }

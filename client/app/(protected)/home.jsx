@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "../contex/authcontex";
 import { useRouter } from "expo-router";
 export default function Home() {
-  const { userInsfo, isLoding, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const router = useRouter();
   return (
     <View style={styles.container}>

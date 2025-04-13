@@ -65,26 +65,32 @@ export const AuthProvider = ({ children }) => {
             return errorResponse
         }
     }
-    const logout = () => {
-        /* setIsLoading(true);
-        axios
-            .post(
-                `${BASE_URL}/logout`,
+    const logout = async () => {
+        try {
+            const token = await getTokenMobile();
+            console.log('logging out')
+            const { data } = await axios.post(
+                `${defaultUrl}/auth/logout`,
                 {},
                 {
-                    headers: { Authorization: `Bearer ${userInfo.access_token}` },
+                    headers: { Authorization: `Bearer ${token}` },
                 },
             )
-            .then(res => {
-                console.log(res.data);
-                AsyncStorage.removeItem('userInfo');
-                setUserInfo({})
-                setIsLoading(false);
-            })
-            .catch(e => {
-                console.log(`login ereer ${e}`);
-                setIsLoading(false);
-            }) */
+            console.log('logged out')
+            if (data.success) {
+                console.log('clearing')
+                setAuthenticated(null);
+                setUserId(null);
+                if (Platform.OS === 'ios' || Platform.OS === 'android') {
+                    await SecureStore.deleteItemAsync('user-id');
+                    await SecureStore.deleteItemAsync('access-token');
+                }
+                console.log('cleared')
+            }
+        } catch (e) {
+            const errorResponse = handleError(e);
+            return errorResponse
+        }
     }
     const isLoggedIn = async () => {
         try {
