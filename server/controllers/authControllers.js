@@ -20,6 +20,7 @@ export const registerUser = async (req, res) => {
       success: false,
       message: "the username already exists "
     })
+    return;
   }
 
   // Insert the new user 
@@ -61,6 +62,7 @@ export const loginUser = async (req, res) => {
         success: false,
         message: "the username is not valide "
       })
+      return;
     }
 
     const user = existUser[0];
@@ -72,6 +74,7 @@ export const loginUser = async (req, res) => {
         success: false,
         message: "the username or password is not correct !"
       })
+      return;
     } else {
 
       // Genetrate JWT Token for the authentification
@@ -122,6 +125,7 @@ export const getUserProfile = async (req, res) => {
         success: false,
         message: 'The accesstoken has invalid userId!'
       })
+      return;
     }
     const user = foundUsers[0]
     console.log(user)
