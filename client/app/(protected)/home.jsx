@@ -13,12 +13,12 @@ export default function Home() {
       <Button
         title="meals"
         color="blue"
-        onPress={() => router.push("/login/Food/mealsHome")}
+        onPress={() => router.push("/(protected)/mealsHome")}
       />
       <Button
         title="Profile"
         color="yellow"
-        onPress={() => router.push("/login/Profile")}
+        onPress={() => router.push("/(protected)/profile")}
       />
     </View>
   );

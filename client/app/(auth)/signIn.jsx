@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 import Color from "@/constants/Colors.ts";
 import { useState, useContext } from "react";
 import SplashScreen from "@/components/SplashScreen";
-
+import { Alert } from "react-native";
 
 
 
@@ -27,6 +27,8 @@ export default function TabTwoScreen() {
     const res = await login(username, password)
     if (res.success) {
       router.push("/(protected)/home") // should use REDIRECT
+    } else {
+      Alert.alert('Error', res.message)
     }
     setSplashLoading(false)
   }

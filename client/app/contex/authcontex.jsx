@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
             if (data.success) {
                 // settings up the user id and the access token into the cookie ( web ) happens automatically on the backend. or async storage ( mobile )
                 if (Platform.OS === 'ios' || Platform.OS === 'android') {
-                    await SecureStore.setItemAsync('user-id', data.data.id);
+                    await SecureStore.setItemAsync('user-id', JSON.stringify(data.data.id));
                     await SecureStore.setItemAsync('access-token', data.data.accessToken);
                 }
                 setUserId(data.id)
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
             })
             console.log('sent')
             if (data.success) {
-                let userId = await SecureStore.getItemAsync('user-id');
+                let userId = await parseInt(await SecureStore.getItemAsync('user-id'));
                 setUserId(userId);
                 setAuthenticated(data.accessToken);
                 return {
