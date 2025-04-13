@@ -85,12 +85,14 @@ export const loginUser = async (req, res) => {
         , process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
       )
-      res.cookie("accesstoken", token, {
-        httpOnly: true,          // Prevents XSS attacks
-        secure: process.env.NODE_ENV === "production" || false // Ensures it's HTTPS in production
-        // sameSite: "Strict",      // Prevents CSRF attacks
-        // maxAge: 60 * 60 * 1000   // Token expires in 1 hour (60 minutes * 60 seconds * 1000 ms)
-      })
+      res.cookie("access_token", token, {
+        httpOnly: true,                // Prevents XSS attacks
+        secure: (process.env.NODE_ENV === "production"), // true in production, false in development (for HTTP)
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",              // Allows the cookie to be sent cross-site (required for cross-origin requests)
+        maxAge: 24 * 60 * 60 * 1000,   // Cookie expires in 1 day (same as token expiration)
+        path: "/",                     // Ensure the cookie is available across all paths
+      });
+
       res.status(200).json({
         success: true,
         message: "the login is complete successfuly",

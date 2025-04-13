@@ -1,12 +1,14 @@
 // app/index.js
 import { Redirect } from "expo-router";
-
-
+import { useEffect } from "react";
+import useAuth from "@/app/contex/authcontex";
 
 
 
 export default function Index() {
-  if (false) { // logged in 
+
+  const { authenticated } = useAuth();
+  if (authenticated) { // logged in 
     return <Redirect href="/(protected)/home" />;
   }
 

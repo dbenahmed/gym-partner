@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import { defaultUrl } from "@/constants/constants";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import SplashScreen from "@/components/SplashScreen";
 import { handleError } from "@/lib/handleError";
 import { Platform } from "react-native";
-
+import * as SecureStore from 'expo-secure-store';
 
 
 
@@ -14,6 +12,12 @@ export const AuthProvider = ({ children }) => {
 
     const [userId, setUserId] = useState();
     const [splashLoading, setSplashLoading] = useState(false);
+    const [authenticated, setAuthenticated] = useState(false);
+
+    const getTokenMobile = async () => {
+        const token = await SecureStore.getItemAsync('access-token');
+        return token;
+    }
 
     const register = async (username, password) => {
         try {
@@ -47,10 +51,11 @@ export const AuthProvider = ({ children }) => {
             if (data.success) {
                 // settings up the user id and the access token into the cookie ( web ) happens automatically on the backend. or async storage ( mobile )
                 if (Platform.OS === 'ios' || Platform.OS === 'android') {
-                    await AsyncStorage.setItem('userid', data.data.id);
-                    await AsyncStorage.setItem('accesstoken', data.data.accessToken);
+                    await SecureStore.setItemAsync('user-id', data.data.id);
+                    await SecureStore.setItemAsync('access-token', data.data.accessToken);
                 }
                 setUserId(data.id)
+                setAuthenticated(true);
                 return {
                     success: true, message: data.message
                 }
@@ -82,23 +87,53 @@ export const AuthProvider = ({ children }) => {
             }) */
     }
     const isLoggedIn = async () => {
-        /* try {
-            setSplachLouding(true)
-            let userInfo = await AsyncStorage.getItem('userInfo');
-            userInfo = JSON.parse(userInfo);
-            if (userInfo) {
-                setUserInfo(userInfo);
+        try {
+            let header = {}
+            if (Platform.OS === 'ios' || Platform.OS === 'android') {
+                const token = await getTokenMobile();
+                if (!token) {
+                    return {
+                        success: false,
+                        message: "No token found",
+                    };
+                }
+                header = {
+                    Authorization: `Bearer ${token}`
+                }
             }
-            setSplachLouding(false)
+            console.log('sending')
+            const { data } = await axios.post(`${defaultUrl}/auth/check`, {}, {
+                withCredentials: true,
+                headers: header
+            })
+            console.log('sent')
+            if (data.success) {
+                let userId = await SecureStore.getItemAsync('user-id');
+                setUserId(userId);
+                setAuthenticated(true);
+                return {
+                    success: true,
+                    message: data.message,
+                };
+            }
         } catch (e) {
-            console.log(`is logged in errer ${e}`)
-            setSplachLouding(false)
-        } */
+            const errorResponse = handleError(e);
+            return errorResponse
+        }
     }
 
 
+    useEffect(() => {
+        const run = async () => {
+            const log = await isLoggedIn();
+        }
+        run();
+    }, []);
+
+
+
     return (
-        <AuthContext.Provider value={{ splashLoading, setSplashLoading, register, login, logout, userId, setUserId }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ splashLoading, authenticated, setAuthenticated, setSplashLoading, register, login, isLoggedIn, logout, userId, setUserId }}>{children}</AuthContext.Provider>
     )
 }
 

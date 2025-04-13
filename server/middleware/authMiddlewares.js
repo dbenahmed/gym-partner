@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 dotenv.config();
 
 
-export const getAccessToken = async (req, res, next) => {
+export const getAccessToken = async () => {
     // Try cookie (web)
     const cookieToken = req.cookies?.access_token;
 
@@ -23,7 +23,7 @@ export const getAccessToken = async (req, res, next) => {
 const authMiddleware = async (req, res, next) => {
     try {
         // get the token from the request
-        const token = await getAccessToken(req, res, next);
+        const token = await getAccessToken();
         if (!token) {
             return res.status(401).json({ message: 'No token provided or invalid format' });
         }

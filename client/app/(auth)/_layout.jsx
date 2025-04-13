@@ -1,11 +1,13 @@
 import { Stack } from "expo-router";
 import { Redirect } from "expo-router";
+import useAuth from "@/app/contex/authcontex";
+
+
+
 export default function Layout() {
+    const { authenticated } = useAuth();
 
-
-
-
-    if (false) // logged in 
+    if (authenticated) // logged in 
     {
         return <Redirect href="/(protected)/home" />
     }
