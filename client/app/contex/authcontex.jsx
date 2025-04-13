@@ -3,6 +3,12 @@ import { defaultUrl } from "@/constants/constants";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreen from "@/components/SplashScreen";
+import { handleError } from "@/lib/handleError";
+import { Platform } from "react-native";
+
+
+
+
 export const AuthContext = React.createContext();
 export const AuthProvider = ({ children }) => {
 
@@ -27,36 +33,32 @@ export const AuthProvider = ({ children }) => {
             }
 
         } catch (e) {
-            if (e.name === 'AxiosError') {
-                return {
-                    success: false,
-                    message: e.response.data.message,
-                }
-            } else {
-                console.error(`register error ${e}`)
-                return {
-                    success: false,
-                    message: e.message,
-                }
-            }
+            const errorResponse = handleError(e);
+            return errorResponse
         }
     }
-    const login = (email, pasword) => {
-        /* setIsLoading(true);
-        axios
-            .post(`${BASE_URL}/login`, {
-                email, pasword,
+    const login = async (username, password) => {
+        try {
+            const { data, headers } = await axios.post(`${defaultUrl}/auth/login`, {
+                username, password
+            }, {
+                withCredentials: true
             })
-            .then(res => {
-                let userInfo = res.data;
-                console.log(userInfo);
-                setUserInfo(userInfo);
-                AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-                setIsLoading(false);
-            }).catch(e => {
-                console.log(`login ereer ${e}`);
-                setIsLoading(false);
-            }) */
+            if (data.success) {
+                // settings up the user id and the access token into the cookie ( web ) happens automatically on the backend. or async storage ( mobile )
+                if (Platform.OS === 'ios' || Platform.OS === 'android') {
+                    await AsyncStorage.setItem('userid', data.data.id);
+                    await AsyncStorage.setItem('accesstoken', data.data.accessToken);
+                }
+                setUserId(data.id)
+                return {
+                    success: true, message: data.message
+                }
+            }
+        } catch (e) {
+            const errorResponse = handleError(e);
+            return errorResponse
+        }
     }
     const logout = () => {
         /* setIsLoading(true);
@@ -96,7 +98,7 @@ export const AuthProvider = ({ children }) => {
 
 
     return (
-        <AuthContext.Provider value={{ splashLoading, setSplashLoading, register, login, logout }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ splashLoading, setSplashLoading, register, login, logout, userId, setUserId }}>{children}</AuthContext.Provider>
     )
 }
 

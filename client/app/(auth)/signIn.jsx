@@ -11,15 +11,29 @@ import { AuthContext } from "@/app/contex/authcontex";
 import { useRouter } from "expo-router";
 import Color from "@/constants/Colors.ts";
 import { useState, useContext } from "react";
+import SplashScreen from "@/components/SplashScreen";
+
+
+
+
 export default function TabTwoScreen() {
   const router = useRouter();
   const [password, setPassword] = useState("password1");
   const [username, setUsername] = useState("user1");
-  const { isLouding, login } = useContext(AuthContext);
+  const { login, splashLoading, setSplashLoading } = useContext(AuthContext);
 
   const handleLogin = async () => {
-    login(username, password)
+    setSplashLoading(true)
+    const res = await login(username, password)
+    if (res.success) {
+      router.push("/(protected)/home") // should use REDIRECT
+    }
+    setSplashLoading(false)
+  }
 
+
+  if (splashLoading) {
+    return <SplashScreen />
   }
 
   return (
@@ -67,7 +81,7 @@ export default function TabTwoScreen() {
             fontFamily: "outfitb",
           }}
         >
-          Create account
+          Log In
         </Text>
       </TouchableOpacity>
       <View
