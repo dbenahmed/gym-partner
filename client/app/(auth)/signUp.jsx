@@ -7,19 +7,40 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import Color from "@/constants/Color";
+import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
 import { useState, useContext } from "react";
-
 import { AuthContext } from "@/app/contex/authcontex";
+import useAuth from "@/app/contex/authcontex";
+import SplashScreen from "@/components/SplashScreen";
+import { Alert } from "react-native";
+
+
+
 export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const { isLouding,register } = useContext(AuthContext);
+  const [password, setPassword] = useState("password1");
+  const [username, setUsername] = useState("user1");
+  const { register, splashLoading, setSplashLoading } = useAuth()
 
 
+  const handleRegister = async () => {
+    setSplashLoading(true)
+    const res = await register(username, password)
+    if (res.success) {
+      Alert.alert("Success", res.message)
+      router.push("/(auth)/signIn")
+    } else {
+      Alert.alert("Error", res.message)
+    }
+    setSplashLoading(false)
+  };
+
+
+  if (splashLoading) {
+    return <SplashScreen />
+  }
   return (
     <View
       style={{
@@ -29,7 +50,7 @@ export default function SignUp() {
         padding: 20,
       }}
     >
-     
+
       <Image
         source={require("@/assets/images/logo.jpg")}
         style={{ width: 180, height: 180, margin: 50 }}
@@ -41,16 +62,10 @@ export default function SignUp() {
       </Text>
 
       <TextInput
-        placeholder="Full name"
-        value={name}
+        placeholder="username"
+        value={username}
         style={styles.textInput}
-        onChangeText={(text) => setName(text)}
-      />
-      <TextInput
-        placeholder="Email"
-        value={email}
-        style={styles.textInput}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => setUsername(text)}
       />
       <TextInput
         placeholder="password"
@@ -62,7 +77,7 @@ export default function SignUp() {
       <TouchableOpacity
         style={{
           padding: 15,
-          backgroundColor: Color.second,
+          backgroundColor: Color.light.background,
           width: "100%",
           marginTop: 20,
           borderRadius: 15,
@@ -71,12 +86,12 @@ export default function SignUp() {
         <Text
           style={{
             textAlign: "center",
-            color: Color.first,
+            color: Color.light.tint,
             fontSize: 18,
             fontFamily: "outfitb",
           }}
           onPress={() => {
-            register(name, email, password);
+            handleRegister()
           }}
         >
           Create account
@@ -91,8 +106,8 @@ export default function SignUp() {
         }}
       >
         <Text>Already have an account?</Text>
-        <Pressable onPress={() => router.push("/login/signIn")}>
-          <Text style={{ color: Color.second, fontFamily: "outfitb" }}>
+        <Pressable onPress={() => router.push("/(auth)/signIn")}>
+          <Text style={{ color: Color.light.background, fontFamily: "outfitb" }}>
             sign In Here
           </Text>
         </Pressable>

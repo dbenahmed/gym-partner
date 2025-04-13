@@ -9,13 +9,35 @@ import {
 } from "react-native";
 import { AuthContext } from "@/app/contex/authcontex";
 import { useRouter } from "expo-router";
-import Color from "@/constants/Color";
-import {useState , useContext} from "react";
+import Color from "@/constants/Colors.ts";
+import { useState, useContext } from "react";
+import SplashScreen from "@/components/SplashScreen";
+import { Alert } from "react-native";
+
+
+
 export default function TabTwoScreen() {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const { isLouding,login } = useContext(AuthContext);
+  const [password, setPassword] = useState("password1");
+  const [username, setUsername] = useState("user1");
+  const { login, splashLoading, setSplashLoading } = useContext(AuthContext);
+
+  const handleLogin = async () => {
+    setSplashLoading(true)
+    const res = await login(username, password)
+    if (res.success) {
+      router.push("/(protected)/home") // should use REDIRECT
+    } else {
+      Alert.alert('Error', res.message)
+    }
+    setSplashLoading(false)
+  }
+
+
+  if (splashLoading) {
+    return <SplashScreen />
+  }
+
   return (
     <View
       style={{
@@ -32,36 +54,36 @@ export default function TabTwoScreen() {
       <Text
         style={{ fontSize: 25, textAlign: "center", fontFamily: "outfitb" }}
       >
-        Welcome Back
+        Sign In Page
       </Text>
-      
-      <TextInput placeholder="Email" value={email} style={styles.textInput} onChangeText={text=>setEmail(text)} />
+
+      <TextInput placeholder="username" value={username} style={styles.textInput} onChangeText={text => setUsername(text)} />
       <TextInput
         placeholder="password"
         value={password}
         secureTextEntry={true}
         style={styles.textInput}
-        onChangeText={text=>setPassword(text)}
+        onChangeText={text => setPassword(text)}
       />
       <TouchableOpacity
         style={{
           padding: 15,
-          backgroundColor: Color.second,
+          backgroundColor: Color.light.background,
           width: "100%",
           marginTop: 20,
           borderRadius: 15,
         }}
-        onPress={()=>{login(email,password)}}
+        onPress={() => { handleLogin() }}
       >
         <Text
           style={{
             textAlign: "center",
-            color: Color.first,
+            color: Color.light.tint,
             fontSize: 18,
             fontFamily: "outfitb",
           }}
         >
-          Create account
+          Log In
         </Text>
       </TouchableOpacity>
       <View
@@ -73,8 +95,8 @@ export default function TabTwoScreen() {
         }}
       >
         <Text>Don't have an account?</Text>
-        <Pressable onPress={() => router.push("/login/signUp")}>
-          <Text style={{ color: Color.second, fontFamily: "outfitb" }}>
+        <Pressable onPress={() => router.push("/(auth)/signUp")}>
+          <Text style={{ color: Color.light.background, fontFamily: "outfitb" }}>
             sign Up Here
           </Text>
         </Pressable>

@@ -32,10 +32,15 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "PORT": "3232",
+      "URL": "http://192.168.94.215"
     }
   }
 }

@@ -1,20 +1,19 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import  {AuthProvider}  from "@/app/contex/authcontex";
-
-
+import { Slot, Stack } from "expo-router";
+import { AuthProvider } from "@/app/contex/authcontex";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
-  
   useFonts({
-    'outfitr': require('@/assets/fonts/Outfit-Regular.ttf'),
-    'outfitb': require('@/assets/fonts/Outfit-Bold.ttf'),
+    outfitr: require("@/assets/fonts/Outfit-Regular.ttf"),
+    outfitb: require("@/assets/fonts/Outfit-Bold.ttf"),
   });
 
   return (
-    <AuthProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-      </Stack>
-    </AuthProvider>
+    <SafeAreaView style={{ flex: 1 }}>
+      <AuthProvider>
+        <Slot />
+      </AuthProvider>
+    </SafeAreaView>
   );
 }

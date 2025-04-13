@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "../contex/authcontex";
 import { useRouter } from "expo-router";
 export default function Home() {
-  const { userInsfo, isLoding, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const router = useRouter();
   return (
     <View style={styles.container}>
@@ -13,12 +13,12 @@ export default function Home() {
       <Button
         title="meals"
         color="blue"
-        onPress={() => router.push("/login/Food/mealsHome")}
+        onPress={() => router.push("/(protected)/mealsHome")}
       />
       <Button
         title="Profile"
         color="yellow"
-        onPress={() => router.push("/login/Profile")}
+        onPress={() => router.push("/(protected)/profile")}
       />
     </View>
   );

@@ -4,7 +4,7 @@ import { users } from '../db/schemas/dev/schema.js';
 import { eq } from 'drizzle-orm';
 import db from "../db/index.js";
 import dotenv from "dotenv"
-
+import { getAccessToken } from "../middleware/authMiddlewares.js";
 
 dotenv.config();
 
@@ -20,6 +20,7 @@ export const registerUser = async (req, res) => {
       success: false,
       message: "the username already exists "
     })
+    return;
   }
 
   // Insert the new user 
@@ -61,6 +62,7 @@ export const loginUser = async (req, res) => {
         success: false,
         message: "the username is not valide "
       })
+      return;
     }
 
     const user = existUser[0];
@@ -72,6 +74,7 @@ export const loginUser = async (req, res) => {
         success: false,
         message: "the username or password is not correct !"
       })
+      return;
     } else {
 
       // Genetrate JWT Token for the authentification
@@ -82,17 +85,20 @@ export const loginUser = async (req, res) => {
         , process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
       )
-      res.cookie("accesstoken", token, {
-        httpOnly: true,          // Prevents XSS attacks
-        secure: process.env.NODE_ENV === "production" || false // Ensures it's HTTPS in production
-        // sameSite: "Strict",      // Prevents CSRF attacks
-        // maxAge: 60 * 60 * 1000   // Token expires in 1 hour (60 minutes * 60 seconds * 1000 ms)
-      })
+      res.cookie("access_token", token, {
+        httpOnly: true,                // Prevents XSS attacks
+        secure: (process.env.NODE_ENV === "production"), // true in production, false in development (for HTTP)
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",              // Allows the cookie to be sent cross-site (required for cross-origin requests)
+        maxAge: 24 * 60 * 60 * 1000,   // Cookie expires in 1 day (same as token expiration)
+        path: "/",                     // Ensure the cookie is available across all paths
+      });
+
       res.status(200).json({
         success: true,
         message: "the login is complete successfuly",
         data: {
-          id: user.id
+          id: user.id,
+          accessToken: token
         }
       })
     }
@@ -122,6 +128,7 @@ export const getUserProfile = async (req, res) => {
         success: false,
         message: 'The accesstoken has invalid userId!'
       })
+      return;
     }
     const user = foundUsers[0]
     console.log(user)
@@ -181,11 +188,34 @@ export const updateUserProfile = async (req, res) => {
 // Log out the user  ماتخدمهاش مانحتاجوهاش
 export const logoutUser = (req, res) => {
   try {
-    const { userId } = req.user;
-    // ... existing code ...
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: (process.env.NODE_ENV === "production"),
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 0,
+      path: "/"
+    })
+    res.status(200).json({
+      success: true,
+      message: 'The user is logged out successfully'
+    })
   } catch (error) {
     res.status(500).json({ message: 'Error updating user profile', error: error.message });
   }
 };
 
 
+
+
+export const checkAuth = async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      message: 'The user is authenticated',
+      accessToken: req.token
+    })
+  }
+  catch (err) {
+    res.status(500).json({ message: 'Error checking authentication', error: err.message });
+  }
+}
