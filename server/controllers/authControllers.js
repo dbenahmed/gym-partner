@@ -4,7 +4,7 @@ import { users } from '../db/schemas/dev/schema.js';
 import { eq } from 'drizzle-orm';
 import db from "../db/index.js";
 import dotenv from "dotenv"
-
+import { getAccessToken } from "../middleware/authMiddlewares.js";
 
 dotenv.config();
 
@@ -85,7 +85,6 @@ export const loginUser = async (req, res) => {
         , process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
       )
-      res.setHeader("Authorization", `Bearer ${accessToken}`);
       res.cookie("accesstoken", token, {
         httpOnly: true,          // Prevents XSS attacks
         secure: process.env.NODE_ENV === "production" || false // Ensures it's HTTPS in production
@@ -199,15 +198,10 @@ export const logoutUser = (req, res) => {
 
 export const checkAuth = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const foundUsers = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-    if (foundUsers.length === 0) {
-      res.status(401).json({
-        success: false,
-        message: 'The accesstoken has invalid userId!'
-      })
-      return;
-    }
+    return res.status(200).json({
+      success: true,
+      message: 'The user is authenticated'
+    })
   }
   catch (err) {
     res.status(500).json({ message: 'Error checking authentication', error: err.message });

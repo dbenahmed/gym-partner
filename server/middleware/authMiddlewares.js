@@ -32,9 +32,16 @@ const authMiddleware = async (req, res, next) => {
         // verify userId is inside the decoded access token
         if (!decoded.id) {
             res.status(400).json({ success: false, message: "Access token invalid no user id included" })
+            return;
         }
         // verify user exists
         const foundUser = await db.select({ id: users.id, username: users.username, avatar: users.avatar, email: users.email, firstname: users.firstname, lastname: users.lastname }).from(users).where(eq(users.id, decoded.id)).limit(1)
+
+        if (foundUser.length === 0) {
+            res.status(400).json({ success: false, message: "Access token invalid no user id included" })
+            return;
+        }
+
         req.user = foundUser[0].id;
         req.userData = foundUser[0]
         next();
