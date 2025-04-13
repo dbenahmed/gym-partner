@@ -194,3 +194,21 @@ export const logoutUser = (req, res) => {
 };
 
 
+
+
+export const checkAuth = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const foundUsers = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (foundUsers.length === 0) {
+      res.status(401).json({
+        success: false,
+        message: 'The accesstoken has invalid userId!'
+      })
+      return;
+    }
+  }
+  catch (err) {
+    res.status(500).json({ message: 'Error checking authentication', error: err.message });
+  }
+}

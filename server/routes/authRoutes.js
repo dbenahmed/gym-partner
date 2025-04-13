@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, getUserProfile, updateUserProfile, logoutUser } from '../controllers/authControllers.js'
+import { registerUser, loginUser, getUserProfile, updateUserProfile, logoutUser, checkAuth } from '../controllers/authControllers.js'
 import authMiddleware from '../middleware/authMiddlewares.js';
 
 
@@ -26,5 +26,7 @@ router.put('/auth/me', authMiddleware, updateUserProfile);
 // Log out the user
 router.post('/auth/logout', authMiddleware, logoutUser);
 
+// Check the authentication
+router.post('/auth/check', checkAuth);
 
 export default router

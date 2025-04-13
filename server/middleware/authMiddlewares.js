@@ -6,16 +6,27 @@ import { eq } from 'drizzle-orm';
 dotenv.config();
 
 
+const getAccessToken = async (req, res, next) => {
+    // Try cookie (web)
+    const cookieToken = req.cookies?.access_token;
+
+    // Try Authorization header (mobile)
+    const authHeader = req.headers?.authorization;
+    const bearerToken = authHeader?.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : null;
+
+    return cookieToken || bearerToken || null;
+}
+
 
 const authMiddleware = async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'No token provided or invalid format' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
     try {
+        // get the token from the request
+        const token = await getAccessToken(req, res, next);
+        if (!token) {
+            return res.status(401).json({ message: 'No token provided or invalid format' });
+        }
         // Verify the token using your secret key
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
         // verify userId is inside the decoded access token
