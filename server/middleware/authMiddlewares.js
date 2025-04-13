@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 dotenv.config();
 
 
-const getAccessToken = async (req, res, next) => {
+export const getAccessToken = async (req, res, next) => {
     // Try cookie (web)
     const cookieToken = req.cookies?.access_token;
 
