@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 dotenv.config();
 
 
-export const getAccessToken = async () => {
+export const getAccessToken = async (req, res) => {
     // Try cookie (web)
     const cookieToken = req.cookies?.access_token;
 
@@ -23,7 +23,7 @@ export const getAccessToken = async () => {
 const authMiddleware = async (req, res, next) => {
     try {
         // get the token from the request
-        const token = await getAccessToken();
+        const token = await getAccessToken(req, res);
         if (!token) {
             return res.status(401).json({ message: 'No token provided or invalid format' });
         }
@@ -44,6 +44,7 @@ const authMiddleware = async (req, res, next) => {
 
         req.user = foundUser[0].id;
         req.userData = foundUser[0]
+        req.token = token;
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

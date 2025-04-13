@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     const [userId, setUserId] = useState();
     const [splashLoading, setSplashLoading] = useState(false);
-    const [authenticated, setAuthenticated] = useState(false);
+    const [authenticated, setAuthenticated] = useState(null);
 
     const getTokenMobile = async () => {
         const token = await SecureStore.getItemAsync('access-token');
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
                     await SecureStore.setItemAsync('access-token', data.data.accessToken);
                 }
                 setUserId(data.id)
-                setAuthenticated(true);
+                setAuthenticated(data.data.accessToken);
                 return {
                     success: true, message: data.message
                 }
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
             if (data.success) {
                 let userId = await SecureStore.getItemAsync('user-id');
                 setUserId(userId);
-                setAuthenticated(true);
+                setAuthenticated(data.accessToken);
                 return {
                     success: true,
                     message: data.message,

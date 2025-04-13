@@ -202,7 +202,8 @@ export const checkAuth = async (req, res) => {
   try {
     return res.status(200).json({
       success: true,
-      message: 'The user is authenticated'
+      message: 'The user is authenticated',
+      accessToken: req.token
     })
   }
   catch (err) {
