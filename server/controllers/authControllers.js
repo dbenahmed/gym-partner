@@ -95,7 +95,8 @@ export const loginUser = async (req, res) => {
         success: true,
         message: "the login is complete successfuly",
         data: {
-          id: user.id
+          id: user.id,
+          accessToken: token
         }
       })
     }

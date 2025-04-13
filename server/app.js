@@ -25,7 +25,13 @@ const port = process.env.PORT || 3000
 
 // Middleware
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow all origins (dynamically) for development purposes I dont understand this yet but it works
+        callback(null, true);
+    }, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Ensure all necessary methods are allowed
+    credentials: true,  // Allow credentials (cookies, authorization headers)
+}))
 app.use(cookieParser())
 
 
