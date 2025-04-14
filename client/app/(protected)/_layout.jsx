@@ -8,10 +8,10 @@ import { Platform } from "react-native";
 import TabBarBackground from '@/components/ui/TabBarBackground';
 
 
-
 export default function Layout() {
 
     const { authenticated } = useAuth();
+
 
 
 
