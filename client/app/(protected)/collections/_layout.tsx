@@ -6,8 +6,8 @@ export default function CollectionsLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTitle: "Profile",
-        headerTransparent: true,
+        headerTransparent: false,
+        headerShown: false,
         headerTitleAlign: "left",
         headerStyle: {
           backgroundColor: "rgba(255,255,255,0.9)",
@@ -21,20 +21,20 @@ export default function CollectionsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Collections",
-          headerShown: false,
+          title: "My Collections",
+          headerShown: true,
         }}
       />
       <Stack.Screen
-        name="Plans/index"
+        name="/[collectionId]/index"
         options={{
-          title: "Plans",
+          headerShown: true,
         }}
       />
       <Stack.Screen
-        name="Plans/Exercises/index"
+        name="/[collectionId]/[planId]/index"
         options={{
-          title: "Exercises",
+          headerShown: true,
         }}
       />
     </Stack>

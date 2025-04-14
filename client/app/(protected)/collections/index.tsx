@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
-import ROUTES from "@/constants/routes";
-import { router } from "expo-router";
 import { fetchGetUserCollections } from "@/lib/api";
 import useAuth from "@/app/contex/authcontex";
 import { ActivityIndicator } from "react-native";
 import Colors from "@/constants/Colors";
-
-
+import { router, useNavigation } from "expo-router";
 type Collection = {
   collectionId: number;
   title: string;
@@ -18,6 +15,8 @@ const Collections = () => {
   const [collections, setCollections] = useState<Collection[]>([]);
   const { authenticated } = useAuth();
   const [loading, setLoading] = useState(true);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const run = async () => {
@@ -57,7 +56,20 @@ const Collections = () => {
                 shadowRadius: 4,
                 elevation: 2,
               }}
-              onPress={() => Alert.alert(item.title)}
+              onPress={() => {
+                console.log("item.collectionId", item.collectionId);
+                router.push(
+                  {
+                    pathname: `./${item.collectionId}`,
+                    params: {
+                      ...item,
+                    },
+                  },
+                  {
+                    relativeToDirectory: true,
+                  }
+                );
+              }}
             >
               <Text
                 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}

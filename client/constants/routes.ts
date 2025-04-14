@@ -9,9 +9,9 @@ export const ROUTES = {
   PROTECTED_HOME: "/(protected)/home",
   PROTECTED_PROFILE: "/(protected)/Profile",
   PROTECTED_COLLECTIONS: "/(protected)/Collections",
-  PROTECTED_COLLECTIONS_PLANS: "/(protected)/Collections/Plans",
+  PROTECTED_COLLECTIONS_PLANS: "/(protected)/Collections/:collectionId",
   PROTECTED_COLLECTIONS_PLANS_EXERCISES:
-    "/(protected)/Collections/Plans/Exercises",
+    "/(protected)/Collections/:collectionId/:planId",
 };
 
 export default ROUTES;
