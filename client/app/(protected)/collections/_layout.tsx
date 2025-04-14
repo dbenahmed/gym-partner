@@ -1,29 +1,38 @@
-import { useFonts } from "expo-font";
-import { Slot, Stack } from "expo-router";
-import { AuthProvider } from "@/app/contex/authcontex";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-export default function PlansLayout() {
+import { Stack } from "expo-router";
+import { TouchableOpacity } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Alert } from "react-native";
+export default function CollectionsLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: true,
+        headerTitle: "Profile",
+        headerTransparent: true,
+        headerTitleAlign: "left",
+        headerStyle: {
+          backgroundColor: "rgba(255,255,255,0.9)",
+        },
+        headerTitleStyle: {
+          fontSize: 24,
+          fontWeight: "bold",
+        },
       }}
     >
       <Stack.Screen
         name="index"
         options={{
           title: "Collections",
+          headerShown: false,
         }}
       />
       <Stack.Screen
-        name="(Plans)/index"
+        name="Plans/index"
         options={{
           title: "Plans",
         }}
       />
       <Stack.Screen
-        name="(Plans)/(Exercises)/index"
+        name="Plans/Exercises/index"
         options={{
           title: "Exercises",
         }}
