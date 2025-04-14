@@ -12,9 +12,13 @@ import {
     deleteWorkoutPlan,
     addExerciseToPlan,
     updateExerciseInPlan,
-    removeExerciseFromPlan
+    removeExerciseFromPlan,
+    getExercisesForPlan
 } from '../controllers/workoutPlansControllers.js'
 import authMiddleware from '../middleware/authMiddlewares.js';
+
+
+
 // ! > done
 // Get a list of all workout collections for the user
 router.get('/workout/collections', authMiddleware, getWorkoutCollections);
@@ -29,14 +33,11 @@ router.put('/workout/collections/:collectionId', authMiddleware, updateWorkoutCo
 router.delete('/workout/collections/:collectionId', authMiddleware, deleteWorkoutCollection);
 
 // Get a list of all workout plans across collections
-router.get('/workout/plans', authMiddleware, getWorkoutPlans);
+router.get('/workout/plans/:collectionId', authMiddleware, getWorkoutPlans);
 
 // Create a new workout plan inside a collection
 router.post('/workout/plans', authMiddleware, createWorkoutPlan);
 // ! < done
-
-// todo ( مانحتاجوهاش نورمالمو ): Get details of a specific workout plan
-router.get('/workout/plans/:planId', authMiddleware, getWorkoutPlanDetails);
 
 // ! done >
 // Update a workout plan's name or collection
@@ -56,5 +57,8 @@ router.put('/workout/plans/:planId/exercises/:exerciseId', authMiddleware, updat
 // Remove an exercise from a workout plan
 router.delete('/workout/plans/:planId/exercises/:exerciseId', authMiddleware, removeExerciseFromPlan);
 // ! < done
+
+
+router.get('/workout/plans/:planId/exercises', authMiddleware, getExercisesForPlan);
 
 export default router;

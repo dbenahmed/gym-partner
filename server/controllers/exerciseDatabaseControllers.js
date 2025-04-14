@@ -20,9 +20,17 @@ export const getAllExercises = async (req, res) => {
     const { page } = req.query
     const limit = (req.query.limit) ? parseInt(req.query.limit) : 10;
 
-    const filteredQueries = Object.fromEntries(Object.entries(queries).filter((v, i) => v[1] !== ""))
+    const filteredQueries = Object.fromEntries(Object.entries(queries).filter((v, i) => v[1] !== "" && v[1] !== undefined && v[1] !== null))
 
-    console.log('filteredQueries', filteredQueries)
+    if (Object.keys(filteredQueries).length === 0) {
+      res.status(400).json({
+        success: false,
+        message: "No valid filters provided"
+      })
+      return
+    }
+
+
     const andConditions = Object.entries(filteredQueries).map(([key, value]) => {
       if (key === "name") {
         return ilike(exercises[key], `%${value}%`)
