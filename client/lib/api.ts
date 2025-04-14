@@ -1,10 +1,11 @@
-import { defaultUrl, token } from "@/constants/constants";
+import { defaultUrl } from "@/constants/constants";
 
 export const fetchAddFoodToUser = async (
   date: String,
   foodId: Number,
   description: String,
-  servingSize: Number
+  servingSize: Number,
+  accessToken: String
 ) => {
   try {
     const url = `${defaultUrl}/meals`;
@@ -12,7 +13,7 @@ export const fetchAddFoodToUser = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
         date,
@@ -29,13 +30,13 @@ export const fetchAddFoodToUser = async (
     if (!data.success) {
       throw new Error(data.message);
       return;
-    }   
+    }
     return {
       success: true,
       message: data.insertedFood,
     };
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     return {
       success: false,
       message: error.message,
@@ -65,11 +66,40 @@ export const fetchSearchFood = async (text: String) => {
       success: true,
       meals: data.meals,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
     return {
       success: false,
-      error: error,
+      error: error.message,
+    };
+  }
+};
+
+export const fetchGetUserCollections = async (accessToken: String) => {
+  try {
+    const url = `${defaultUrl}/workout/collections`;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to fetch collections");
+    }
+    const { success, message, data } = await res.json();
+    if (!success) {
+      throw new Error(message);
+    }
+    return {
+      success: true,
+      collections: data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message,
     };
   }
 };

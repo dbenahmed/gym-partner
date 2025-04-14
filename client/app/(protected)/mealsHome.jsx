@@ -223,7 +223,7 @@ export default function mealsHome() {
 
     setAddFoodLoading(true)
 
-    const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, servingSize)
+    const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, servingSize, authenticated)
     if (res.success) {
       Alert.alert("Food added successfully")
       renderUserMealsOnDate()

@@ -50,6 +50,14 @@ export default function Layout() {
                     tabBarLabel: 'Profile',
                 }} />
                 <Tabs.Screen name="Collections" options={{
+                    headerShown: true,
+                    headerTitle: 'My Collections',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                        fontSize: 24,
+                    },
+                    headerStyle: {
+                    },
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="run" color={color} size={size} />
                     ),

@@ -10,16 +10,24 @@ import * as SecureStore from 'expo-secure-store';
 
 
 export const AuthContext = React.createContext();
+
+
+export const getTokenMobile = async () => {
+    const token = await SecureStore.getItemAsync('access-token');
+    if (token) {
+        return token;
+    } else {
+        return null;
+    }
+}
+
 export const AuthProvider = ({ children }) => {
 
     const [userId, setUserId] = useState();
     const [splashLoading, setSplashLoading] = useState(true);
     const [authenticated, setAuthenticated] = useState(null);
 
-    const getTokenMobile = async () => {
-        const token = await SecureStore.getItemAsync('access-token');
-        return token;
-    }
+
 
     const register = async (username, password) => {
         try {
@@ -136,7 +144,6 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const run = async () => {
-            console.log('loggedIn', loggedIn)
             const loggedIn = await isLoggedIn();
             setSplashLoading(false);
         }
