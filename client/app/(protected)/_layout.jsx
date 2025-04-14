@@ -49,12 +49,13 @@ export default function Layout() {
                     ),
                     tabBarLabel: 'Profile',
                 }} />
-                <Tabs.Screen name="Sessions" options={{
+                <Tabs.Screen name="Collections" options={{
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="run" color={color} size={size} />
                     ),
-                    tabBarLabel: 'Sessions',
+                    tabBarLabel: 'Collections',
                 }} />
+
             </Tabs>
         )
     }

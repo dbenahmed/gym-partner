@@ -15,7 +15,7 @@ import {
 import React from "react";
 import Color from "@/constants/Colors.ts";
 import { useState, useEffect, useContext } from "react";
-import Meal from "@/components/Meal";
+import Meal from "@/components/meal";
 import { defaultUrl } from "@/constants/constants.ts"
 import { fetchSearchFood, fetchAddFoodToUser } from "@/lib/api";
 import useAuth from "@/app/contex/authcontex";
