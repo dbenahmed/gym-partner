@@ -87,8 +87,7 @@ export const loginUser = async (req, res) => {
       )
       res.cookie("access_token", token, {
         httpOnly: true,                // Prevents XSS attacks
-        secure: (process.env.NODE_ENV === "production"), // true in production, false in development (for HTTP)
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",              // Allows the cookie to be sent cross-site (required for cross-origin requests)
+        secure: process.env.NODE_ENV === "production", // true in production, false in development (for HTTP)
         maxAge: 24 * 60 * 60 * 1000,   // Cookie expires in 1 day (same as token expiration)
         path: "/",                     // Ensure the cookie is available across all paths
       });

@@ -15,7 +15,7 @@ import {
 import React from "react";
 import Color from "@/constants/Colors.ts";
 import { useState, useEffect, useContext } from "react";
-import Meal from "@/components/Meal";
+import Meal from "@/components/meal";
 import { defaultUrl } from "@/constants/constants.ts"
 import { fetchSearchFood, fetchAddFoodToUser } from "@/lib/api";
 import useAuth from "@/app/contex/authcontex";
@@ -223,7 +223,7 @@ export default function mealsHome() {
 
     setAddFoodLoading(true)
 
-    const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, servingSize)
+    const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, servingSize, authenticated)
     if (res.success) {
       Alert.alert("Food added successfully")
       renderUserMealsOnDate()

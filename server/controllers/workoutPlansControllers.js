@@ -1,7 +1,7 @@
 // Get a list of all workout collections for the user
 import db from "../db/index.js";
 import { collections, exercises, plans, plansExercises, schema, users } from "../db/schemas/dev/schema.js";
-import { and, eq, exists, sql } from "drizzle-orm";
+import { and, eq, exists, sql, inArray } from "drizzle-orm";
 
 const verifyPlanOwnership = async (userId, planId) => {
   try {
@@ -60,12 +60,13 @@ export const createWorkoutCollection = async (req, res) => {
     } = req.body
 
     if (
-      !!title || !!description
+      !title
     ) {
       res.status(401).json({
         success: false,
         message: 'Title or Description are not given'
       })
+      return
     }
 
     // verify collection title does not exist
@@ -80,6 +81,7 @@ export const createWorkoutCollection = async (req, res) => {
         success: false,
         message: "Collection title already used"
       })
+      return
     }
 
     console.log(user.id)
@@ -203,7 +205,7 @@ export const getWorkoutPlans = async (req, res) => {
     const user = req.userData
     const {
       collectionId
-    } = req.body
+    } = req.params
 
     // check if this collections exists and user authorized
     const foundCollections = await db.select().from(collections).where(
@@ -378,43 +380,86 @@ export const addExerciseToPlan = async (req, res) => {
     const userId = req.user;
     const userData = req.userData;
     const { planId } = req.params
-    const { exerciseId } = req.body
+    const { exercisesIds } = req.body
+
+
+    if (!exercisesIds) {
+      res.status(400).json({
+        success: false,
+        message: "No exercises ids are given"
+      })
+    }
+
+
 
     // find the plan if exists
     // check if the plan created by the user ( authorized to add exercise to it )
     const foundPlans = await db.select().from(plans).where(eq(plans.id, planId))
       .innerJoin(collections, and(eq(plans.collectionId, collections.id), eq(collections.userId, userId)))
     const plan = foundPlans[0]
-    // get the exercise id and verify it exists in the db
-    const foundExercises = await db.select().from(exercises).where(eq(exercises.id, exerciseId)).limit(1)
+
+    if (!plan) {
+      res.status(401).json({
+        success: false,
+        message: "Plan does not exist or user is not authorized"
+      })
+      return
+    }
+
+
+    // get all the exercise id and verify all of them exists in the db
+
+
+
+    const foundExercises = await db.select().from(exercises).where(inArray(exercises.id, exercisesIds))
+    if (foundExercises.length !== exercisesIds.length) {
+      const missingExercises = exercisesIds.filter(id => !foundExercises.some(e => e.id === id));
+      res.status(401).json({
+        success: false,
+        message: `One or more exercises do not exist`,
+        data: {
+          missingExercises
+        }
+      })
+      return
+    }
+
     if (foundExercises.length === 0) {
       res.status(401).json({
         success: false,
         message: "Exercise does not exist"
       })
+      return
     }
-    const exercise = foundExercises[0]
 
-    // verify if this exercise is not already inside of this plan
-    const exerciseNotAlreadyAdded = await db.select().from(plansExercises).where(and(
-      eq(plansExercises.planId, planId),
-      eq(plansExercises.exerciseId, exerciseId)
-    )).limit(1)
-    if (exerciseNotAlreadyAdded.length > 0) {
-      res.status(401).json({
-        success: false,
-        message: "Exercise already exists in this plan"
-      })
+
+
+    // verify if each of these exercises is not already inside of this plan
+    for (const exercise of foundExercises) {
+      const exerciseNotAlreadyAdded = await db.select().from(plansExercises).where(and(
+        eq(plansExercises.planId, planId),
+        eq(plansExercises.exerciseId, exercise.id)
+      )).limit(1)
+      if (exerciseNotAlreadyAdded.length > 0) {
+        res.status(401).json({
+          success: false,
+          message: "Exercise already exists in this plan"
+        })
+        return
+      }
     }
+
 
     // todo : get maximum order to insert the exercise above
 
-    // add the exercise to the plan
-    await db.insert(plansExercises).values({
-      planId,
-      exerciseId,
-      order: 0
-    })
+    // add all the exercises to the plan
+    for (const exercise of foundExercises) {
+      await db.insert(plansExercises).values({
+        planId,
+        exerciseId: exercise.id,
+        order: 0
+      })
+    }
 
     res.json({
       success: true,
@@ -482,3 +527,37 @@ export const removeExerciseFromPlan = async (req, res) => {
     res.status(500).json({ message: 'Error removing exercise from plan', error: error.message });
   }
 };
+
+
+export const getExercisesForPlan = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { planId } = req.params;
+
+    const foundPlan = await db.select().from(plans).where(eq(plans.id, planId))
+      .innerJoin(collections, and(eq(plans.collectionId, collections.id), eq(collections.userId, userId)))
+    const plan = foundPlan[0]
+    console.log("plan", plan)
+
+    if (!plan) {
+      res.status(401).json({
+        success: false,
+        message: "Plan does not exist or user is not authorized"
+      })
+      return
+    }
+
+    const foundExercises = await db.select().from(plansExercises).where(eq(plansExercises.planId, planId))
+      .innerJoin(exercises, eq(plansExercises.exerciseId, exercises.id)).orderBy(plansExercises.order)
+    console.log("foundExercises", foundExercises)
+      res.status(200).json({
+        success: true,
+        data: foundExercises,
+        message: "Exercises for plan retrieved successfully"
+      })
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error getting exercises for plan', error: error.message });
+  }
+};
+
