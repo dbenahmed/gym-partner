@@ -61,6 +61,12 @@ export default function Layout() {
                     ),
                     tabBarLabel: 'Sessions',
                 }} />
+                <Tabs.Screen name="Explore" options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="magnify" color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Explore',
+                }} />
 
             </Tabs>
         )
