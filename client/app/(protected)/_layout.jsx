@@ -55,6 +55,12 @@ export default function Layout() {
                     ),
                     tabBarLabel: 'Collections',
                 }} />
+                <Tabs.Screen name="Sessions" options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="run" color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Sessions',
+                }} />
 
             </Tabs>
         )

@@ -43,13 +43,22 @@ export const fetchAddFoodToUser = async (
     };
   }
 };
-export const fetchSearchFood = async (text: String) => {
+
+type SearchFoodBodyType = {
+  name: String;
+};
+
+export const fetchSearchFood = async (
+  accessToken: String,
+  body: SearchFoodBodyType
+) => {
   try {
-    const url = `${defaultUrl}/explore/meals?name=${text}`;
+    const url = `${defaultUrl}/explore/meals?name=${body.name}`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     if (!res.ok) {
@@ -324,6 +333,47 @@ export const fetchSearchExercises = async (
       success: true,
       message: message,
       data: data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+type CreateCustomMealBodyType = {
+  foodname: String;
+  calories: Number;
+  proteinper100g: Number;
+  carbohydratesper100g: Number;
+  fatper100g: Number;
+};
+export const fetchCreateCustomMeal = async (
+  accessToken: String,
+  body: CreateCustomMealBodyType
+) => {
+  try {
+    const url = `${defaultUrl}/meals/custom`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      throw new Error("Failed to create custom meal");
+    }
+    const { success, message, data } = await res.json();
+    if (!success) {
+      throw new Error(message);
+    }
+    return {
+      success: true,
+      message: message,
+      createdMeal: data,
     };
   } catch (error: any) {
     return {
