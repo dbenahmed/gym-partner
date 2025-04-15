@@ -1,13 +1,22 @@
-import { ilike } from "drizzle-orm";
+import { ilike, or, and } from "drizzle-orm";
 import db from "../db/index.js";
 import { foods } from "../db/schemas/dev/schema.js";
-
+import { eq } from "drizzle-orm";
 // Get a list of all available meals
 export const getAllMeals = async (req, res) => {
     try {
+        const userId = req.user;
+
         const { name } = req.query
         const meals = await db.query.foods.findMany({
-            where: ilike(foods.foodname, `%${name}%`)
+            where: and(
+                ilike(foods.foodname, `%${name}%`),
+                or(
+                    eq(foods.status, 'verified'),
+                    eq(foods.status, 'pending'),
+                    eq(foods.createdBy, userId)
+                )
+            )
         })
         res.status(200).json({
             success: true,
