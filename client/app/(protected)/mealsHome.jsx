@@ -20,7 +20,7 @@ import { defaultUrl } from "@/constants/constants.ts"
 import { fetchSearchFood, fetchAddFoodToUser, fetchCreateCustomMeal } from "@/lib/api";
 import useAuth from "@/app/contex/authcontex";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
+import { router } from "expo-router";
 
 
 export default function mealsHome() {
@@ -135,6 +135,22 @@ export default function mealsHome() {
   const goToNextDay = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + 1);
+
+    // Get today's date and set to midnight for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Set the potential next date to midnight for accurate comparison
+    const nextDateMidnight = new Date(newDate);
+    nextDateMidnight.setHours(0, 0, 0, 0);
+
+    // Check if the next date would be in the future compared to today
+    if (nextDateMidnight.getTime() > today.getTime()) {
+      Alert.alert("Cannot view future dates", "You can only view today and past meals.");
+      return;
+    }
+
+    // If we get here, the next date is either today or in the past
     setCurrentDate(newDate);
   };
 
@@ -298,7 +314,30 @@ export default function mealsHome() {
                   <Text style={styles.nutritionLabel}>Fat (g)</Text>
                   <Text style={styles.nutritionValue}>{selectedAdditionFoodItem.fatper100g}</Text>
                 </View>
+
               </View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: Color.light.tint,
+                  padding: 12,
+                  borderRadius: 8,
+                  marginTop: 15,
+                  alignSelf: 'center',
+                  width: '100%',
+                }}
+                onPress={() => {
+                  router.push(`/Explore/meals/${selectedAdditionFoodItem.id}`);
+                }}
+              >
+                <Text style={{
+                  color: Color.light.background,
+                  fontWeight: '700',
+                  fontSize: 16,
+                  textAlign: 'center'
+                }}>
+                  View Food Details
+                </Text>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={{
@@ -431,21 +470,42 @@ export default function mealsHome() {
                   &lt;
                 </Text>
               </TouchableOpacity>
-              {currentDate.getDate() == new Date().getDate() ? (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>Today meals</Text>
+              {(() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selectedDate = new Date(currentDate);
+                selectedDate.setHours(0, 0, 0, 0);
+
+                const diffDays = Math.round((today - selectedDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Today's meals</Text>;
+                } else if (diffDays === 1) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Yesterday's meals</Text>;
+                } else if (diffDays === 2) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Day before yesterday</Text>;
+                } else if (diffDays < 3) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>{diffDays} days ago</Text>;
+                } else {
+                  return (
+                    <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                      {currentDate.toDateString()}
+                    </Text>
+                  );
+                }
+              })()}
+              {currentDate.getTime() < new Date().setHours(0, 0, 0, 0) ? (
+                <TouchableOpacity>
+                  <Text
+                    style={{ color: Color.light.tint, fontWeight: "900", fontSize: 30 }}
+                    onPress={goToNextDay}
+                  >
+                    &gt;
+                  </Text>
+                </TouchableOpacity>
               ) : (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
-                  Your menu for day : {currentDate.toDateString()}
-                </Text>
+                <View></View>
               )}
-              <TouchableOpacity>
-                <Text
-                  style={{ color: Color.light.tint, fontWeight: "900", fontSize: 30 }}
-                  onPress={goToNextDay}
-                >
-                  &gt;
-                </Text>
-              </TouchableOpacity>
             </View>
 
 

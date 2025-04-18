@@ -19,7 +19,7 @@ export default function Sessions() {
             try {
                 // Replace with actual API call when available
                 // Example: const response = await fetchGetUserSessions(authenticated);
-
+                
                 // Placeholder data
                 const mockSessions = [
                     { id: 1, title: 'Morning Workout', date: '2023-06-15', duration: '45 min' },

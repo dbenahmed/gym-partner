@@ -32,7 +32,15 @@ export const getAllMeals = async (req, res) => {
 export const getMealDetails = async (req, res) => {
     try {
         const userId = req.user;
-        // ... existing code ...
+        const { mealId } = req.params;
+        const meal = await db.query.foods.findFirst({
+            where: eq(foods.id, mealId)
+        })
+        res.status(200).json({
+            success: true,
+            message: "Meal details fetched successfully",
+            meal: meal
+        })
     } catch (error) {
         res.status(500).json({ message: 'Error updating today meal', error: error.message });
     }

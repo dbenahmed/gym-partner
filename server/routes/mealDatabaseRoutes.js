@@ -7,6 +7,6 @@ import { getAllMeals, getMealDetails } from '../controllers/mealDatabaseControll
 router.get('/explore/meals', authMiddleware, getAllMeals);
 
 // Get detailed nutritional info for a specific meal
-router.get('/explore/meals/:mealId', getMealDetails);
+router.get('/explore/meals/:mealId', authMiddleware, getMealDetails);
 
 export default router; 
