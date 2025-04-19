@@ -20,23 +20,24 @@ export const createWorkoutSession = async (req, res) => {
       startTime,
       note,
       ExerciseArray,
-    } = req.body
+    } = req.body;
+    
     if (!dueDate || !name || !startTime) {
-      res.status(401).json({
+     return   res.status(401).json({
         message: "Due Date not Included"
       })
     }
     // verify format of the dueDate
     const isYYYYMMDD = isYYYYMMDD(dueDate)
     if (!isYYYYMMDD.success) {
-      res.status(401).json({
+      return res.status(401).json({
         message: "Due Date does not follow the format YYYY-MM-DD"
       })
     }
     // verify format of the startDate
     const isHHMMSS = isHHMMSS(dueDate)
     if (!isHHMMSS.success) {
-      res.status(401).json({
+     return res.status(401).json({
         message: "Start Time does not follow the format HH-MM-SS"
       })
     }
@@ -46,7 +47,7 @@ export const createWorkoutSession = async (req, res) => {
       where: and(eq(sessions.name, name), eq(sessions.duedate, dueDate))
     })
     if (nameExists) {
-      res.status(201).json({
+     return  res.status(201).json({
         success: false,
         message: "This name already in on that day"
       })
@@ -63,29 +64,22 @@ export const createWorkoutSession = async (req, res) => {
         starttime: startTime,
         endtime: null,
         note: note,
-        rating: null
+        rating: null,
+        createdBy:userId,
       }).returning({
-        id: plans.id
+        id: createdSession.id
       })
     } else {
-      // get exercises from plan
       // verify plan created by that user (authorized)
       const authorized = await verifyPlanCreatedByUser(planId, userId)
       const finished = db.transaction(async (tx) => {
-        // get the exercises of this plan
-        const exercisesIds = await tx.query.plansExercises.findMany({
-          where: eq(plansExercises.planId, planId),
-          columns: {
-            exerciseId: true
-          }
-        })
-        // verify the exercises are found and is array
+    
+        // verify the exercisesArray is array
         if (Array.isArray(ExerciseArray)) {
-          // get the exercises data and infos for each exercise inside the plan
+          // get the exercises data and infos from the exercise array 
+          //check if the exercise from the arrayExo from the  request are correct
           for (let i = 0; i < ExerciseArray.length; i++) {
-            const foundExercise = await tx.query.exercises.findFirst({
-              where: eq(exercises.id, ExerciseArray[i].exerciseId)
-            })
+            const foundExercise = ExerciseArray[i];
             if (foundExercise) {
               sessionExercises.push(foundExercise)
             } else {
@@ -94,7 +88,7 @@ export const createWorkoutSession = async (req, res) => {
           }
         }
         // create the session
-        created = await tx.insert(sessions).values({
+        createdSession = await tx.insert(sessions).values({
           planId: planId,
           name,
           duedate: dueDate,
@@ -102,10 +96,27 @@ export const createWorkoutSession = async (req, res) => {
           endtime: null,
           note: note,
           rating: null,
-          sessionExercises:sessionExercises,
+          createdBy:userId,
+          // sessionExercises:sessionExercises,
         }).returning({
-          id: sessions.id
+          CreatedSessionId: createdSession.id
         })
+        for (let index = 0; index < sessionExercises.length; index++) {
+          const exo = sessionExercises[index];
+          for (let index2 = 0; index2 < exo.sets.length; index++) {
+            createdSession = await tx.insert(sets_of_sessions_exercises).values({
+                exercise_id : exo.id,
+                session_id : CreatedSessionId,
+                order : exo.order,
+                weight:exo.weight,
+                unit : exo.unit ,
+                reps : exo.reps
+            }
+            ) 
+          }
+          
+        }
+
       }).catch((e) => {
         console.error(e)
       })
@@ -127,7 +138,20 @@ export const createWorkoutSession = async (req, res) => {
 export const getWorkoutSessions = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+    const foundedSessions = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.createdBy, userId));
+    if (!foundedSessions){
+      return res.status().jsom({
+        message : "there is no session created by this user ",
+      })
+    } else{
+      return res.status(200).json({
+        success: true,
+        userSessions : foundedSessions,
+      })
+    }
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving workout sessions', error: error.message });
   }
@@ -144,19 +168,64 @@ export const getWorkoutSessionDetails = async (req, res) => {
 };
 
 // Add an exercise to an active session
-export const saveExerciseToSession = async (req, res) => {
-  try {
-    const userId = req.user;
-    // verify if user authorized 
+  export const saveExerciseToSession = async (req, res) => {
+    try {
+      const userId = req.user;
+      const {sessionId,Id,weight,unit,reps} = req.body;
+    
+      // verify if user authorized 
+      //check if the session exist and created by this user 
+      const foundSessions =await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, sessionId));
+      if (!foundSessions){
+        return res.status(404).json({
+          success:false ,
+          message:"Session not found"
+        })
+      }  
+      session = foundSessions[0];
+        // check if created by this user 
+        if (session.createdBy !== userId ){
+          return res.status(401).json({
+            success:false ,
+            message:"this session wasn't created by this user "
+          })
+        }
+        //   //check if the ex
+        // const exercise = await db.query.exercises.findFirst({
+        //   where: eq(exercises.name, exerciseName)
+        // });
+    
+        if (!exercise) {
+          return res.status(404).json({
+            success: false,
+            message: "Exercise not found"
+          });
+        }
 
-    // if exists already update changes
 
-    // if does not exist add new exercise to the session
 
-  } catch (error) {
-    res.status(500).json({ message: 'Error adding exercise to session', error: error.message });
-  }
-};
+      // check if the exercise exist in the sesion
+      sessionExercises= session.sessionExercises;
+      const existExercise = await db.query.sessionExercises.findFirst(
+        where(eq(sessionExercises.id, Id))
+      )
+     //exsiting code ...
+
+
+
+
+
+      // if exists already update changes
+
+      // if does not exist add new exercise to the session
+
+    } catch (error) {
+      res.status(500).json({ message: 'Error adding exercise to session', error: error.message });
+    }
+  };
 
 // Log a set for an exercise
 export const logSetForExercise = async (req, res) => {
