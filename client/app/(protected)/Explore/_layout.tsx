@@ -27,6 +27,7 @@ export default function ExploreLayout() {
         name="meals/[mealId]"
         options={{
           title: "Meal Details",
+
           headerStyle: {
             backgroundColor: Colors.light.background,
           },

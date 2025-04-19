@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert, Button } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { defaultUrl } from '@/constants/constants';
 import Color from "@/constants/Colors.ts";
 import useAuth from '@/app/contex/authcontex';
@@ -192,6 +192,8 @@ export default function MealDetails() {
         </View>
     );
 }
+
+
 
 const styles = StyleSheet.create({
     container: {

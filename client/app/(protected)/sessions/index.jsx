@@ -6,7 +6,7 @@ import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '@/app/contex/authcontex';
 import Colors from '@/constants/Colors';
-
+import { router } from 'expo-router';
 export default function Sessions() {
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -115,9 +115,7 @@ export default function Sessions() {
                     elevation: 2,
                 }}
                 onPress={() => {
-                    console.log('Create new session');
-                    // Navigate to create session screen
-                    // router.push('/sessions/create');
+                    router.push('/sessions/newSession');
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>
