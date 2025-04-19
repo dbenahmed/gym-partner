@@ -19,6 +19,7 @@ export const createWorkoutSession = async (req, res) => {
       name,
       startTime,
       note,
+      ExerciseArray,
     } = req.body
     if (!dueDate || !name || !startTime) {
       res.status(401).json({
@@ -52,7 +53,7 @@ export const createWorkoutSession = async (req, res) => {
     }
     // create the sessions
     let createdSession; // created session infos
-    let exercisesToAdd = []; // exercises to add to the session
+    let sessionExercises = []; // exercises to add to the session
     if (!planId) {
       // get make an empty session
       createdSession = await db.insert(sessions).values({
@@ -79,14 +80,14 @@ export const createWorkoutSession = async (req, res) => {
           }
         })
         // verify the exercises are found and is array
-        if (Array.isArray(exercisesIds)) {
+        if (Array.isArray(ExerciseArray)) {
           // get the exercises data and infos for each exercise inside the plan
-          for (let i = 0; i < exercisesIds.length; i++) {
+          for (let i = 0; i < ExerciseArray.length; i++) {
             const foundExercise = await tx.query.exercises.findFirst({
-              where: eq(exercises.id, exercisesIds[i].exerciseId)
+              where: eq(exercises.id, ExerciseArray[i].exerciseId)
             })
             if (foundExercise) {
-              exercisesToAdd.push(foundExercise)
+              sessionExercises.push(foundExercise)
             } else {
               console.error('given exercise id not found')
             }
@@ -100,7 +101,8 @@ export const createWorkoutSession = async (req, res) => {
           starttime: startTime,
           endtime: null,
           note: note,
-          rating: null
+          rating: null,
+          sessionExercises:sessionExercises,
         }).returning({
           id: sessions.id
         })
@@ -113,7 +115,6 @@ export const createWorkoutSession = async (req, res) => {
       message: "Plan Created Successfully",
       data: {
         session: createdSession,
-        exercises: exercisesToAdd
       }
     })
   } catch (error) {
