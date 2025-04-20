@@ -212,16 +212,47 @@ export const getWorkoutSessionDetails = async (req, res) => {
       const existExercise = await db.query.sessionExercises.findFirst(
         where(eq(sessionExercises.id, Id))
       )
-     //exsiting code ...
+    
+     
 
 
 
 
 
       // if exists already update changes
+      if (existExercise){
+        await db.update(session.sessionExercises).set({
+          weight : weight,
+          reps : reps ,
+          unit : unit ,
+          dueDate : new Date(),
+        })
+      }
+      res.status(200).json({
+        success:true,
+        message : "the exercise is updated in the session "
+      })
+
+
+
+
+
+
 
       // if does not exist add new exercise to the session
-
+      if (!existExercise){
+        await db.insert(session.sessionExercises).values({
+          weight : weight,
+          reps : reps ,
+          unit : unit ,
+          dueDate : new Date(),
+        })
+      }
+        return res.status(200).json({
+           success:true,
+        message : "the exercise is added to the session "
+        })
+      
     } catch (error) {
       res.status(500).json({ message: 'Error adding exercise to session', error: error.message });
     }
@@ -230,7 +261,7 @@ export const getWorkoutSessionDetails = async (req, res) => {
 // Log a set for an exercise
 export const logSetForExercise = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.user;  
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error logging set for exercise', error: error.message });
