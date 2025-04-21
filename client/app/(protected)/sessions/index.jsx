@@ -7,6 +7,11 @@ import { useNavigation } from '@react-navigation/native';
 import useAuth from '@/app/contex/authcontex';
 import Colors from '@/constants/Colors';
 import { router } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+
+
+
 export default function Sessions() {
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,10 +21,11 @@ export default function Sessions() {
     useEffect(() => {
         // Fetch sessions data
         const fetchSessions = async () => {
+            console.log('Fetching sessions for date:', currentDate.toISOString().split('T')[0]);
             try {
                 // Replace with actual API call when available
                 // Example: const response = await fetchGetUserSessions(authenticated);
-                
+
                 // Placeholder data
                 const mockSessions = [
                     { id: 1, title: 'Morning Workout', date: '2023-06-15', duration: '45 min' },
@@ -40,14 +46,92 @@ export default function Sessions() {
         };
 
         fetchSessions();
-    }, []);
+    }, [currentDate]);
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
+
+    const goToPreviousDay = () => {
+        const prevDate = new Date(currentDate);
+        prevDate.setDate(prevDate.getDate() - 1);
+        setCurrentDate(prevDate);
+        console.log('Previous day:', prevDate.toISOString().split('T')[0]);
+        // Here you would fetch data for the previous day
+    };
+
+    const goToNextDay = () => {
+        const nextDate = new Date(currentDate);
+        nextDate.setDate(nextDate.getDate() + 1);
+        setCurrentDate(nextDate);
+        console.log('Next day:', nextDate.toISOString().split('T')[0]);
+        // Here you would fetch data for the next day
+    };
+
+    // Check if current date is today (to disable next button)
+    const isToday = currentDate.getTime() === today.getTime();
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
             <View style={{ padding: 16 }}>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16 }}>
-                    Your Workout Sessions
-                </Text>
+                <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: 'center', marginBottom: 12 }}>
+                    <TouchableOpacity
+                        style={{
+                            padding: 10,
+                            width: 40,
+                            alignItems: 'center',
+                        }}
+                        onPress={goToPreviousDay}
+                    >
+                        <MaterialCommunityIcons
+                            name="chevron-left"
+                            size={24}
+                            color={Colors.light.tint}
+                            style={{
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.2,
+                                shadowRadius: 1,
+                                elevation: 2,
+                            }}
+                        />
+                    </TouchableOpacity>
+
+                    <View style={{ alignItems: 'center' }}>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.text }}>
+                            {currentDate.toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric'
+                            })}
+                        </Text>
+                    </View>
+
+                    {!isToday ? (
+                        <TouchableOpacity
+                            style={{
+                                padding: 10,
+                                width: 40,
+                                alignItems: 'center',
+                            }}
+                            onPress={goToNextDay}
+                        >
+                            <MaterialCommunityIcons
+                                name="chevron-right"
+                                size={24}
+                                color={Colors.light.tint}
+                                style={{
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 1 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 1,
+                                    elevation: 2,
+                                }}
+                            />
+                        </TouchableOpacity>
+                    ) : (
+                        <View style={{ width: 40 }} /> // Empty view with same width as buttons
+                    )}
+                </View>
 
                 {loading ? (
                     <ActivityIndicator size="large" color={Colors.light.tint} />
