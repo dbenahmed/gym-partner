@@ -7,7 +7,8 @@ import SessionExerciseContainer from '@/components/sessionExerciseContainer';
 import { defaultUrl } from '@/constants/constants';
 import useAuth from '@/app/contex/authcontex';
 import { ActivityIndicator } from 'react-native';
-
+import { useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 
 
 
@@ -22,6 +23,7 @@ export default function StartSession() {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const { date } = useLocalSearchParams();
 
     const [filteredExercises, setFilteredExercises] = useState([]);
 
@@ -44,23 +46,67 @@ export default function StartSession() {
             return;
         }
         setExercises([...exercises, {
-            ...exercise,
-            reps: '',
-            weight: ''
+            id: exercise.id,
+            name: exercise.name,
+            category: exercise.category,
+            sets: []
         }]);
         setModalVisible(false);
     };
 
 
     const saveSession = async () => {
+        if (!sessionName || !date) {
+            console.log('sesions name or date not included')
+            Alert.alert('Error', 'Please enter a session name and date');
+            return;
+        }
         console.log('Save Session exercises');
-        console.log(exercises);
+        const exercisesArray = exercises.map((exercise, index) => ({
+            ...exercise,
+            order: index
+        }));
+        console.log('exercisesArray', exercisesArray);
+        console.log(date)
+        const res = await fetch(`${defaultUrl}/workout/sessions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authenticated}`
+            },
+            body: JSON.stringify({
+                planId: null,
+                dueDate: date,
+                name: sessionName,
+                startTime: null,
+                endTime: null,
+                note: sessionNotes,
+                rating: null,
+                exercisesArray: exercisesArray
+            })
+        });
+        console.log('res', res)
+        if (!res.ok) {
+            console.log('Error saving session');
+            Alert.alert('Error', 'Failed to save session');
+            return;
+        }
+        const { success, message, data } = await res.json();
+        if (!success) {
+            console.log('error', message)
+            Alert.alert('Error', message);
+            return;
+        }
+        console.log('Session saved successfully');
+        console.log(data);
+        router.push('/sessions');
     }
 
     const updateExerciseData = (id, field, value) => {
         const updatedExercises = exercises.map(exercise =>
             exercise.id === id ? { ...exercise, [field]: value } : exercise
         );
+        console.log('UPDATED EXOS', updatedExercises)
         setExercises(updatedExercises);
     };
 
@@ -150,10 +196,9 @@ export default function StartSession() {
             )}
 
             {exercises.length > 0 && (
-                <TouchableOpacity style={styles.saveButton} 
-                onPress={() => {
-                    console.log('Save Session');
-                    saveSession();
+                <TouchableOpacity style={styles.saveButton}
+                    onPress={() => {
+                        saveSession();
                     }}
                     disabled={exercises.length === 0}
                 >

@@ -17,6 +17,7 @@ export default function Sessions() {
     const [loading, setLoading] = useState(true);
     const { authenticated } = useAuth();
     const navigation = useNavigation();
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     useEffect(() => {
         // Fetch sessions data
@@ -47,7 +48,6 @@ export default function Sessions() {
 
         fetchSessions();
     }, [currentDate]);
-    const [currentDate, setCurrentDate] = useState(new Date());
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
 
@@ -199,7 +199,12 @@ export default function Sessions() {
                     elevation: 2,
                 }}
                 onPress={() => {
-                    router.push('/sessions/newSession');
+                    router.push({
+                        pathname: '/sessions/newSession',
+                        params: {
+                            date: currentDate.toISOString().split('T')[0]
+                        }
+                    });
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>
