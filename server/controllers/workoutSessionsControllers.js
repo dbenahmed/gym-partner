@@ -3,7 +3,7 @@ import db from "../db/index.js";
 import { exercises, plansExercises, sessions, setsOfSessionsExercises } from "../db/schemas/dev/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
-    
+
 // Start a new workout session
 // In this route I did not add the exercises to the sessionsExercises table,
 // I only created the session and send the exercise of the selected planId
@@ -96,7 +96,7 @@ export const createWorkoutSession = async (req, res) => {
         console.log('exercisesArray', exercisesArray)
 
         // verify the exercisesArray is array
-        if (exercisesArray && !Array.isArray(exercisesArray) &&  exercisesArray.length === 0) {
+        if (exercisesArray && !Array.isArray(exercisesArray) && exercisesArray.length === 0) {
             return {
                 success: false,
                 message: "Exercises Array is not an array",
@@ -254,7 +254,23 @@ export const getWorkoutSessions = async (req, res) => {
 export const getWorkoutSessionDetails = async (req, res) => {
     try {
         const userId = req.user;
-        // ... existing code ...
+
+        const foundSessions = await db.query.sessions.findMany({
+            where: eq(sessions.createdBy, userId)
+        })
+
+        if (!foundSessions) {
+            return res.status(404).json({
+                success: false,
+                message: "Session not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Session found",
+            session: foundSessions
+        })
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving workout session details', error: error.message });
     }
