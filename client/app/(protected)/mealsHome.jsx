@@ -17,18 +17,22 @@ import Color from "@/constants/Colors.ts";
 import { useState, useEffect, useContext } from "react";
 import Meal from "@/components/meal";
 import { defaultUrl } from "@/constants/constants.ts"
-import { fetchSearchFood, fetchAddFoodToUser } from "@/lib/api";
+import { fetchSearchFood, fetchAddFoodToUser, fetchCreateCustomMeal } from "@/lib/api";
 import useAuth from "@/app/contex/authcontex";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from "expo-router";
+
 
 export default function mealsHome() {
   const [meals, setMeals] = useState([]);
 
-  const { authenticated } = useAuth();
+  const { authenticated, userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false)
 
 
-  console.log('auth', authenticated)
+
+  const [customFoodModalVisible, setCustomFoodModalVisible] = useState(false)
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -119,7 +123,7 @@ export default function mealsHome() {
   const [nbKcal, setNbKcal] = useState(0);
   const [nbProt, setNbProt] = useState(0);
   const [nbFat, setNbFat] = useState(0);
-  const [nabCarbs, setNbCarbs] = useState(0);
+  const [nbCarbs, setNbCarbs] = useState(0);
 
 
   const goToPreviousDay = () => {
@@ -131,6 +135,22 @@ export default function mealsHome() {
   const goToNextDay = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + 1);
+
+    // Get today's date and set to midnight for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Set the potential next date to midnight for accurate comparison
+    const nextDateMidnight = new Date(newDate);
+    nextDateMidnight.setHours(0, 0, 0, 0);
+
+    // Check if the next date would be in the future compared to today
+    if (nextDateMidnight.getTime() > today.getTime()) {
+      Alert.alert("Cannot view future dates", "You can only view today and past meals.");
+      return;
+    }
+
+    // If we get here, the next date is either today or in the past
     setCurrentDate(newDate);
   };
 
@@ -161,27 +181,31 @@ export default function mealsHome() {
   };
 
 
-  const AddFood = () => {
+  const AddFood = async () => {
     if (
       nameFood.length == 0 ||
       nbFat == 0 ||
       nbKcal == 0 ||
       nbProt == 0 ||
-      nabCarbs == 0
+      nbCarbs == 0
     ) {
       Alert.alert("there are a empty input");
     } else {
       setModalVisibleFood(false);
-      nbFood++;
-      const food = {
-        id: nbFood,
-        name: nameFood,
-        kcal: nbKcal,
-        protein: nbProt,
-        fat: nbFat,
-        carbs: nabCarbs,
-      };
-      setFoods([...foods, food]);
+      const res = await fetchCreateCustomMeal(authenticated, {
+        foodname: nameFood,
+        calories: nbKcal,
+        proteinper100g: nbProt,
+        carbohydratesper100g: nbCarbs,
+        fatper100g: nbFat,
+      });
+      if (res.success) {
+        Alert.alert("Success", res.message);
+        setCustomFoodModalVisible(false)
+        console.log('added')
+      } else {
+        Alert.alert("Error", res.message);
+      }
       setNameFood("");
       setNbCarbs(0);
       setNbFat(0);
@@ -290,7 +314,30 @@ export default function mealsHome() {
                   <Text style={styles.nutritionLabel}>Fat (g)</Text>
                   <Text style={styles.nutritionValue}>{selectedAdditionFoodItem.fatper100g}</Text>
                 </View>
+
               </View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: Color.light.tint,
+                  padding: 12,
+                  borderRadius: 8,
+                  marginTop: 15,
+                  alignSelf: 'center',
+                  width: '100%',
+                }}
+                onPress={() => {
+                  router.push(`/Explore/meals/${selectedAdditionFoodItem.id}`);
+                }}
+              >
+                <Text style={{
+                  color: Color.light.background,
+                  fontWeight: '700',
+                  fontSize: 16,
+                  textAlign: 'center'
+                }}>
+                  View Food Details
+                </Text>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={{
@@ -332,14 +379,12 @@ export default function mealsHome() {
   const searchForFood = async (e) => {
     setSearchForFoodLoading(true);
     const text = e
-    console.log(text)
-    const res = await fetchSearchFood(text);
-    console.log(res)
+    const res = await fetchSearchFood(authenticated, { name: text });
     if (res.success) {
       setFoods(res.meals);
     } else {
       Alert.alert("Error", res.error);
-      setError(true)
+      setModalVisible(false)
     }
     setSearchForFoodLoading(false);
   }
@@ -425,21 +470,42 @@ export default function mealsHome() {
                   &lt;
                 </Text>
               </TouchableOpacity>
-              {currentDate.getDate() == new Date().getDate() ? (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>Today meals</Text>
+              {(() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selectedDate = new Date(currentDate);
+                selectedDate.setHours(0, 0, 0, 0);
+
+                const diffDays = Math.round((today - selectedDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Today's meals</Text>;
+                } else if (diffDays === 1) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Yesterday's meals</Text>;
+                } else if (diffDays === 2) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Day before yesterday</Text>;
+                } else if (diffDays < 3) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>{diffDays} days ago</Text>;
+                } else {
+                  return (
+                    <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                      {currentDate.toDateString()}
+                    </Text>
+                  );
+                }
+              })()}
+              {currentDate.getTime() < new Date().setHours(0, 0, 0, 0) ? (
+                <TouchableOpacity>
+                  <Text
+                    style={{ color: Color.light.tint, fontWeight: "900", fontSize: 30 }}
+                    onPress={goToNextDay}
+                  >
+                    &gt;
+                  </Text>
+                </TouchableOpacity>
               ) : (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
-                  Your menu for day : {currentDate.toDateString()}
-                </Text>
+                <View></View>
               )}
-              <TouchableOpacity>
-                <Text
-                  style={{ color: Color.light.tint, fontWeight: "900", fontSize: 30 }}
-                  onPress={goToNextDay}
-                >
-                  &gt;
-                </Text>
-              </TouchableOpacity>
             </View>
 
 
@@ -527,7 +593,22 @@ export default function mealsHome() {
                               }
                             }>
                               <View style={{ justifyContent: "center", alignItems: "center", width: "100%" }}>
-                                <Text style={{ fontWeight: '800', width: "100", ...styles.car }}>{item.foodname}</Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: "100%" }}>
+                                  <Text style={{ fontWeight: '800', width: "100", ...styles.car }}>{item.foodname}</Text>
+                                  <Text style={{ fontWeight: '800', width: "100", ...styles.car }}>
+                                    {
+                                      item.status === 'verified' ? (
+                                        <MaterialIcons name="verified" size={18} color="orange" />
+                                      ) : item?.status === 'pending' ? (
+                                        <MaterialIcons name="verified" size={18} color="gray" />
+                                      ) : item.createdBy === userId ? (
+                                        <MaterialIcons name="person" size={18} color="red" />
+                                      ) : (
+                                        <MaterialIcons name="gpp-maybe" size={18} color="red" />
+                                      )
+                                    }
+                                  </Text>
+                                </View>
                                 <View style={{ flexDirection: 'row', flexGrow: 1, padding: 10 }}>
                                   <View style={styles.box}>
                                     <Text style={styles.car}>Protein</Text>
@@ -555,9 +636,13 @@ export default function mealsHome() {
                   }
 
 
-                  <TouchableOpacity style={{ ...styles.button, backgroundColor: Color.light.tint, color: Color.light.text, margin: 0 }}>
+                  <TouchableOpacity style={{ ...styles.button, backgroundColor: Color.light.tint, color: Color.light.text, margin: 0 }}
+                    onPress={() => {
+                      setCustomFoodModalVisible(true)
+                    }}
+                  >
                     <Text style={{ fontWeight: "700", color: Color.light.text }}>
-                      Create new food
+                      Create custom food
                     </Text>
                   </TouchableOpacity>
 
@@ -658,6 +743,7 @@ export default function mealsHome() {
                       placeholder="protein (g)"
                       value={nbProt}
                       onChangeText={(e) => setNbProt(e)}
+                      keyboardType="numeric"
                     />
                     <TextInput
                       style={styles.foodVitamineInput}
@@ -668,7 +754,7 @@ export default function mealsHome() {
                     <TextInput
                       style={styles.foodVitamineInput}
                       placeholder="carb(g)"
-                      value={nabCarbs}
+                      value={nbCarbs}
                       onChangeText={(e) => setNbCarbs(e)}
                     />
                   </View>
@@ -676,7 +762,6 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
                         borderRadius: 5,
                         borderColor: Color.light.tint,
                         borderWidth: 2,
@@ -686,6 +771,109 @@ export default function mealsHome() {
                       Add Food
                     </Text>
                   </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={customFoodModalVisible}
+              onRequestClose={() => setCustomFoodModalVisible(false)}
+            >
+              <View style={{ ...styles.modalBackground, backgroundColor: "rgba(0,0,0,0.3)", justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ ...styles.modeleContent, backgroundColor: Color.light.background }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: Color.light.tint }}>Add Custom Food</Text>
+                    <TouchableOpacity onPress={() => setCustomFoodModalVisible(false)}>
+                      <MaterialIcons name="close" size={24} color={Color.light.tint} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <TextInput
+                    placeholder="Food Name"
+                    style={styles.FoodInput}
+                    value={nameFood}
+                    onChangeText={(e) => setNameFood(e)}
+                  />
+
+                  <View style={{ marginVertical: 10 }}>
+                    <TextInput
+                      style={styles.foodVitamineInput}
+                      placeholder="Calories (per 100g)"
+                      keyboardType="numeric"
+                      value={nbKcal.toString()}
+                      onChangeText={(e) => setNbKcal(e)}
+                    />
+
+                    <TextInput
+                      style={styles.foodVitamineInput}
+                      placeholder="Protein (g per 100g)"
+                      keyboardType="numeric"
+                      value={nbProt.toString()}
+                      onChangeText={(e) => setNbProt(e)}
+                    />
+
+                    <TextInput
+                      style={styles.foodVitamineInput}
+                      placeholder="Carbs (g per 100g)"
+                      keyboardType="numeric"
+                      value={nbCarbs.toString()}
+                      onChangeText={(e) => setNbCarbs(e)}
+                    />
+
+                    <TextInput
+                      style={styles.foodVitamineInput}
+                      placeholder="Fat (g per 100g)"
+                      keyboardType="numeric"
+                      value={nbFat.toString()}
+                      onChangeText={(e) => setNbFat(e)}
+                    />
+                  </View>
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.button, { flex: 1, marginRight: 5 }]}
+                      onPress={() => setCustomFoodModalVisible(false)}
+                    >
+                      <Text style={{
+                        fontWeight: "700",
+                        color: Color.light.tint,
+                        textAlign: 'center',
+                        borderRadius: 5,
+                        borderColor: Color.light.tint,
+                        borderWidth: 2,
+                        padding: 10,
+                      }}>
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.button, { flex: 1, marginLeft: 5 }]}
+                      onPress={() => {
+                        console.log('Adding custom food:', {
+                          name: nameFood,
+                          calories: nbKcal,
+                          protein: nbProt,
+                          carbs: nbCarbs,
+                          fat: nbFat
+                        });
+                        AddFood()
+                      }}
+                    >
+                      <Text style={{
+                        fontWeight: "700",
+                        color: Color.light.tint,
+                        textAlign: 'center',
+                        borderRadius: 5,
+                        borderColor: Color.light.tint,
+                        borderWidth: 2,
+                        padding: 10,
+                      }}>
+                        Add Food
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </Modal>
@@ -746,12 +934,16 @@ const styles = StyleSheet.create({
     backgroundColor: Color.light.tint,
     marginTop: 10,
     borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   foodVitamineInput: {
     backgroundColor: Color.light.tint,
     width: "23%",
     marginTop: 10,
     borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   car: {
     fontSize: 12,

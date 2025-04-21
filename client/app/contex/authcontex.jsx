@@ -23,7 +23,7 @@ export const getTokenMobile = async () => {
 
 export const AuthProvider = ({ children }) => {
 
-    const [userId, setUserId] = useState();
+    const [userId, setUserId] = useState(null);
     const [splashLoading, setSplashLoading] = useState(true);
     const [authenticated, setAuthenticated] = useState(null);
 
@@ -53,11 +53,14 @@ export const AuthProvider = ({ children }) => {
     }
     const login = async (username, password) => {
         try {
+            console.log('logging in')
+            console.log(defaultUrl)
             const { data, headers } = await axios.post(`${defaultUrl}/auth/login`, {
                 username, password
             }, {
                 withCredentials: true
             })
+            console.log('logged')
             if (data.success) {
                 // settings up the user id and the access token into the cookie ( web ) happens automatically on the backend. or async storage ( mobile )
                 if (Platform.OS === 'ios' || Platform.OS === 'android') {

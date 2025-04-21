@@ -68,13 +68,13 @@ export const getExerciseDetails = async (req, res) => {
     const foundExercise = await db.select().from(exercises).where(eq(exercises.id, exerciseId)).limit(1)
 
     if (!foundExercise || foundExercise.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: 'Exercise Not Found'
       })
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: foundExercise[0]
     })
