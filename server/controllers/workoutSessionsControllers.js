@@ -12,7 +12,7 @@ import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 export const createWorkoutSession = async (req, res) => {
   try {
     const userId = req.user;
-    const userDate = req.userDate;
+    const userData = req.userData;
     const {
       planId,
       dueDate,
@@ -21,9 +21,9 @@ export const createWorkoutSession = async (req, res) => {
       note,
       ExerciseArray,
     } = req.body;
-    
+
     if (!dueDate || !name || !startTime) {
-     return   res.status(401).json({
+      return res.status(401).json({
         message: "Due Date not Included"
       })
     }
@@ -37,7 +37,7 @@ export const createWorkoutSession = async (req, res) => {
     // verify format of the startDate
     const isHHMMSS = isHHMMSS(dueDate)
     if (!isHHMMSS.success) {
-     return res.status(401).json({
+      return res.status(401).json({
         message: "Start Time does not follow the format HH-MM-SS"
       })
     }
@@ -47,7 +47,7 @@ export const createWorkoutSession = async (req, res) => {
       where: and(eq(sessions.name, name), eq(sessions.duedate, dueDate))
     })
     if (nameExists) {
-     return  res.status(201).json({
+      return res.status(201).json({
         success: false,
         message: "This name already in on that day"
       })
@@ -65,7 +65,7 @@ export const createWorkoutSession = async (req, res) => {
         endtime: null,
         note: note,
         rating: null,
-        createdBy:userId,
+        createdBy: userId,
       }).returning({
         id: createdSession.id
       })
@@ -73,7 +73,7 @@ export const createWorkoutSession = async (req, res) => {
       // verify plan created by that user (authorized)
       const authorized = await verifyPlanCreatedByUser(planId, userId)
       const finished = db.transaction(async (tx) => {
-    
+
         // verify the exercisesArray is array
         if (Array.isArray(ExerciseArray)) {
           // get the exercises data and infos from the exercise array 
@@ -96,7 +96,7 @@ export const createWorkoutSession = async (req, res) => {
           endtime: null,
           note: note,
           rating: null,
-          createdBy:userId,
+          createdBy: userId,
           // sessionExercises:sessionExercises,
         }).returning({
           CreatedSessionId: createdSession.id
@@ -105,16 +105,16 @@ export const createWorkoutSession = async (req, res) => {
           const exo = sessionExercises[index];
           for (let index2 = 0; index2 < exo.sets.length; index++) {
             createdSession = await tx.insert(sets_of_sessions_exercises).values({
-                exercise_id : exo.id,
-                session_id : CreatedSessionId,
-                order : exo.order,
-                weight:exo.weight,
-                unit : exo.unit ,
-                reps : exo.reps
+              exercise_id: exo.id,
+              session_id: CreatedSessionId,
+              order: exo.order,
+              weight: exo.weight,
+              unit: exo.unit,
+              reps: exo.reps
             }
-            ) 
+            )
           }
-          
+
         }
 
       }).catch((e) => {
@@ -139,17 +139,17 @@ export const getWorkoutSessions = async (req, res) => {
   try {
     const userId = req.user;
     const foundedSessions = await db
-    .select()
-    .from(sessions)
-    .where(eq(sessions.createdBy, userId));
-    if (!foundedSessions){
+      .select()
+      .from(sessions)
+      .where(eq(sessions.createdBy, userId));
+    if (!foundedSessions) {
       return res.status().jsom({
-        message : "there is no session created by this user ",
+        message: "there is no session created by this user ",
       })
-    } else{
+    } else {
       return res.status(200).json({
         success: true,
-        userSessions : foundedSessions,
+        userSessions: foundedSessions,
       })
     }
   } catch (error) {
@@ -168,100 +168,100 @@ export const getWorkoutSessionDetails = async (req, res) => {
 };
 
 // Add an exercise to an active session
-  export const saveExerciseToSession = async (req, res) => {
-    try {
-      const userId = req.user;
-      const {sessionId,Id,weight,unit,reps} = req.body;
-    
-      // verify if user authorized 
-      //check if the session exist and created by this user 
-      const foundSessions =await db
+export const saveExerciseToSession = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { sessionId, Id, weight, unit, reps } = req.body;
+
+    // verify if user authorized 
+    //check if the session exist and created by this user 
+    const foundSessions = await db
       .select()
       .from(sessions)
       .where(eq(sessions.id, sessionId));
-      if (!foundSessions){
-        return res.status(404).json({
-          success:false ,
-          message:"Session not found"
-        })
-      }  
-      session = foundSessions[0];
-        // check if created by this user 
-        if (session.createdBy !== userId ){
-          return res.status(401).json({
-            success:false ,
-            message:"this session wasn't created by this user "
-          })
-        }
-        //   //check if the ex
-        // const exercise = await db.query.exercises.findFirst({
-        //   where: eq(exercises.name, exerciseName)
-        // });
-    
-        if (!exercise) {
-          return res.status(404).json({
-            success: false,
-            message: "Exercise not found"
-          });
-        }
-
-
-
-      // check if the exercise exist in the sesion
-      sessionExercises= session.sessionExercises;
-      const existExercise = await db.query.sessionExercises.findFirst(
-        where(eq(sessionExercises.id, Id))
-      )
-    
-     
-
-
-
-
-
-      // if exists already update changes
-      if (existExercise){
-        await db.update(session.sessionExercises).set({
-          weight : weight,
-          reps : reps ,
-          unit : unit ,
-          dueDate : new Date(),
-        })
-      }
-      res.status(200).json({
-        success:true,
-        message : "the exercise is updated in the session "
+    if (!foundSessions) {
+      return res.status(404).json({
+        success: false,
+        message: "Session not found"
       })
-
-
-
-
-
-
-
-      // if does not exist add new exercise to the session
-      if (!existExercise){
-        await db.insert(session.sessionExercises).values({
-          weight : weight,
-          reps : reps ,
-          unit : unit ,
-          dueDate : new Date(),
-        })
-      }
-        return res.status(200).json({
-           success:true,
-        message : "the exercise is added to the session "
-        })
-      
-    } catch (error) {
-      res.status(500).json({ message: 'Error adding exercise to session', error: error.message });
     }
-  };
+    session = foundSessions[0];
+    // check if created by this user 
+    if (session.createdBy !== userId) {
+      return res.status(401).json({
+        success: false,
+        message: "this session wasn't created by this user "
+      })
+    }
+    //   //check if the ex
+    // const exercise = await db.query.exercises.findFirst({
+    //   where: eq(exercises.name, exerciseName)
+    // });
+
+    if (!exercise) {
+      return res.status(404).json({
+        success: false,
+        message: "Exercise not found"
+      });
+    }
+
+
+
+    // check if the exercise exist in the sesion
+    sessionExercises = session.sessionExercises;
+    const existExercise = await db.query.sessionExercises.findFirst(
+      where(eq(sessionExercises.id, Id))
+    )
+
+
+
+
+
+
+
+    // if exists already update changes
+    if (existExercise) {
+      await db.update(session.sessionExercises).set({
+        weight: weight,
+        reps: reps,
+        unit: unit,
+        dueDate: new Date(),
+      })
+    }
+    res.status(200).json({
+      success: true,
+      message: "the exercise is updated in the session "
+    })
+
+
+
+
+
+
+
+    // if does not exist add new exercise to the session
+    if (!existExercise) {
+      await db.insert(session.sessionExercises).values({
+        weight: weight,
+        reps: reps,
+        unit: unit,
+        dueDate: new Date(),
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      message: "the exercise is added to the session "
+    })
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding exercise to session', error: error.message });
+  }
+};
 
 // Log a set for an exercise
 export const logSetForExercise = async (req, res) => {
   try {
-    const userId = req.user;  
+    const userId = req.user;
     // ... existing code ...
   } catch (error) {
     res.status(500).json({ message: 'Error logging set for exercise', error: error.message });
