@@ -3,7 +3,7 @@ import db from "../db/index.js";
 import { exercises, plansExercises, sessions, setsOfSessionsExercises } from "../db/schemas/dev/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
-
+    
 // Start a new workout session
 // In this route I did not add the exercises to the sessionsExercises table,
 // I only created the session and send the exercise of the selected planId
@@ -27,13 +27,14 @@ export const createWorkoutSession = async (req, res) => {
         console.log(req.body)
 
 
-        if (rating && (rating > 5 || rating < 0)) {
+        if (rating || (rating > 5 || rating < 0)) {
             return res.status(401).json({
                 success: false,
                 message: "Rating must be between 1 and 5"
             })
         }
 
+        console.log('rating', rating)
         if (!dueDate || !name) {
             return res.status(401).json({
                 success: false,
@@ -48,6 +49,7 @@ export const createWorkoutSession = async (req, res) => {
                 message: "Due Date does not follow the format YYYY-MM-DD"
             })
         }
+        console.log('dueDate', dueDate)
         // verify format of the startDate
         if (startTime) {
             const startTimeIsHHMMSSFormat = isHHMMSS(startTime)
@@ -71,6 +73,7 @@ export const createWorkoutSession = async (req, res) => {
         const nameExists = await db.query.sessions.findFirst({
             where: and(eq(sessions.createdBy, userId), eq(sessions.name, name), eq(sessions.duedate, dueDate))
         })
+        console.log('nameExists', nameExists)
         if (nameExists) {
             return res.status(201).json({
                 success: false,
@@ -88,10 +91,12 @@ export const createWorkoutSession = async (req, res) => {
                 })
             }
         }
+        console.log('authorized', planId)
 
+        console.log('exercisesArray', exercisesArray)
 
         // verify the exercisesArray is array
-        if (!(Array.isArray(exercisesArray))) {
+        if (exercisesArray && !Array.isArray(exercisesArray) &&  exercisesArray.length === 0) {
             return {
                 success: false,
                 message: "Exercises Array is not an array",
@@ -100,6 +105,7 @@ export const createWorkoutSession = async (req, res) => {
         }
 
         const finished = await db.transaction(async (tx) => {
+            console.log('tx', tx)
 
             // create the session
             const createdSessions = await tx.insert(sessions).values({
@@ -115,6 +121,8 @@ export const createWorkoutSession = async (req, res) => {
                 id: sessions.id
             })
             const createdSession = createdSessions[0].id;
+
+            console.log('createdSession', createdSession)
 
             const exercisesValidation = await Promise.all(exercisesArray.map(async (exo) => {
                 console.log("exo", exo)
@@ -157,6 +165,7 @@ export const createWorkoutSession = async (req, res) => {
                 }
             }))
 
+            console.log('exercisesValidation', exercisesValidation)
             if (!exercisesValidation.every(exo => exo.success)) {
                 return {
                     success: false,
@@ -203,6 +212,9 @@ export const createWorkoutSession = async (req, res) => {
                 message: finished.message,
             })
         }
+
+
+        console.log('finished', finished)
 
         res.status(201).json({
             success: true,
