@@ -231,10 +231,20 @@ export const createWorkoutSession = async (req, res) => {
 export const getWorkoutSessions = async (req, res) => {
     try {
         const userId = req.user;
+        const { date } = req.query;
+        const isYYYYMMDDFormat = isYYYYMMDD(date)
+        if (!isYYYYMMDDFormat.success) {
+            return res.status(401).json({
+                success: false,
+                message: "Date does not follow the format YYYY-MM-DD"
+            })
+        }
+
+        
         const foundedSessions = await db
             .select()
             .from(sessions)
-            .where(eq(sessions.createdBy, userId));
+            .where(and(eq(sessions.createdBy, userId), eq(sessions.duedate, date)));
         if (!foundedSessions) {
             return res.status().jsom({
                 message: "there is no session created by this user ",

@@ -8,7 +8,7 @@ import useAuth from '@/app/contex/authcontex';
 import Colors from '@/constants/Colors';
 import { router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
+import { defaultUrl } from '@/constants/constants';
 
 
 
@@ -16,29 +16,40 @@ export default function Sessions() {
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const { authenticated } = useAuth();
-    const navigation = useNavigation();
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
 
     useEffect(() => {
         // Fetch sessions data
         const fetchSessions = async () => {
+            setLoading(true);
             console.log('Fetching sessions for date:', currentDate.toISOString().split('T')[0]);
             try {
                 // Replace with actual API call when available
                 // Example: const response = await fetchGetUserSessions(authenticated);
 
-                // Placeholder data
-                const mockSessions = [
-                    { id: 1, title: 'Morning Workout', date: '2023-06-15', duration: '45 min' },
-                    { id: 2, title: 'Evening Run', date: '2023-06-14', duration: '30 min' },
-                    { id: 3, title: 'Strength Training', date: '2023-06-12', duration: '60 min' },
-                ];
-
-                setTimeout(() => {
-                    setSessions(mockSessions);
+                const res = await fetch(`${defaultUrl}/workout/sessions?date=${currentDate.toISOString().split('T')[0]}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authenticated}`
+                    }
+                })
+                if (!res.ok) {
+                    Alert.alert('Error', 'Failed to load workout sessions');
                     setLoading(false);
-                }, 1000);
+                    return;
+                }
 
+                const { success, userSessions, message } = await res.json();
+
+                if (!success) {
+                    Alert.alert('Error', message);
+                    setLoading(false);
+                    return;
+                }
+
+                setSessions(userSessions);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching sessions:', error);
                 Alert.alert('Error', 'Failed to load workout sessions');
@@ -157,18 +168,17 @@ export default function Sessions() {
                                 onPress={() => {
                                     // Navigate to session details
                                     console.log('Navigate to session', item.id);
-                                    // router.push(`/sessions/${item.id}`);
+                                    router.push({
+                                        pathname: `/sessions/${item.id}`,
+                                    });
                                 }}
                             >
                                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>
-                                    {item.title}
+                                    {item.name}
                                 </Text>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={{ fontSize: 14, color: '#666' }}>
-                                        {item.date}
-                                    </Text>
-                                    <Text style={{ fontSize: 14, color: '#666' }}>
-                                        {item.duration}
+                                        {item.note}
                                     </Text>
                                 </View>
                             </TouchableOpacity>
