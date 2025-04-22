@@ -1,0 +1,1168 @@
+{
+  "id": "a119cb96-fc27-4f53-93e0-93206fa216dc",
+  "prevId": "3da0b9b5-eff1-4ee4-b5b7-76fc95b6e9ea",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "dev.collections": {
+      "name": "collections",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "collections_user_id_fkey": {
+          "name": "collections_user_id_fkey",
+          "tableFrom": "collections",
+          "tableTo": "users",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "collections_title_check": {
+          "name": "collections_title_check",
+          "value": "length((title)::text) >= 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.exercises": {
+      "name": "exercises",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "force": {
+          "name": "force",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "NULL"
+        },
+        "level": {
+          "name": "level",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mechanic": {
+          "name": "mechanic",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "NULL"
+        },
+        "equipment": {
+          "name": "equipment",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "NULL"
+        },
+        "primarymuscles": {
+          "name": "primarymuscles",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "secondarymuscles": {
+          "name": "secondarymuscles",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instructions": {
+          "name": "instructions",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "images": {
+          "name": "images",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "exercises_category_check": {
+          "name": "exercises_category_check",
+          "value": "(category)::text = ANY (ARRAY[('powerlifting'::character varying)::text, ('strength'::character varying)::text, ('stretching'::character varying)::text, ('cardio'::character varying)::text, ('olympic weightlifting'::character varying)::text, ('strongman'::character varying)::text, ('plyometrics'::character varying)::text])"
+        },
+        "exercises_equipment_check": {
+          "name": "exercises_equipment_check",
+          "value": "(equipment)::text = ANY (ARRAY[('medicine ball'::character varying)::text, ('dumbbell'::character varying)::text, ('body only'::character varying)::text, ('bands'::character varying)::text, ('kettlebells'::character varying)::text, ('foam roll'::character varying)::text, ('cable'::character varying)::text, ('machine'::character varying)::text, ('barbell'::character varying)::text, ('exercise ball'::character varying)::text, ('e-z curl bar'::character varying)::text, ('other'::character varying)::text])"
+        },
+        "exercises_force_check": {
+          "name": "exercises_force_check",
+          "value": "(force)::text = ANY (ARRAY[('static'::character varying)::text, ('pull'::character varying)::text, ('push'::character varying)::text])"
+        },
+        "exercises_level_check": {
+          "name": "exercises_level_check",
+          "value": "(level)::text = ANY (ARRAY[('beginner'::character varying)::text, ('intermediate'::character varying)::text, ('expert'::character varying)::text])"
+        },
+        "exercises_mechanic_check": {
+          "name": "exercises_mechanic_check",
+          "value": "(mechanic)::text = ANY (ARRAY[('isolation'::character varying)::text, ('compound'::character varying)::text])"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.foods": {
+      "name": "foods",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "foodname": {
+          "name": "foodname",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "''"
+        },
+        "calories": {
+          "name": "calories",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proteinper100g": {
+          "name": "proteinper100g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "carbohydratesper100g": {
+          "name": "carbohydratesper100g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fatper100g": {
+          "name": "fatper100g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "saturatedfatper100g": {
+          "name": "saturatedfatper100g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "transfat": {
+          "name": "transfat",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fiber": {
+          "name": "fiber",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sugar": {
+          "name": "sugar",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sodium": {
+          "name": "sodium",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cholesterol": {
+          "name": "cholesterol",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brand": {
+          "name": "brand",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom": {
+          "name": "custom",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "likes": {
+          "name": "likes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "dislikes": {
+          "name": "dislikes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_created_by": {
+          "name": "fk_created_by",
+          "tableFrom": "foods",
+          "tableTo": "users",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "foods_calories_check": {
+          "name": "foods_calories_check",
+          "value": "calories >= 0"
+        },
+        "foods_carbohydratesper100g_check": {
+          "name": "foods_carbohydratesper100g_check",
+          "value": "carbohydratesper100g >= 0"
+        },
+        "foods_cholesterol_check": {
+          "name": "foods_cholesterol_check",
+          "value": "cholesterol >= 0"
+        },
+        "foods_fatper100g_check": {
+          "name": "foods_fatper100g_check",
+          "value": "fatper100g >= 0"
+        },
+        "foods_fiber_check": {
+          "name": "foods_fiber_check",
+          "value": "fiber >= 0"
+        },
+        "foods_foodname_check": {
+          "name": "foods_foodname_check",
+          "value": "length((foodname)::text) > 0"
+        },
+        "foods_proteinper100g_check": {
+          "name": "foods_proteinper100g_check",
+          "value": "proteinper100g >= 0"
+        },
+        "foods_saturatedfatper100g_check": {
+          "name": "foods_saturatedfatper100g_check",
+          "value": "saturatedfatper100g >= 0"
+        },
+        "foods_sodium_check": {
+          "name": "foods_sodium_check",
+          "value": "sodium >= 0"
+        },
+        "foods_sugar_check": {
+          "name": "foods_sugar_check",
+          "value": "sugar >= 0"
+        },
+        "foods_transfat_check": {
+          "name": "foods_transfat_check",
+          "value": "transfat >= 0"
+        },
+        "foods_status_check": {
+          "name": "foods_status_check",
+          "value": "(status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('refused'::character varying)::text])"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.foods_logs": {
+      "name": "foods_logs",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "food_id": {
+          "name": "food_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updateddate": {
+          "name": "updateddate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "servingsize_g": {
+          "name": "servingsize_g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_food": {
+          "name": "fk_food",
+          "tableFrom": "foods_logs",
+          "tableTo": "foods",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "food_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_user": {
+          "name": "fk_user",
+          "tableFrom": "foods_logs",
+          "tableTo": "users",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "foods_logs_servingsize_g_check": {
+          "name": "foods_logs_servingsize_g_check",
+          "value": "servingsize_g >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.plans": {
+      "name": "plans",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "collection_id": {
+          "name": "collection_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "plans_collection_id_fkey": {
+          "name": "plans_collection_id_fkey",
+          "tableFrom": "plans",
+          "tableTo": "collections",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "plans_title_check": {
+          "name": "plans_title_check",
+          "value": "length((title)::text) >= 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.plans_exercises": {
+      "name": "plans_exercises",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "plan_id": {
+          "name": "plan_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "exercise_id": {
+          "name": "exercise_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_exercise": {
+          "name": "fk_exercise",
+          "tableFrom": "plans_exercises",
+          "tableTo": "exercises",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "exercise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_plan": {
+          "name": "fk_plan",
+          "tableFrom": "plans_exercises",
+          "tableTo": "plans",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "dev.sessions": {
+      "name": "sessions",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "plan_id": {
+          "name": "plan_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duedate": {
+          "name": "duedate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "starttime": {
+          "name": "starttime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "endtime": {
+          "name": "endtime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_plan": {
+          "name": "fk_plan",
+          "tableFrom": "sessions",
+          "tableTo": "plans",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_created_by": {
+          "name": "fk_created_by",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "sessions_name_check": {
+          "name": "sessions_name_check",
+          "value": "length((name)::text) >= 1"
+        },
+        "sessions_rating_check": {
+          "name": "sessions_rating_check",
+          "value": "(rating >= 0) AND (rating <= 5)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.sets_of_sessions_exercises": {
+      "name": "sets_of_sessions_exercises",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "exercise_id": {
+          "name": "exercise_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight": {
+          "name": "weight",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "varchar(10)[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reps": {
+          "name": "reps",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_session_exercise_id": {
+          "name": "fk_session_exercise_id",
+          "tableFrom": "sets_of_sessions_exercises",
+          "tableTo": "exercises",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "exercise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_session_id": {
+          "name": "fk_session_id",
+          "tableFrom": "sets_of_sessions_exercises",
+          "tableTo": "sessions",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "dev.templates": {
+      "name": "templates",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "templates_title_check": {
+          "name": "templates_title_check",
+          "value": "length((title)::text) >= 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.templates_exercises": {
+      "name": "templates_exercises",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "template_id": {
+          "name": "template_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "exercise_id": {
+          "name": "exercise_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_exercise": {
+          "name": "fk_exercise",
+          "tableFrom": "templates_exercises",
+          "tableTo": "exercises",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "exercise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_template": {
+          "name": "fk_template",
+          "tableFrom": "templates_exercises",
+          "tableTo": "templates",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "template_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "dev.users": {
+      "name": "users",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(72)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "salt": {
+          "name": "salt",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refreshtoken": {
+          "name": "refreshtoken",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "avatar": {
+          "name": "avatar",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "firstname": {
+          "name": "firstname",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastname": {
+          "name": "lastname",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_username_key": {
+          "name": "users_username_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        },
+        "users_refreshtoken_key": {
+          "name": "users_refreshtoken_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "refreshtoken"
+          ]
+        },
+        "users_email_key": {
+          "name": "users_email_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "users_email_check": {
+          "name": "users_email_check",
+          "value": "(email)::text ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$'::text"
+        },
+        "users_username_check": {
+          "name": "users_username_check",
+          "value": "(length((username)::text) > 3) AND ((username)::text ~ '^[a-zA-Z0-9_]+$'::text)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "dev.weights_logs": {
+      "name": "weights_logs",
+      "schema": "dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight": {
+          "name": "weight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creationdate": {
+          "name": "creationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updationdate": {
+          "name": "updationdate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "unit": {
+          "name": "unit",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_user": {
+          "name": "fk_user",
+          "tableFrom": "weights_logs",
+          "tableTo": "users",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "weights_logs_unit_check": {
+          "name": "weights_logs_unit_check",
+          "value": "(unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])"
+        },
+        "weights_logs_weight_check": {
+          "name": "weights_logs_weight_check",
+          "value": "weight >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {
+    "dev": "dev"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

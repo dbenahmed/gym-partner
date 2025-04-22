@@ -21,7 +21,7 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
                         style={styles.addSetButton}
                         onPress={() => {
                             const updatedSets = Array.isArray(item.sets) ? [...item.sets] : [];
-                            updatedSets.push({ reps: '', weight: '' });
+                            updatedSets.push({ reps: 0, weight: 0, unit: 'kg' });
                             updateExerciseData(item.id, 'sets', updatedSets);
                         }}
                     >
@@ -33,19 +33,19 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
                     <Text style={styles.noSetsText}>No sets added yet. Add your first set.</Text>
                 ) : (
                     item.sets.map((set, index) => (
-                        <SetsContainer 
-                            key={index} 
-                            item={item} 
-                            set={set} 
-                            index={index} 
-                            updateExerciseData={updateExerciseData} 
+                        <SetsContainer
+                            key={index}
+                            item={item}
+                            set={set}
+                            index={index}
+                            updateExerciseData={updateExerciseData}
                         />
                     ))
                 )}
             </View>
         </View>
     );
-}   
+}
 
 const styles = StyleSheet.create({
     exerciseCard: {

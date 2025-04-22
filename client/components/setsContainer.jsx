@@ -21,10 +21,9 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
                 {index === 0 && <Text style={styles.inputLabel}>Reps</Text>}
                 <TextInput
                     style={styles.input}
-                    value={item.reps}
                     onChangeText={(value) => {
                         const updatedSets = [...item.sets];
-                        updatedSets[index].reps = value;
+                        updatedSets[index].reps = parseInt(value);
                         updateExerciseData(item.id, 'sets', updatedSets);
                     }}
                     keyboardType="numeric"
@@ -36,10 +35,9 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
                 {index === 0 && <Text style={styles.inputLabel}>Weight</Text>}
                 <TextInput
                     style={[styles.input]}
-                    value={item.weight}
                     onChangeText={(value) => {
                         const updatedSets = [...item.sets];
-                        updatedSets[index].weight = value;
+                        updatedSets[index].weight = parseInt(value);
                         updateExerciseData(item.id, 'sets', updatedSets);
                     }}
                     keyboardType="numeric"
