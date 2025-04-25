@@ -67,7 +67,8 @@ export const AuthProvider = ({ children }) => {
                     await SecureStore.setItemAsync('user-id', JSON.stringify(data.data.id));
                     await SecureStore.setItemAsync('access-token', data.data.accessToken);
                 }
-                setUserId(data.id)
+                console.log('settings user id to ',data.data.id)
+                setUserId(data.data.id)
                 setAuthenticated(data.data.accessToken);
                 return {
                     success: true, message: data.message
@@ -131,6 +132,7 @@ export const AuthProvider = ({ children }) => {
             console.log('data', data)
             if (data.success) {
                 let userId = await parseInt(await SecureStore.getItemAsync('user-id'));
+                console.log('validation',userId)
                 setUserId(userId);
                 setAuthenticated(token);
                 return {
