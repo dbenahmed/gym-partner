@@ -354,6 +354,7 @@ export const fetchCreateCustomMeal = async (
   body: CreateCustomMealBodyType
 ) => {
   try {
+    console.log('adding custom food now')
     const url = `${defaultUrl}/meals/custom`;
     const res = await fetch(url, {
       method: "POST",
@@ -367,6 +368,7 @@ export const fetchCreateCustomMeal = async (
       throw new Error("Failed to create custom meal");
     }
     const { success, message, data } = await res.json();
+    console.log(success)
     if (!success) {
       throw new Error(message);
     }
