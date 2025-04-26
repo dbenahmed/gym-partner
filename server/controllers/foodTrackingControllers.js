@@ -105,10 +105,27 @@ export const addMeal = async (req, res) => {
 };
 
 // todo : lowp : Update an existing meal in today's log
-export const updateMeal = (req, res) => {
+export const updateMeal = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+   const {mealId , newServingsize_g} = req.body;
+   const checkTheMeal = await db
+      .select()
+      .from(foodsLogs)
+      .where(eq(foodsLogs.id,mealId));
+      if (checkTheMeal.length === 0 ){
+        return res.status(400).json({
+          success:false,
+          message : "the session is not exist verify the id  "
+        })
+      }
+       await db.update(foodsLogs).set({
+        servingsizeG:newServingsize_g,
+      }).where(eq(foodsLogs.id,mealId));
+     return res.status(200).json({
+  success:true,
+  message:"the meal is updated successfully"
+ })
   } catch (error) {
     res.status(500).json({ message: 'Error updating meal', error: error.message });
   }

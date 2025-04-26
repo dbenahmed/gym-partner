@@ -251,8 +251,25 @@ export const updateWorkoutSession = async (req, res) => {
 export const deleteWorkoutSession = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
-  } catch (error) {
+   const {sessionId} = req.body;
+   const checkTheSession = await db
+   .select()
+   .from(sessions)
+   .where(eq(sessions.id,sessionId));
+   if (checkTheSession.length === 0){
+    return res.status(400).json({
+      success:false,
+      message:"the session is not deleted verify the id !"
+    })
+   }
+     await db
+     .delete(sessions)
+     .where(eq(sessions.id,sessionId));
+   return res.status(200).json({
+    success:true,
+    message : "the session is deleted successfully  ",
+  })
+   } catch (error) {
     res.status(500).json({ message: 'Error deleting workout session', error: error.message });
   }
 }; 
