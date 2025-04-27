@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import db from "../db/index.js";
-import { exercises, plansExercises, sessions } from "../db/schemas/dev/schema.js";
+import { exercises, plansExercises, sessions , setsOfSessionsExercises } from "../db/schemas/dev/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 
@@ -104,7 +104,7 @@ export const createWorkoutSession = async (req, res) => {
         for (let index = 0; index < sessionExercises.length; index++) {
           const exo = sessionExercises[index];
           for (let index2 = 0; index2 < exo.sets.length; index++) {
-            createdSession = await tx.insert(sets_of_sessions_exercises).values({
+            createdSession = await tx.insert(setsOfSessionsExercises).values({
                 exercise_id : exo.id,
                 session_id : CreatedSessionId,
                 order : exo.order,
@@ -241,7 +241,46 @@ export const logSetForExercise = async (req, res) => {
 export const updateWorkoutSession = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+   const {sessionId , newSessionName , newExercises } = req.body;
+   const checkTheSession = await db
+   .select()
+   .from(sessions)
+   .where(eq(sessions.id,sessionId));
+   if (checkTheSession.length === 0){
+    return res.status(400).json({
+      success:false,
+      message:"the session is not exist verify the id !"
+    })
+   }
+   if (newSessionName){
+   await db.update(sessions).set({
+    name : newSessionNamem ,
+  }).where(eq(sessions.id,sessionId));
+}
+if (newExercises)
+   {
+    await db
+    .delete(setsOfSessionsExercises)
+    .where(eq(setsOfSessionsExercises.id,sessionId));
+    newExercises.forEach( async ele => {
+      await db.insert(setsOfSessionsExercises).values({
+        sessionId : sessionId,
+        exerciseId : ele.exerciseId,
+        creationdate : ele.creationdate,
+        order : ele.order,
+        weight: ele.weight,
+        reps: ele.reps,
+
+      })
+    });
+
+   }
+
+
+
+
+
+
   } catch (error) {
     res.status(500).json({ message: 'Error updating workout session', error: error.message });
   }
@@ -262,9 +301,9 @@ export const deleteWorkoutSession = async (req, res) => {
       message:"the session is not deleted verify the id !"
     })
    }
-     await db
-     .delete(sessions)
-     .where(eq(sessions.id,sessionId));
+      await db
+      .delete(sessions)
+      .where(eq(sessions.id,sessionId));
    return res.status(200).json({
     success:true,
     message : "the session is deleted successfully  ",
