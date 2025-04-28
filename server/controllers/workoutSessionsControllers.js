@@ -161,7 +161,23 @@ export const getWorkoutSessions = async (req, res) => {
 export const getWorkoutSessionDetails = async (req, res) => {
   try {
     const userId = req.user;
-    // ... existing code ...
+   const {sessionId} = req.body;
+   //check if the session exist 
+   const foundSessions =await db
+   .select()
+   .from(sessions)
+   .where(eq(sessions.id, sessionId));
+   if (!foundSessions){
+    return res.status(400).json({
+      success: false,
+      message : "session was not founded"
+    })
+   }
+   res.status(200).json({
+    success:true,
+    Session : foundSessions ,
+   })
+   
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving workout session details', error: error.message });
   }
