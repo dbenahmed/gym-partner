@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import db from "../db/index.js";
+
 import { exercises, plansExercises, sessions, setsOfSessionsExercises } from "../db/schemas/dev/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
@@ -10,6 +11,7 @@ import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 // to the client's frontend 
 // todo : negotiate about this features with team later
 export const createWorkoutSession = async (req, res) => {
+
     try {
         const userId = req.user;
         const userData = req.userData;
@@ -229,6 +231,7 @@ export const createWorkoutSession = async (req, res) => {
 
 // Get a list of past workout sessions for the user
 export const getWorkoutSessions = async (req, res) => {
+
     try {
         const userId = req.user;
         const { date } = req.query;
@@ -262,6 +265,7 @@ export const getWorkoutSessions = async (req, res) => {
 
 // Get details of a specific session
 export const getWorkoutSessionDetails = async (req, res) => {
+
     try {
         const userId = req.user;
 
@@ -292,7 +296,7 @@ export const saveExerciseToSession = async (req, res) => {
         const userId = req.user;
         const { sessionId, Id, weight, unit, reps } = req.body;
 
-        // verify if user authorized 
+        // todo : verify if user authorized 
         //check if the session exist and created by this user 
         const foundSessions = await db
             .select()
@@ -316,6 +320,7 @@ export const saveExerciseToSession = async (req, res) => {
         // const exercise = await db.query.exercises.findFirst({
         //   where: eq(exercises.name, exerciseName)
         // });
+
 
         if (!exercise) {
             return res.status(404).json({
@@ -387,22 +392,81 @@ export const logSetForExercise = async (req, res) => {
     }
 };
 
+// todo : verify
 // Update session details
 export const updateWorkoutSession = async (req, res) => {
-    try {
-        const userId = req.user;
-        // ... existing code ...
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating workout session', error: error.message });
-    }
+  try {
+    const userId = req.user;
+   const {sessionId , newSessionName , newExercises } = req.body;
+   const checkTheSession = await db
+   .select()
+   .from(sessions)
+   .where(eq(sessions.id,sessionId));
+   if (checkTheSession.length === 0){
+    return res.status(400).json({
+      success:false,
+      message:"the session is not exist verify the id !"
+    })
+   }
+   if (newSessionName){
+   await db.update(sessions).set({
+    name : newSessionNamem ,
+  }).where(eq(sessions.id,sessionId));
+}
+if (newExercises)
+   {
+    await db
+    .delete(setsOfSessionsExercises)
+    .where(eq(setsOfSessionsExercises.id,sessionId));
+    newExercises.forEach( async ele => {
+      await db.insert(setsOfSessionsExercises).values({
+        sessionId : sessionId,
+        exerciseId : ele.exerciseId,
+        creationdate : ele.creationdate,
+        order : ele.order,
+        weight: ele.weight,
+        reps: ele.reps,
+
+      })
+    });
+
+   }
+
+
+
+
+
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating workout session', error: error.message });
+  }
+
 };
 
 // Delete a session
 export const deleteWorkoutSession = async (req, res) => {
-    try {
-        const userId = req.user;
-        // ... existing code ...
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting workout session', error: error.message });
-    }
+
+  try {
+    const userId = req.user;
+   const {sessionId} = req.body;
+   const checkTheSession = await db
+   .select()
+   .from(sessions)
+   .where(eq(sessions.id,sessionId));
+   if (checkTheSession.length === 0){
+    return res.status(400).json({
+      success:false,
+      message:"the session is not deleted verify the id !"
+    })
+   }
+      await db
+      .delete(sessions)
+      .where(eq(sessions.id,sessionId));
+   return res.status(200).json({
+    success:true,
+    message : "the session is deleted successfully  ",
+  })
+   } catch (error) {
+    res.status(500).json({ message: 'Error deleting workout session', error: error.message });
+  }
 }; 
