@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import useAuth from '@/app/contex/authcontex';
@@ -8,7 +8,6 @@ import { defaultUrl } from '@/constants/constants';
 import { router } from 'expo-router';
 import { Stack } from 'expo-router';
 
-
 export default function SessionDetails() {
     const { sessionsId } = useLocalSearchParams();
     const [loading, setLoading] = useState(true);
@@ -16,63 +15,68 @@ export default function SessionDetails() {
     const [exercises, setExercises] = useState([]);
     const { authenticated } = useAuth();
 
+    const deleteSession = async (sessionId) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${defaultUrl}/workout/sessions/${sessionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authenticated}`
+                }
+            });
+
+            if (!response.ok) {
+                Alert.alert('Error', "Failed to delete session");
+                setLoading(false);
+                return;
+            }
+            const { success, message } = await response.json();
+            if (!success) {
+                Alert.alert('Error', message);
+                setLoading(false);
+                return;
+            }
+            router.push('/sessions');
+            setLoading(false);
+            Alert.alert('Success', 'Session deleted successfully');
+        }
+        catch (error) {
+            console.error('Error deleting session:', error);
+            Alert.alert('Error', 'Failed to delete session');
+        }
+    };
+
     useEffect(() => {
         // In a real app, you would fetch the session data from the API
         // For now, we'll use mock data
         const fetchSessionDetails = async () => {
             setLoading(true);
             try {
-                // Mock data for demonstration
-                const mockSession = {
-                    id: 69,
-                    planId: null,
-                    duedate: "2025-04-21",
-                    name: "dd",
-                    starttime: null,
-                    endtime: null,
-                    note: "dd",
-                    rating: null,
-                    createdBy: 84
-                };
-
-                const mockExercises = [
-                    {
-                        id: 72,
-                        sessionId: 72,
-                        exerciseId: 83,
-                        creationdate: "2025-04-21 18:33:28.145916+00",
-                        order: 0,
-                        weight: [12],
-                        unit: ["lbs"],
-                        reps: [32]
-                    }
-                ];
-
-                // Simulate API delay
-                setTimeout(() => {
-                    setSession(mockSession);
-                    setExercises(mockExercises);
-                    setLoading(false);
-                }, 500);
-
                 // In a real app, you would use something like:
-                /*
                 const response = await fetch(`${defaultUrl}/workout/sessions/${sessionsId}`, {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authenticated}`
-                  }
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authenticated}`
+                    }
                 });
-                
+
                 if (!response.ok) {
-                  throw new Error('Failed to fetch session details');
+                    throw new Error('Failed to fetch session details');
                 }
-                
-                const data = await response.json();
-                setSession(data.session);
-                setExercises(data.exercises);
-                */
+
+                const { success, message, session, exercises } = await response.json();
+                console.log(session, exercises);
+                if (!success) {
+                    Alert.alert('Error', message);
+                    setLoading(false);
+                    return;
+                }
+                setSession(session);
+                setExercises(exercises);
+                setLoading(false);
+
             } catch (error) {
                 console.error('Error fetching session details:', error);
                 setLoading(false);
@@ -96,91 +100,99 @@ export default function SessionDetails() {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
+                <Stack.Screen options={{
+                    title: 'Session Details',
+                }} />
                 <ActivityIndicator size="large" color={Colors.light.tint} />
                 <Text style={styles.loadingText}>Loading session details...</Text>
             </View>
         );
-    }
-
-    return (
-        <View style={{ flex: 1 }}>
-            <Stack.Screen options={{
-                title: 'Session Details',
-            }} />
-            <ScrollView style={styles.container}>
-                {/* Session Header */}
-                <View style={styles.sessionHeader}>
-                    <Text style={styles.sessionName}>{session.name}</Text>
-                    <Text style={styles.sessionDate}>{formatDate(session.duedate)}</Text>
-                    {session.note && <Text style={styles.sessionNote}>Note: {session.note}</Text>}
-                </View>
-
-                {/* Session Stats */}
-                <View style={styles.statsContainer}>
-                    <View style={styles.statItem}>
-                        <MaterialCommunityIcons name="dumbbell" size={24} color={Colors.light.tint} />
-                        <Text style={styles.statValue}>{exercises.length}</Text>
-                        <Text style={styles.statLabel}>Exercises</Text>
+    } else {
+        return (
+            <View style={{ flex: 1 }}>
+                <Stack.Screen options={{
+                    title: 'Session Details',
+                }} />
+                <ScrollView style={styles.container}>
+                    {/* Session Header */}
+                    <View style={styles.sessionHeader}>
+                        <Text style={styles.sessionName}>{session.name}</Text>
+                        <Text style={styles.sessionDate}>{formatDate(session.duedate)}</Text>
+                        {session.note && <Text style={styles.sessionNote}>Note: {session.note}</Text>}
                     </View>
 
-                    <View style={styles.statItem}>
-                        <MaterialCommunityIcons name="clock-outline" size={24} color={Colors.light.tint} />
-                        <Text style={styles.statValue}>
-                            {session.starttime && session.endtime
-                                ? `${new Date(session.endtime) - new Date(session.starttime)}min`
-                                : 'N/A'}
-                        </Text>
-                        <Text style={styles.statLabel}>Duration</Text>
+                    {/* Session Stats */}
+                    <View style={styles.statsContainer}>
+                        <View style={styles.statItem}>
+                            <MaterialCommunityIcons name="dumbbell" size={24} color={Colors.light.tint} />
+                            <Text style={styles.statValue}>{exercises.length}</Text>
+                            <Text style={styles.statLabel}>Exercises</Text>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <MaterialCommunityIcons name="clock-outline" size={24} color={Colors.light.tint} />
+                            <Text style={styles.statValue}>
+                                {session.starttime && session.endtime
+                                    ? `${new Date(session.endtime) - new Date(session.starttime)}min`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.statLabel}>Duration</Text>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <MaterialCommunityIcons name="star" size={24} color={Colors.light.tint} />
+                            <Text style={styles.statValue}>{session.rating || 'N/A'}</Text>
+                            <Text style={styles.statLabel}>Rating</Text>
+                        </View>
                     </View>
 
-                    <View style={styles.statItem}>
-                        <MaterialCommunityIcons name="star" size={24} color={Colors.light.tint} />
-                        <Text style={styles.statValue}>{session.rating || 'N/A'}</Text>
-                        <Text style={styles.statLabel}>Rating</Text>
-                    </View>
-                </View>
+                    {/* Exercises List */}
+                    <View style={styles.exercisesContainer}>
+                        <Text style={styles.sectionTitle}>Exercises</Text>
 
-                {/* Exercises List */}
-                <View style={styles.exercisesContainer}>
-                    <Text style={styles.sectionTitle}>Exercises</Text>
+                        {exercises.length === 0 ? (
+                            <Text style={styles.emptyMessage}>No exercises recorded for this session</Text>
+                        ) : (
+                            exercises.map((exercise, index) => (
+                                <View key={exercise.id} style={styles.exerciseCard}>
+                                    <Text style={styles.exerciseName}>Exercise #{index + 1}</Text>
 
-                    {exercises.length === 0 ? (
-                        <Text style={styles.emptyMessage}>No exercises recorded for this session</Text>
-                    ) : (
-                        exercises.map((exercise, index) => (
-                            <View key={exercise.id} style={styles.exerciseCard}>
-                                <Text style={styles.exerciseName}>Exercise #{index + 1}</Text>
-
-                                <View style={styles.setsContainer}>
-                                    {exercise.weight.map((weight, setIndex) => (
-                                        <View key={setIndex} style={styles.setRow}>
-                                            <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
-                                            <Text style={styles.setDetail}>
-                                                {weight} {exercise.unit[setIndex]} × {exercise.reps[setIndex]} reps
-                                            </Text>
-                                        </View>
-                                    ))}
+                                    <View style={styles.setsContainer}>
+                                        {exercise.weight.map((weight, setIndex) => (
+                                            <View key={setIndex} style={styles.setRow}>
+                                                <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
+                                                <Text style={styles.setDetail}>
+                                                    {weight} {exercise.unit[setIndex]} × {exercise.reps[setIndex]} reps
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
                                 </View>
-                            </View>
-                        ))
-                    )}
-                </View>
+                            ))
+                        )}
+                    </View>
 
-                {/* Action Buttons */}
-                <View style={styles.actionsContainer}>
-                    {/*  <TouchableOpacity style={[styles.actionButton, styles.primaryButton]}>
+                    {/* Action Buttons */}
+                    <View style={styles.actionsContainer}>
+                        {/*  <TouchableOpacity style={[styles.actionButton, styles.primaryButton]}>
                         <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
                         <Text style={styles.actionButtonText}>Edit Session</Text>
                     </TouchableOpacity>
  */}
-                    <TouchableOpacity style={[styles.actionButton, styles.dangerButton]}>
-                        <MaterialCommunityIcons name="delete" size={20} color="#fff" />
-                        <Text style={styles.actionButtonText}>Delete</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </View>
-    );
+                        <TouchableOpacity style={[styles.actionButton, styles.dangerButton]}
+                            onPress={() => {
+                                // Handle delete session action
+                                deleteSession(session.id);
+                            }}
+                        >
+                            <MaterialCommunityIcons name="delete" size={20} color="#fff" />
+                            <Text style={styles.actionButtonText}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </View>
+        )
+    };
 }
 
 const styles = StyleSheet.create({

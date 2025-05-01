@@ -268,22 +268,49 @@ export const getWorkoutSessionDetails = async (req, res) => {
 
     try {
         const userId = req.user;
-
-        const foundSessions = await db.query.sessions.findMany({
-            where: eq(sessions.createdBy, userId)
+        console.log('uuid', userId)
+        const foundSession = await db.query.sessions.findFirst({
+            where: and(eq(sessions.createdBy, userId), eq(sessions.id, req.params.sessionId)),
+            with: {
+                setsOfSessionsExercises: true
+            }
         })
 
-        if (!foundSessions) {
+        if (!foundSession) {
             return res.status(404).json({
                 success: false,
                 message: "Session not found"
             })
         }
 
+        const responseSessions = {
+            id: foundSession.id,
+            name: foundSession.name,
+            startTtime: foundSession.starttime,
+            endtime: foundSession.endtime,
+            note: foundSession.note,
+            rating: foundSession.rating,
+            createdBy: foundSession.createdBy,
+            duedate: foundSession.duedate,
+        }
+        const responseExercises = foundSession.setsOfSessionsExercises.map(exercise => ({
+            id: exercise.id,
+            exerciseId: exercise.exerciseId,
+            sessionsId: exercise.sessionId,
+            creationDate: exercise.creationdate,
+            order: exercise.order,
+            weight: exercise.weight,
+            unit: exercise.unit,
+            reps: exercise.reps,
+            creationdate: exercise.creationdate,
+            exerciseId: exercise.exerciseId
+        }))
+
         res.status(200).json({
             success: true,
             message: "Session found",
-            session: foundSessions
+            session: responseSessions,
+            exercises: responseExercises
         })
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving workout session details', error: error.message });
@@ -429,7 +456,7 @@ export const deleteWorkoutSession = async (req, res) => {
 
     try {
         const userId = req.user;
-        const { sessionId } = req.body;
+        const { sessionId } = req.params;
         const checkTheSession = await db
             .select()
             .from(sessions)

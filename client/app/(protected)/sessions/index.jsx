@@ -84,7 +84,7 @@ export default function Sessions() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
             <View style={{ padding: 16 }}>
-                <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: 'center', marginBottom: 12 }}>
+                <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: 'center', marginBottom: 8 }}>
                     <TouchableOpacity
                         style={{
                             padding: 10,
@@ -144,55 +144,60 @@ export default function Sessions() {
                     )}
                 </View>
 
-                {loading ? (
-                    <ActivityIndicator size="large" color={Colors.light.tint} />
-                ) : (
-                    <FlatList
-                        data={sessions}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={{
-                                    backgroundColor: Colors.light.background,
-                                    borderRadius: 8,
-                                    padding: 16,
-                                    marginBottom: 12,
-                                    shadowColor: "#000",
-                                    shadowOffset: { width: 0, height: 2 },
-                                    shadowOpacity: 0.1,
-                                    shadowRadius: 4,
-                                    elevation: 2,
-                                    borderLeftWidth: 4,
-                                    borderLeftColor: Colors.light.tint,
-                                }}
-                                onPress={() => {
-                                    // Navigate to session details
-                                    console.log('Navigate to session', item.id);
-                                    router.push({
-                                        pathname: `/sessions/${item.id}`,
-                                    });
-                                }}
-                            >
-                                <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>
-                                    {item.name}
-                                </Text>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 14, color: '#666' }}>
-                                        {item.note}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        )}
-                        ListEmptyComponent={
-                            <View style={{ alignItems: 'center', marginTop: 40 }}>
-                                <Text style={{ fontSize: 16, color: '#666' }}>
-                                    No workout sessions found
+
+            </View>
+
+            {loading ? (
+                <ActivityIndicator size="large" color={Colors.light.tint} />
+            ) : (
+                <FlatList
+                    style={{ marginBottom: 20, flex: 1,paddingHorizontal:20 }} // Added marginBottom to avoid overlap with button
+                    contentContainerStyle={{ paddingBottom: 80 }} // Added paddingBottom to avoid overlap with button
+                    showsVerticalScrollIndicator={true}
+                    data={sessions}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor: Colors.light.background,
+                                borderRadius: 8,
+                                padding: 16,
+                                marginBottom: 12,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 2 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 4,
+                                elevation: 2,
+                                borderLeftWidth: 4,
+                                borderLeftColor: Colors.light.tint,
+                            }}
+                            onPress={() => {
+                                // Navigate to session details
+                                console.log('Navigate to session', item.id);
+                                router.push({
+                                    pathname: `/sessions/${item.id}`,
+                                });
+                            }}
+                        >
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>
+                                {item.name}
+                            </Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Text style={{ fontSize: 14, color: '#666' }}>
+                                    {item.note}
                                 </Text>
                             </View>
-                        }
-                    />
-                )}
-            </View>
+                        </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={
+                        <View style={{ alignItems: 'center', marginTop: 40 }}>
+                            <Text style={{ fontSize: 16, color: '#666' }}>
+                                No workout sessions found
+                            </Text>
+                        </View>
+                    }
+                />
+            )}
 
             <TouchableOpacity
                 style={{
