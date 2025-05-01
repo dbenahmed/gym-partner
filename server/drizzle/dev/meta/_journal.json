@@ -36,6 +36,20 @@
       "when": 1743949877297,
       "tag": "0004_minor_pyro",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745249855658,
+      "tag": "0005_nappy_blue_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1745250483513,
+      "tag": "0006_flowery_winter_soldier",
+      "breakpoints": true
     }
   ]
 }

@@ -171,11 +171,17 @@ export const sessions = schema.table("sessions", {
 	endtime: time(),
 	note: text(),
 	rating: integer(),
+	createdBy: integer("created_by").notNull(),
 }, (table) => [
 	foreignKey({
 		columns: [table.planId],
 		foreignColumns: [plans.id],
 		name: "fk_plan"
+	}).onDelete("cascade"),
+	foreignKey({
+		columns: [table.createdBy],
+		foreignColumns: [users.id],
+		name: "fk_created_by"
 	}).onDelete("cascade"),
 	check("sessions_name_check", sql`length((name)::text) >= 1`),
 	check("sessions_rating_check", sql`(rating >= 0) AND (rating <= 5)`),
@@ -187,8 +193,8 @@ export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises"
 	exerciseId: integer("exercise_id").notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	order: integer().notNull(),
-	weight: integer().notNull(),
-	unit: varchar({ length: 10 }).notNull(),
+	weight: integer().array().notNull(),
+	unit: varchar({ length: 10 }).array().notNull(),
 	reps: integer().array().notNull(),
 }, (table) => [
 	foreignKey({
@@ -201,9 +207,6 @@ export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises"
 		foreignColumns: [sessions.id],
 		name: "fk_session_id"
 	}).onDelete("cascade"),
-	check("sets_of_sessions_exercises_reps_check", sql`array_length(reps, 1) > 0`),
-	check("sets_of_sessions_exercises_unit_check", sql`(unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])`),
-	check("sets_of_sessions_exercises_weight_check", sql`weight >= 0`),
 ]);
 
 export const templatesExercises = schema.table("templates_exercises", {

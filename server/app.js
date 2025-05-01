@@ -17,6 +17,9 @@ import dashboardRouter from './routes/dashboardRoutes.js';
 import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
 
+
+import serveonet from "serveonet";
+
 dotenv.config();
 
 
@@ -54,8 +57,39 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(port, async () => {
-    console.log(`server started port http://localhost:${port}`);
-})
+    console.log(`server started at http://localhost:${port}`);
 
+    serveonet({
+        localHost: "localhost",
+        localPort: 3232,
+        // Note that for request particular subdomain you need to register in first connection.
+        remoteSubdomain: "gympartner",
+        remotePort: 80,
+        serverAliveInterval: 60,
+        serverAliveCountMax: 3,
+    })
+        .on("connect", (connection) => {
+            console.log(
+                "Forwarding to localhost:" + connection.localPort,
+                "ssh pid: " + connection.pid
+            );
+        })
+        .on("data", (data) => {
+            console.log(data);
+        })
+        .on("timeout", (connection) => {
+            console.log("Connection to " + connection.host + " timed out.");
+        })
+        .on("error", (event) => {
+            console.error(event.message);
+        })
+        .on("close", (event) => {
+            console.error("SSH exited with code " + event.code);
+            event.onrestart = () => console.info("Restarted");
+        });
+
+
+
+})
 
 export default app;

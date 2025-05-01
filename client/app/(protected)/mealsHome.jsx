@@ -17,18 +17,24 @@ import Color from "@/constants/Colors.ts";
 import { useState, useEffect, useContext } from "react";
 import Meal from "@/components/meal";
 import { defaultUrl } from "@/constants/constants.ts"
-import { fetchSearchFood, fetchAddFoodToUser } from "@/lib/api";
+import { fetchSearchFood, fetchAddFoodToUser, fetchCreateCustomMeal } from "@/lib/api";
 import useAuth from "@/app/contex/authcontex";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from "expo-router";
+import SplashScreen from "@/components/SplashScreen";
+
 
 export default function mealsHome() {
   const [meals, setMeals] = useState([]);
 
-  const { authenticated } = useAuth();
+  const { authenticated, userId } = useAuth();
+  console.log('userId loading', userId)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false)
 
 
-  console.log('auth', authenticated)
+  const [createFoodLoading, setCreateFoodLoading] = useState(false);
+  const [customFoodModalVisible, setCustomFoodModalVisible] = useState(false)
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -66,6 +72,13 @@ export default function mealsHome() {
       setLoading(false);
       setError(true)
     }
+  }
+
+
+  const [verifiedOnly, setVerifiedOnly] = useState(false)
+
+  const toggleVerifiedOnly = () => {
+    setVerifiedOnly(prev => !prev)
   }
 
   useEffect(() => {
@@ -112,14 +125,14 @@ export default function mealsHome() {
     }, []); */
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalVisibleFood, setModalVisibleFood] = useState(false);
+  const [modalVisibleFood, setModalVisibleFood] = useState(true);
   const [search, setSearch] = useState("");
   const [searchForFoodLoading, setSearchForFoodLoading] = useState(false)
   const [nameFood, setNameFood] = useState("");
   const [nbKcal, setNbKcal] = useState(0);
   const [nbProt, setNbProt] = useState(0);
   const [nbFat, setNbFat] = useState(0);
-  const [nabCarbs, setNbCarbs] = useState(0);
+  const [nbCarbs, setNbCarbs] = useState(0);
 
 
   const goToPreviousDay = () => {
@@ -131,6 +144,22 @@ export default function mealsHome() {
   const goToNextDay = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + 1);
+
+    // Get today's date and set to midnight for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Set the potential next date to midnight for accurate comparison
+    const nextDateMidnight = new Date(newDate);
+    nextDateMidnight.setHours(0, 0, 0, 0);
+
+    // Check if the next date would be in the future compared to today
+    if (nextDateMidnight.getTime() > today.getTime()) {
+      Alert.alert("Cannot view future dates", "You can only view today and past meals.");
+      return;
+    }
+
+    // If we get here, the next date is either today or in the past
     setCurrentDate(newDate);
   };
 
@@ -161,33 +190,41 @@ export default function mealsHome() {
   };
 
 
-  const AddFood = () => {
+  const AddFood = async () => {
+    console.log('hamoudas')
     if (
       nameFood.length == 0 ||
-      nbFat == 0 ||
-      nbKcal == 0 ||
-      nbProt == 0 ||
-      nabCarbs == 0
+      parseInt(nbFat) == 0 ||
+      parseInt(nbKcal) == 0 ||
+      parseInt(nbProt) == 0 ||
+      parseInt(nbCarbs) == 0
     ) {
       Alert.alert("there are a empty input");
-    } else {
-      setModalVisibleFood(false);
-      nbFood++;
-      const food = {
-        id: nbFood,
-        name: nameFood,
-        kcal: nbKcal,
-        protein: nbProt,
-        fat: nbFat,
-        carbs: nabCarbs,
-      };
-      setFoods([...foods, food]);
-      setNameFood("");
-      setNbCarbs(0);
-      setNbFat(0);
-      setNbProt(0);
-      setNbKcal(0);
+      return;
     }
+    setCreateFoodLoading(true)
+    const { success, message } = await fetchCreateCustomMeal(authenticated, {
+      foodname: nameFood,
+      calories: parseInt(nbKcal),
+      proteinper100g: parseInt(nbProt),
+      carbohydratesper100g: parseInt(nbCarbs),
+      fatper100g: parseInt(nbFat),
+    });
+    if (success) {
+      Alert.alert("Success", message);
+      setCustomFoodModalVisible(false)
+      console.log('added')
+    } else {
+      Alert.alert("Error", message);
+      console.error('Error:', message);
+    }
+    setCreateFoodLoading(false)
+    setNameFood("");
+    setNbCarbs(0);
+    setNbFat(0);
+    setNbProt(0);
+    setNbKcal(0);
+
   };
   const [servingSize, setServingSize] = useState(0)
   const delateMeal = async (id) => {
@@ -221,47 +258,85 @@ export default function mealsHome() {
   const addFoodToUser = async () => {
     // REQUEST
 
+    if (parseInt(servingSize) <= 0 || servingSize.length == 0) {
+      Alert.alert("Please enter a serving size");
+      return;
+    }
     setAddFoodLoading(true)
 
-    const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, servingSize, authenticated)
+    const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, parseInt(servingSize), authenticated)
     if (res.success) {
       Alert.alert("Food added successfully")
       renderUserMealsOnDate()
       toggleAdditionModal()
+      setAddFoodLoading(false)
+      setServingSize(0)
     } else {
       Alert.alert("Error", res.message)
     }
-    setAddFoodLoading(false)
     // Close the modal
-
   }
+
+
+
+
+
   const renderFoodAdditionModal = () => {
     if (additionModalVisible) {
       return (
         <Modal
-          animationType="fade"
+          animationType="slide"
           transparent={true}
           visible={additionModalVisible}
           onRequestClose={() => setAdditionModalVisible(false)}
         >
           <View style={styles.modalBackground}>
             <View style={styles.modeleContent}>
-              <Text style={{ fontWeight: "700", color: Color.light.tint }}>Addition Modal</Text>
-              <TouchableOpacity style={styles.button} onPress={() => setAdditionModalVisible(false)}>
-                <Text style={{ fontWeight: "700", color: Color.light.text }}>Close</Text>
-              </TouchableOpacity>
-              <View style={styles.servingSizeContainer}>
-                <Text style={styles.servingSizeLabel}>Serving Size (g):</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <Text style={{ fontWeight: "800", fontSize: 19, color: Color.light.text }}>
+                  {selectedAdditionFoodItem.foodname}
+                </Text>
+                <TouchableOpacity onPress={() => setAdditionModalVisible(false)}>
+                  <MaterialIcons name="close" size={24} color={Color.light.tint} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: Color.light.tintLighter,
+                padding: 10,
+                borderRadius: 8,
+                marginBottom: 16
+              }}>
+                <MaterialIcons name="info-outline" size={20} color={Color.light.tint} style={{ marginRight: 8 }} />
+                <Text style={{ color: '#000000', fontSize: 12, fontWeight: '400' }}>
+                  {selectedAdditionFoodItem.description || 'No description available'}
+                </Text>
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 16,
+                justifyContent: 'space-between'
+              }}>
+                <Text style={{ fontWeight: '600', color: '#000000', fontSize: 13 }}>
+                  <MaterialIcons name="restaurant" size={16} color={Color.light.tint} style={{ marginRight: 4 }} />
+                  Serving Size (g):
+                </Text>
                 <TextInput
-                  style={[styles.servingSizeInput, {
-                    borderWidth: 1,
+                  style={{
+                    borderWidth: 0.7,
                     borderColor: Color.light.tint,
                     borderRadius: 8,
                     padding: 10,
                     color: Color.light.text,
                     backgroundColor: 'transparent',
-                    placeholderTextColor: 'rgba(255, 255, 255, 0.7)'
-                  }]}
+                    placeholderTextColor: 'rgba(0, 0, 0, 0.5)',
+                    width: '50%',
+                    marginLeft: 10
+                  }}
                   placeholder="Enter serving size"
                   keyboardType="numeric"
                   onChangeText={(value) => {
@@ -270,85 +345,155 @@ export default function mealsHome() {
                 />
               </View>
 
-              <View style={styles.nutritionInfoContainer}>
-                <View style={styles.nutritionBox}>
-                  <Text style={styles.nutritionLabel}>Calories</Text>
-                  <Text style={styles.nutritionValue}>{selectedAdditionFoodItem.calories}</Text>
-                </View>
-
-                <View style={styles.nutritionBox}>
-                  <Text style={styles.nutritionLabel}>Protein (g)</Text>
-                  <Text style={styles.nutritionValue}>{selectedAdditionFoodItem.proteinper100g}</Text>
-                </View>
-
-                <View style={styles.nutritionBox}>
-                  <Text style={styles.nutritionLabel}>Carbs (g)</Text>
-                  <Text style={styles.nutritionValue}>{selectedAdditionFoodItem.carbohydratesper100g}</Text>
-                </View>
-
-                <View style={styles.nutritionBox}>
-                  <Text style={styles.nutritionLabel}>Fat (g)</Text>
-                  <Text style={styles.nutritionValue}>{selectedAdditionFoodItem.fatper100g}</Text>
-                </View>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={{
-                backgroundColor: Color.light.background,
-                padding: 12,
-
-                borderRadius: 8,
-                marginTop: 15,
-                alignSelf: 'center',
-                width: '100%',
-              }}
-              onPress={() => {
-                // Add the food item with the specified serving size
-                if (servingSize) {
-                  addFoodToUser()
-                } else {
-                  // Alert if no serving size is entered
-                  Alert.alert("Please enter a serving size");
-                }
-              }}
-            >
-              <Text style={{
-                color: Color.light.text,
-                fontWeight: '700',
-                fontSize: 16,
-                textAlign: 'center'
-              }}>
-                {!addFoodLoading ? "Add" :
-                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <ActivityIndicator size="large" />
-                  </View>}
+              <Text style={{ fontWeight: "700", fontSize: 16, color: '#000000', marginBottom: 12 }}>
+                <MaterialIcons name="pie-chart" size={16} color={Color.light.tint} style={{ marginRight: 4 }} />
+                Nutrition Facts (per 100g)
               </Text>
-            </TouchableOpacity>
+
+              <View style={{
+                backgroundColor: 'white',
+                borderRadius: 10,
+                padding: 14,
+                marginBottom: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+                elevation: 2,
+              }}>
+                <View style={{ marginBottom: 6 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <Text style={{ fontWeight: '700', color: '#000000', fontSize: 13, width: '33%' }}>Nutrient</Text>
+                    <Text style={{ fontWeight: '700', color: '#666666', fontSize: 13, width: '33%', textAlign: 'center' }}>Per 100g</Text>
+                    <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 13, width: '33%', textAlign: 'right' }}>Total</Text>
+                  </View>
+
+                  <View style={{ height: 1, backgroundColor: '#e0e0e0', marginVertical: 4 }} />
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
+                    <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Calories</Text>
+                    <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
+                      {selectedAdditionFoodItem.calories} kcal
+                    </Text>
+                    <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
+                      {servingSize ? Math.round((selectedAdditionFoodItem.calories * servingSize) / 100) : 0} kcal
+                    </Text>
+                  </View>
+
+                  <View style={{ height: 1, backgroundColor: '#f0f0f0', marginVertical: 3 }} />
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
+                    <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Protein</Text>
+                    <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
+                      {selectedAdditionFoodItem.proteinper100g}g
+                    </Text>
+                    <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
+                      {servingSize ? ((selectedAdditionFoodItem.proteinper100g * servingSize) / 100).toFixed(1) : 0}g
+                    </Text>
+                  </View>
+
+                  <View style={{ height: 1, backgroundColor: '#f0f0f0', marginVertical: 3 }} />
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
+                    <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Carbs</Text>
+                    <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
+                      {selectedAdditionFoodItem.carbohydratesper100g}g
+                    </Text>
+                    <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
+                      {servingSize ? ((selectedAdditionFoodItem.carbohydratesper100g * servingSize) / 100).toFixed(1) : 0}g
+                    </Text>
+                  </View>
+
+                  <View style={{ height: 1, backgroundColor: '#f0f0f0', marginVertical: 3 }} />
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
+                    <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Fat</Text>
+                    <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
+                      {selectedAdditionFoodItem.fatper100g}g
+                    </Text>
+                    <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
+                      {servingSize ? ((selectedAdditionFoodItem.fatper100g * servingSize) / 100).toFixed(1) : 0}g
+                    </Text>
+                  </View>
+                </View>
+
+                {selectedAdditionFoodItem.brand && (
+                  <View style={{ marginTop: 6 }}>
+                    <View style={{ height: 1, backgroundColor: '#e0e0e0', marginVertical: 6 }} />
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontWeight: '500', color: '#000000' }}>Brand</Text>
+                      <Text style={{ fontWeight: '700', color: Color.light.tint }}>
+                        {selectedAdditionFoodItem.brand}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: Color.light.tint,
+                    padding: 10,
+                    borderRadius: 6,
+                    width: '100%',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => {
+                    addFoodToUser()
+                  }}
+                >
+                  <MaterialIcons name="add" size={16} color="#FFFFFF" />
+                  <Text style={{
+                    color: Color.light.background,
+                    fontWeight: '600',
+                    fontSize: 14,
+                    marginLeft: 6
+                  }}>
+                    {!addFoodLoading ? "Add Food" : "Adding..."}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {addFoodLoading && (
+                <View style={{ marginTop: 16, alignItems: 'center' }}>
+                  <ActivityIndicator size="small" color={Color.light.tint} />
+                </View>
+              )}
+            </View>
           </View>
-        </Modal >
+        </Modal>
       )
     }
   }
+
+
+
   const searchForFood = async (e) => {
     setSearchForFoodLoading(true);
     const text = e
-    console.log(text)
-    const res = await fetchSearchFood(text);
-    console.log(res)
-    if (res.success) {
-      setFoods(res.meals);
+    const { success, meals, message } = await fetchSearchFood(authenticated, { name: text });
+    if (success) {
+      console.log("id", userId)
+      console.log("meal", meals)
+      const nonRefusedMeals = meals.filter((meal) => (meal.status !== 'refused' || meal.createdBy === userId));
+      setFoods(nonRefusedMeals);
     } else {
-      Alert.alert("Error", res.error);
-      setError(true)
+      Alert.alert("Error", message);
+      setModalVisible(false)
     }
     setSearchForFoodLoading(false);
   }
   return (
     <>
       {
-        error ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Error</Text>
-        </View> :
+        error ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Error</Text>
+          </View>
+        ) :
           <View style={{ flex: 1, paddingBottom: 10 }}>
 
 
@@ -375,10 +520,12 @@ export default function mealsHome() {
                     textAlign: "center",
                     fontWeight: "bold",
                     marginBottom: 5,
+                    width: "100%" ,
+                    fontSize: 12,
                     color: Color.light.tint,
                   }}
                 >
-                  TODAY’S TOTAL
+                  CURRENT DAY TOTAL
                 </Text>
                 <View
                   style={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -425,28 +572,63 @@ export default function mealsHome() {
                   &lt;
                 </Text>
               </TouchableOpacity>
-              {currentDate.getDate() == new Date().getDate() ? (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>Today meals</Text>
+              {(() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selectedDate = new Date(currentDate);
+                selectedDate.setHours(0, 0, 0, 0);
+
+                const diffDays = Math.round((today - selectedDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Today's meals</Text>;
+                } else if (diffDays === 1) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Yesterday's meals</Text>;
+                } else if (diffDays === 2) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>Day before yesterday</Text>;
+                } else if (diffDays < 3) {
+                  return <Text style={{ fontSize: 15, fontWeight: "700" }}>{diffDays} days ago</Text>;
+                } else {
+                  return (
+                    <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                      {currentDate.toDateString()}
+                    </Text>
+                  );
+                }
+              })()}
+              {currentDate.getTime() < new Date().setHours(0, 0, 0, 0) ? (
+                <TouchableOpacity>
+                  <Text
+                    style={{ color: Color.light.tint, fontWeight: "900", fontSize: 30 }}
+                    onPress={goToNextDay}
+                  >
+                    &gt;
+                  </Text>
+                </TouchableOpacity>
               ) : (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
-                  Your menu for day : {currentDate.toDateString()}
-                </Text>
+                <View></View>
               )}
-              <TouchableOpacity>
-                <Text
-                  style={{ color: Color.light.tint, fontWeight: "900", fontSize: 30 }}
-                  onPress={goToNextDay}
-                >
-                  &gt;
-                </Text>
-              </TouchableOpacity>
             </View>
 
 
 
             {loading ? (
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" />
+              <View style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+
+                <SplashScreen backgroundColor={"transparent"} />
+                <Text style={{
+                  flex: 1,
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: Color.light.text,
+                  marginTop: 15
+                }}>
+                  Loading your meals...
+                </Text>
               </View>
             ) : (
               <View style={{ flex: 1 }}>
@@ -468,226 +650,649 @@ export default function mealsHome() {
                 </TouchableOpacity>
               </View>)}
             <Modal
-              animationType="fade"
+              animationType="slide"
               transparent={true}
               visible={modalVisible}
               onRequestClose={() => setModalVisible(false)}
             >
-              <View style={styles.modalBackground}>
-                <View style={{ ...styles.modeleContent, height: "80%" }}>
-                  <TextInput
-                    placeholder="Search for food"
-                    style={{
-                      backgroundColor: Color.light.tint,
-                      borderRadius: 5,
-                      marginBottom: 30,
-                      padding: 10,
-                      color: Color.light.background,
-                      borderRadius: 10,
-                    }}
-                    onChangeText={(e) => {
-                      searchForFood(e)
-                    }}
-                  />
+              <View style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                justifyContent: 'flex-end',
+              }}>
+                <View style={{
+                  backgroundColor: Color.light.background,
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  padding: 16,
+                  height: '90%',
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: -3 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 5,
+                  elevation: 5,
+                }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <Text style={{ fontWeight: '800', color: Color.light.text, fontSize: 20 }}>
+                      Add Food
+                    </Text>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                      <MaterialIcons name="close" size={24} color={Color.light.text} />
+                    </TouchableOpacity>
+                  </View>
 
-                  <TouchableOpacity
-                    style={{
-                      borderColor: Color.light.tint,
-                      borderRadius: 50,
-                      margin: 5,
-                    }}
-                    onPress={() => setModalVisibleFood(true)}
-                  >
-                  </TouchableOpacity>
+                  <View style={{
+                    flexDirection: 'row',
+                    backgroundColor: Color.light.background,
+                    borderRadius: 12,
+                    paddingHorizontal: 12,
+                    marginBottom: 16,
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: Color.light.tint
+                  }}>
+                    <MaterialIcons name="search" size={20} color={Color.light.tint} />
+                    <TextInput
+                      placeholder="Search for food"
+                      placeholderTextColor={Color.light.tabIconDefault}
+                      style={{
+                        flex: 1,
+                        padding: 12,
+                        color: Color.light.text,
+                        fontWeight: '500',
+                        marginLeft: 8,
+                      }}
+                      onChangeText={(e) => {
+                        searchForFood(e)
+                      }}
+                    />
+                  </View>
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 16 }}>
+                      Food Results
+                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <TouchableOpacity
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: verifiedOnly ? Color.light.tint : Color.light.tintLighter,
+                          paddingVertical: 6,
+                          paddingHorizontal: 10,
+                          borderRadius: 8,
+                          marginRight: 8
+                        }}
+                        onPress={() => {
+                          toggleVerifiedOnly()
+                        }}
+                      >
+                        <MaterialIcons
+                          name="verified"
+                          size={16}
+                          color={verifiedOnly ? '#ffffff' : Color.light.tabIconDefault}
+                        />
+                        <Text style={{
+                          color: verifiedOnly ? '#ffffff' : Color.light.tabIconDefault,
+                          fontWeight: '600',
+                          fontSize: 14,
+                          marginLeft: 4
+                        }}>
+                          Verified Only
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: Color.light.tintLighter,
+                          paddingVertical: 6,
+                          paddingHorizontal: 10,
+                          borderRadius: 8,
+                        }}
+                        onPress={() => setCustomFoodModalVisible(true)}
+                      >
+                        <MaterialIcons name="add" size={16} color={Color.light.tint} />
+                        <Text style={{ color: Color.light.tint, fontWeight: '600', fontSize: 14, marginLeft: 4 }}>
+                          Custom Food
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
 
                   {
                     searchForFoodLoading ?
-                      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <ActivityIndicator size="large" />
+                      <View style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}>
+                        <View style={{
+                          backgroundColor: Color.light.background,
+                          borderRadius: 20,
+                          padding: 20,
+                          width: '90%',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <SplashScreen backgroundColor={"transparent"} />
+                          <Text style={{
+                            fontSize: 16,
+                            fontWeight: '600',
+                            color: "#000000",
+                            marginTop: 15
+                          }}>
+                            Searching for foods...
+                          </Text>
+                        </View>
                       </View> :
                       <FlatList
-                        data={foods}
+                        data={verifiedOnly ? foods.filter((item) => item.status === 'verified') : foods}
                         contentContainerStyle={{ paddingBottom: 10 }}
-                        style={{ height: "100%" }}
+                        style={{ flex: 1 }}
                         keyExtractor={(item) => item.id}
-                        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                         renderItem={({ item }) => (
-                          <View style={{
-                            position: 'relative',
-                            backgroundColor: Color.light.tint,
-                            paddingVertical: 6,
-                            paddingHorizontal: 10,
-                            borderRadius: 10
-
-                          }}>
-                            <TouchableOpacity onPress={
-                              () => {
-                                toggleAdditionModal(item)
-                                console.log(item)
-                              }
-                            }>
-                              <View style={{ justifyContent: "center", alignItems: "center", width: "100%" }}>
-                                <Text style={{ fontWeight: '800', width: "100", ...styles.car }}>{item.foodname}</Text>
-                                <View style={{ flexDirection: 'row', flexGrow: 1, padding: 10 }}>
-                                  <View style={styles.box}>
-                                    <Text style={styles.car}>Protein</Text>
-                                    <Text style={styles.car}>{item.proteinper100g}</Text>
-                                  </View>
-                                  <View style={styles.box}>
-                                    <Text style={styles.car}>Kcal</Text>
-                                    <Text style={styles.car}>{item.calories}</Text>
-                                  </View>
-                                  <View style={styles.box}>
-                                    <Text style={styles.car}>Carbs</Text>
-                                    <Text style={styles.car}>{item.carbohydratesper100g}</Text>
-                                  </View>
-                                  <View style={styles.box}>
-                                    <Text style={styles.car}>Fats</Text>
-                                    <Text style={styles.car}>{item.fatper100g}</Text>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: Color.light.background,
+                              paddingVertical: 10,
+                              paddingHorizontal: 12,
+                              borderRadius: 10,
+                              elevation: 2,
+                              shadowColor: Color.light.tint,
+                              shadowOffset: { width: 0, height: 1 },
+                              shadowOpacity: 0.1,
+                              shadowRadius: 2,
+                              borderWidth: 0.5,
+                              borderColor: Color.light.tint
+                            }}
+                            onPress={() => {
+                              toggleAdditionModal(item)
+                              console.log(item)
+                            }}
+                          >
+                            <View>
+                              <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: 'center' }}>
+                                <Text style={{
+                                  fontWeight: '700',
+                                  fontSize: 15,
+                                  color: Color.light.text,
+                                }}
+                                  numberOfLines={1}
+                                  ellipsizeMode="tail">
+                                  {item.foodname}
+                                </Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                    {
+                                      item.status === 'verified' ? (
+                                        <View style={{
+                                          backgroundColor: 'rgba(0, 128, 0, 0.2)',
+                                          borderRadius: 4,
+                                          paddingHorizontal: 6,
+                                          paddingVertical: 3,
+                                          flexDirection: 'row',
+                                          alignItems: 'center'
+                                        }}>
+                                          <MaterialIcons name="verified" size={16} color="green" />
+                                          <Text style={{ color: 'green', fontSize: 12, marginLeft: 4, fontWeight: '600' }}>Verified</Text>
+                                        </View>
+                                      ) : (
+                                        <View style={{
+                                          backgroundColor: 'rgba(128, 128, 128, 0.2)',
+                                          borderRadius: 4,
+                                          paddingHorizontal: 6,
+                                          paddingVertical: 3,
+                                          flexDirection: 'row',
+                                          alignItems: 'center'
+                                        }}>
+                                          <MaterialIcons name="pending" size={16} color="gray" />
+                                          <Text style={{ color: 'gray', fontSize: 12, marginLeft: 4, fontWeight: '600' }}>Pending</Text>
+                                        </View>
+                                      )
+                                    }
+                                    {
+                                      (item.createdBy === userId) && (
+                                        <View style={{
+                                          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                                          borderRadius: 4,
+                                          paddingHorizontal: 6,
+                                          paddingVertical: 3,
+                                          flexDirection: 'row',
+                                          alignItems: 'center'
+                                        }}>
+                                          <MaterialIcons name="person" size={16} color="red" />
+                                          <Text style={{ color: 'red', fontSize: 12, marginLeft: 4, fontWeight: '600' }}>Mine</Text>
+                                        </View>
+                                      )
+                                    }
                                   </View>
                                 </View>
                               </View>
-                            </TouchableOpacity>
-                          </View>
 
+                              <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                backgroundColor: Color.light.tintLighter,
+                                borderRadius: 8,
+                                padding: 6,
+                                marginTop: 8
+                              }}>
+                                <View style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  width: '100%'
+                                }}>
+                                  <View style={{
+                                    paddingHorizontal: 6,
+                                    paddingVertical: 2,
+                                  }}>
+                                    <Text style={{ color: Color.light.text, fontSize: 12 }}>
+                                      <Text style={{ fontWeight: '700', color: Color.light.tint }}>Protein: </Text>
+                                      {item.proteinper100g}g
+                                    </Text>
+                                  </View>
+
+                                  <View style={{
+                                    paddingHorizontal: 6,
+                                    paddingVertical: 2,
+                                  }}>
+                                    <Text style={{ color: Color.light.text, fontSize: 12 }}>
+                                      <Text style={{ fontWeight: '700', color: Color.light.tint }}>Carbs: </Text>
+                                      {item.carbohydratesper100g}g
+                                    </Text>
+                                  </View>
+
+                                  <View style={{
+                                    paddingHorizontal: 6,
+                                    paddingVertical: 2,
+                                  }}>
+                                    <Text style={{ color: Color.light.text, fontSize: 12 }}>
+                                      <Text style={{ fontWeight: '700', color: Color.light.tint }}>Fat: </Text>
+                                      {item.fatper100g}g
+                                    </Text>
+                                  </View>
+
+                                  <View style={{
+                                    paddingHorizontal: 6,
+                                    paddingVertical: 2,
+                                  }}>
+                                    <Text style={{ color: Color.light.text, fontSize: 12 }}>
+                                      <Text style={{ fontWeight: '700', color: Color.light.tint }}>Cal: </Text>
+                                      {item.calories}
+                                    </Text>
+                                  </View>
+                                </View>
+                              </View>
+
+                              <View style={{
+                                marginTop: 8,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between'
+                              }}>
+                                <View style={{
+                                  backgroundColor: Color.light.background,
+                                  borderRadius: 6,
+                                  padding: 4,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginRight: 4,
+                                  borderWidth: 0.5,
+                                  borderColor: Color.light.tint
+                                }}>
+                                  <MaterialIcons name="person" size={14} color={Color.light.tint} />
+                                  <Text style={{
+                                    fontSize: 11,
+                                    color: Color.light.text,
+                                    marginLeft: 4,
+                                    fontStyle: 'italic'
+                                  }} numberOfLines={1} ellipsizeMode="tail">
+                                    By: {item.creatorName || 'Unknown'}
+                                  </Text>
+                                </View>
+
+                                <View style={{
+                                  backgroundColor: Color.light.background,
+                                  borderRadius: 6,
+                                  padding: 4,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  flex: 1,
+                                  marginLeft: 4,
+                                  borderWidth: 0.5,
+                                  borderColor: Color.light.tint
+                                }}>
+                                  <MaterialIcons name="business" size={14} color={Color.light.tint} />
+                                  <Text style={{
+                                    fontSize: 11,
+                                    color: Color.light.text,
+                                    marginLeft: 4,
+                                    fontStyle: 'italic'
+                                  }} numberOfLines={1} ellipsizeMode="tail">
+                                    Brand: {item.brand || 'Generic'}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                          </TouchableOpacity>
                         )}
                       />
                   }
 
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
+                    {/* <TouchableOpacity
+                      style={{
+                        backgroundColor: '#2196F3',
+                        padding: 12,
+                        borderRadius: 10,
+                        flex: 1,
+                        marginRight: 8,
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                      }}
+                      onPress={() => setCustomFoodModalVisible(true)}
+                    >
+                      <MaterialIcons name="add-circle-outline" size={18} color="#FFFFFF" />
+                      <Text style={{ fontWeight: "700", color: "#FFFFFF", marginLeft: 6 }}>
+                        Create Food
+                      </Text>
+                    </TouchableOpacity> */}
 
-                  <TouchableOpacity style={{ ...styles.button, backgroundColor: Color.light.tint, color: Color.light.text, margin: 0 }}>
-                    <Text style={{ fontWeight: "700", color: Color.light.text }}>
-                      Create new food
-                    </Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: Color.light.tint,
+                        padding: 12,
+                        borderRadius: 10,
+                        flex: 1,
+                        marginLeft: 8,
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                      }}
+                      onPress={() => setModalVisible(false)}
+                    >
+                      <MaterialIcons name="close" size={18} color="#FFFFFF" />
+                      <Text style={{ fontWeight: "700", color: "#FFFFFF", marginLeft: 6 }}>
+                        Close
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
 
-
-                  <TouchableOpacity
-                    style={{ ...styles.button, backgroundColor: Color.light.tint, color: Color.light.background, margin: 0 }}
-                    onPress={() => setModalVisible(false)}
-                  >
-                    <Text style={{ fontWeight: "700", color: Color.light.text }}>
-                      Close
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* <TouchableOpacity
-              style={[
-                styles.foodItem,
-                { marginTop: 20, backgroundColor: Color.light.background },
-              ]}
-            >
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 25,
-                  fontWeight: 600,
-                  color: Color.light.tint,
-                  borderColor: Color.light.tint,
-                  borderWidth: 1,
-                  padding: 10,
-                  borderRadius: 5,
-                }}
-                onPress={() => {
-                  if (0 == 0) {
-                    Alert.alert("select a food !");
-                  } else {
-                    createMeal();
-                  }
-                }}
-              >
-                create a meals
-              </Text>
-            </TouchableOpacity> */}
-                  {
-                    renderFoodAdditionModal()
-                  }
-
+                  {renderFoodAdditionModal()}
                 </View>
               </View>
             </Modal>
 
+
             <Modal
-              animationType="fade"
+              animationType="slide"
               transparent={true}
-              visible={modalVisibleFood}
-              onRequestClose={() => setModalVisibleFood(false)}
+              visible={customFoodModalVisible}
+              onRequestClose={() => setCustomFoodModalVisible(false)}
             >
-              <View
-                style={[
-                  styles.modalBackground,
-                  { justifyContent: "center", alignItems: "center" },
-                ]}
-              >
-                <View
-                  style={{
-                    backgroundColor: Color.light.background,
-                    padding: 10,
-                    width: "90%",
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text
-                    style={{
-                      textAlign: "center",
-                      fontSize: 25,
-                      color: Color.light.tint,
-                      fontWeight: "600",
-                      letterSpacing: 2,
-                    }}
-                  >
-                    NEW FOOD
-                  </Text>
-                  <TextInput
-                    placeholder="Name of Food"
-                    style={styles.FoodInput}
-                    value={nameFood}
-                    onChangeText={(e) => setNameFood(e)}
-                  />
-                  <View
-                    style={{ flexDirection: "row", justifyContent: "space-between" }}
-                  >
-                    <TextInput
-                      style={styles.foodVitamineInput}
-                      placeholder="kcal"
-                      value={nbKcal}
-                      onChangeText={(e) => setNbKcal(e)}
-                    />
-                    <TextInput
-                      style={styles.foodVitamineInput}
-                      placeholder="protein (g)"
-                      value={nbProt}
-                      onChangeText={(e) => setNbProt(e)}
-                    />
-                    <TextInput
-                      style={styles.foodVitamineInput}
-                      placeholder="fats(g)"
-                      value={nbFat}
-                      onChangeText={(e) => setNbFat(e)}
-                    />
-                    <TextInput
-                      style={styles.foodVitamineInput}
-                      placeholder="carb(g)"
-                      value={nabCarbs}
-                      onChangeText={(e) => setNbCarbs(e)}
-                    />
+              {
+                createFoodLoading ? (
+                  <View style={{
+                    flex: 1,
+                    backgroundColor: "rgba(0,0,0,0.2)",
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <View style={{
+                      backgroundColor: Color.light.background,
+                      borderRadius: 20,
+                      padding: 20,
+                      width: '90%',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <SplashScreen />
+                      <Text style={{
+                        fontSize: 16,
+                        fontWeight: '600',
+                        color: "#000000",
+                        marginTop: 15
+                      }}>
+                        Creating your food...
+                      </Text>
+                    </View>
                   </View>
-                  <TouchableOpacity style={styles.button} onPress={() => AddFood()}>
-                    <Text
-                      style={{
-                        fontWeight: "700",
-                        color: Color.light.tint,
-                        borderRadius: 5,
-                        borderColor: Color.light.tint,
-                        borderWidth: 2,
-                        padding: 10,
-                      }}
-                    >
-                      Add Food
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+                ) : (
+                  <View style={{
+                    flex: 1,
+                    backgroundColor: "rgba(0,0,0,0.2)",
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <View style={{
+                      backgroundColor: Color.light.background,
+                      borderRadius: 20,
+                      padding: 20,
+                      width: '90%',
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.84,
+                      elevation: 5,
+                    }}>
+                      <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 16,
+                        borderBottomWidth: 1,
+                        borderBottomColor: Color.light.tintLighter,
+                        paddingBottom: 10
+                      }}>
+                        <Text style={{
+                          fontSize: 20,
+                          fontWeight: '700',
+                          color: "#000000"
+                        }}>
+                          Create Custom Food
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => setCustomFoodModalVisible(false)}
+                        >
+                          <MaterialIcons name="close" size={22} color="#000000" />
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={{
+                        backgroundColor: Color.light.background,
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: Color.light.tintLighter,
+                        paddingHorizontal: 12,
+                        paddingVertical: 4,
+                        marginBottom: 12,
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                      }}>
+                        <MaterialIcons name="restaurant" size={20} color={Color.light.tint} style={{ marginRight: 8 }} />
+                        <TextInput
+                          placeholder="Food Name"
+                          placeholderTextColor={Color.light.tabIconDefault}
+                          style={{
+                            flex: 1,
+                            fontSize: 14,
+                            color: Color.light.text,
+                            paddingVertical: 8
+                          }}
+                          onChangeText={(e) => setNameFood(e)}
+                        />
+                      </View>
+
+                      <View style={{ marginVertical: 8 }}>
+                        <View style={{
+                          backgroundColor: Color.light.background,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: Color.light.tintLighter,
+                          paddingHorizontal: 12,
+                          paddingVertical: 4,
+                          marginBottom: 12,
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}>
+                          <MaterialIcons name="local-fire-department" size={20} color="#FF6B6B" style={{ marginRight: 8 }} />
+                          <TextInput
+                            placeholder="Calories per 100g"
+                            placeholderTextColor={Color.light.tabIconDefault}
+                            style={{
+                              flex: 1,
+                              fontSize: 14,
+                              color: Color.light.text,
+                              paddingVertical: 8
+                            }}
+                            keyboardType="numeric"
+                            onChangeText={(e) => setNbKcal(e)}
+                          />
+                        </View>
+
+                        <View style={{
+                          backgroundColor: Color.light.background,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: Color.light.tintLighter,
+                          paddingHorizontal: 12,
+                          paddingVertical: 4,
+                          marginBottom: 12,
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}>
+                          <MaterialIcons name="egg" size={20} color="#4CAF50" style={{ marginRight: 8 }} />
+                          <TextInput
+                            placeholder="Protein per 100g"
+                            placeholderTextColor={Color.light.tabIconDefault}
+                            style={{
+                              flex: 1,
+                              fontSize: 14,
+                              color: Color.light.text,
+                              paddingVertical: 8
+                            }}
+                            keyboardType="numeric"
+                            onChangeText={(e) => setNbProt(e)}
+                          />
+                        </View>
+
+                        <View style={{
+                          backgroundColor: Color.light.background,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: Color.light.tintLighter,
+                          paddingHorizontal: 12,
+                          paddingVertical: 4,
+                          marginBottom: 12,
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}>
+                          <MaterialIcons name="bakery-dining" size={20} color="#FF9800" style={{ marginRight: 8 }} />
+                          <TextInput
+                            placeholder="Carbs per 100g"
+                            placeholderTextColor={Color.light.tabIconDefault}
+                            style={{
+                              flex: 1,
+                              fontSize: 14,
+                              color: Color.light.text,
+                              paddingVertical: 8
+                            }}
+                            keyboardType="numeric"
+                            onChangeText={(e) => setNbCarbs(e)}
+                          />
+                        </View>
+
+                        <View style={{
+                          backgroundColor: Color.light.background,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: Color.light.tintLighter,
+                          paddingHorizontal: 12,
+                          paddingVertical: 4,
+                          marginBottom: 12,
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}>
+                          <MaterialIcons name="water-drop" size={20} color="#FFC107" style={{ marginRight: 8 }} />
+                          <TextInput
+                            placeholder="Fat per 100g"
+                            placeholderTextColor={Color.light.tabIconDefault}
+                            style={{
+                              flex: 1,
+                              fontSize: 14,
+                              color: Color.light.text,
+                              paddingVertical: 8
+                            }}
+                            keyboardType="numeric"
+                            onChangeText={(e) => setNbFat(e)}
+                          />
+                        </View>
+                      </View>
+
+                      <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 8
+                      }}>
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            marginRight: 8,
+                            backgroundColor: Color.light.background,
+                            borderRadius: 10,
+                            borderWidth: 1,
+                            borderColor: Color.light.tint,
+                            padding: 10,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            justifyContent: 'center'
+                          }}
+                          onPress={() => setCustomFoodModalVisible(false)}
+                        >
+                          <MaterialIcons name="close" size={18} color={Color.light.tint} style={{ marginRight: 6 }} />
+                          <Text style={{
+                            fontWeight: "700",
+                            color: Color.light.tint,
+                            fontSize: 14
+                          }}>
+                            Cancel
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            marginLeft: 8,
+                            backgroundColor: Color.light.tint,
+                            borderRadius: 10,
+                            padding: 10,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            justifyContent: 'center'
+                          }}
+                          onPress={() => {
+                            AddFood()
+                          }}
+                        >
+                          <MaterialIcons name="add-circle" size={18} color="white" style={{ marginRight: 6 }} />
+                          <Text style={{
+                            fontWeight: "700",
+                            color: "white",
+                            fontSize: 14
+                          }}>
+                            Create Food
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                )
+              }
             </Modal>
           </View>
       }
@@ -725,7 +1330,7 @@ const styles = StyleSheet.create({
   modalBackground: {
     flex: 1,
     backgroundColor: Color.light.tintLowOpacity,
-    padding: (70, 30),
+    padding: (10, 30),
   },
   modeleContent: {
     padding: 20,
@@ -746,12 +1351,16 @@ const styles = StyleSheet.create({
     backgroundColor: Color.light.tint,
     marginTop: 10,
     borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   foodVitamineInput: {
     backgroundColor: Color.light.tint,
     width: "23%",
     marginTop: 10,
     borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   car: {
     fontSize: 12,

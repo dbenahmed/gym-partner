@@ -51,9 +51,21 @@ export default function Layout() {
                 }} />
                 <Tabs.Screen name="Collections" options={{
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="run" color={color} size={size} />
+                        <MaterialCommunityIcons name="clipboard-list" color={color} size={size} />
                     ),
                     tabBarLabel: 'Collections',
+                }} />
+                <Tabs.Screen name="Sessions" options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="history" color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Sessions',
+                }} />
+                <Tabs.Screen name="Explore" options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="magnify" color={color} size={size} />
+                    ),
+                    tabBarLabel: 'Explore',
                 }} />
 
             </Tabs>
