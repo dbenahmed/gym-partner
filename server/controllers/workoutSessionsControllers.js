@@ -243,7 +243,7 @@ export const getWorkoutSessions = async (req, res) => {
             })
         }
 
-        
+
         const foundedSessions = await db
             .select()
             .from(sessions)
@@ -329,18 +329,11 @@ export const saveExerciseToSession = async (req, res) => {
             });
         }
 
-
-
         // check if the exercise exist in the sesion
         sessionExercises = session.sessionExercises;
         const existExercise = await db.query.sessionExercises.findFirst(
             where(eq(sessionExercises.id, Id))
         )
-
-
-
-
-
 
 
         // if exists already update changes
@@ -356,11 +349,6 @@ export const saveExerciseToSession = async (req, res) => {
             success: true,
             message: "the exercise is updated in the session "
         })
-
-
-
-
-
 
 
         // if does not exist add new exercise to the session
@@ -392,81 +380,83 @@ export const logSetForExercise = async (req, res) => {
     }
 };
 
-// todo : verify
 // Update session details
 export const updateWorkoutSession = async (req, res) => {
-  try {
-    const userId = req.user;
-   const {sessionId , newSessionName , newExercises } = req.body;
-   const checkTheSession = await db
-   .select()
-   .from(sessions)
-   .where(eq(sessions.id,sessionId));
-   if (checkTheSession.length === 0){
-    return res.status(400).json({
-      success:false,
-      message:"the session is not exist verify the id !"
-    })
-   }
-   if (newSessionName){
-   await db.update(sessions).set({
-    name : newSessionNamem ,
-  }).where(eq(sessions.id,sessionId));
-}
-if (newExercises)
-   {
-    await db
-    .delete(setsOfSessionsExercises)
-    .where(eq(setsOfSessionsExercises.id,sessionId));
-    newExercises.forEach( async ele => {
-      await db.insert(setsOfSessionsExercises).values({
-        sessionId : sessionId,
-        exerciseId : ele.exerciseId,
-        creationdate : ele.creationdate,
-        order : ele.order,
-        weight: ele.weight,
-        reps: ele.reps,
+    try {
+        const userId = req.user;
+        const { sessionId, newSessionName, newExercises } = req.body;
+        const checkTheSession = await db
+            .select()
+            .from(sessions)
+            .where(eq(sessions.id, sessionId));
+        if (checkTheSession.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "the session is not exist verify the id !"
+            })
+        }
+        if (newSessionName) {
+            await db.update(sessions).set({
+                name: newSessionName,
+            }).where(eq(sessions.id, sessionId));
+        }
+        if (newExercises) {
+            await db
+                .delete(setsOfSessionsExercises)
+                .where(eq(setsOfSessionsExercises.sessionId, sessionId));
+            newExercises.forEach(async ele => {
+                await db.insert(setsOfSessionsExercises).values({
+                    sessionId: sessionId,
+                    exerciseId: ele.exerciseId,
+                    creationdate: ele.creationdate,
+                    order: ele.order,
+                    weight: ele.weight,
+                    reps: ele.reps,
 
-      })
-    });
+                })
+            });
 
-   }
+        }
 
-
-
-
-
-
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating workout session', error: error.message });
-  }
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating workout session', error: error.message });
+    }
 
 };
 
 // Delete a session
 export const deleteWorkoutSession = async (req, res) => {
 
-  try {
-    const userId = req.user;
-   const {sessionId} = req.body;
-   const checkTheSession = await db
-   .select()
-   .from(sessions)
-   .where(eq(sessions.id,sessionId));
-   if (checkTheSession.length === 0){
-    return res.status(400).json({
-      success:false,
-      message:"the session is not deleted verify the id !"
-    })
-   }
-      await db
-      .delete(sessions)
-      .where(eq(sessions.id,sessionId));
-   return res.status(200).json({
-    success:true,
-    message : "the session is deleted successfully  ",
-  })
-   } catch (error) {
-    res.status(500).json({ message: 'Error deleting workout session', error: error.message });
-  }
+    try {
+        const userId = req.user;
+        const { sessionId } = req.body;
+        const checkTheSession = await db
+            .select()
+            .from(sessions)
+            .where(eq(sessions.id, sessionId));
+        if (checkTheSession.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "the session is not deleted verify the id !"
+            })
+        }
+        await db.transaction(async (tx) => {
+            try {
+                await tx
+                    .delete(sessions)
+                    .where(eq(sessions.id, sessionId));
+                await tx.delete(setsOfSessionsExercises)
+                    .where(eq(setsOfSessionsExercises.sessionId, sessionId));
+            } catch (error) {
+                console.error('Transaction error:', error);
+                throw error; // Rethrow the error to trigger transaction rollback
+            }
+        })
+        return res.status(200).json({
+            success: true,
+            message: "the session is deleted successfully  ",
+        })
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting workout session', error: error.message });
+    }
 }; 
