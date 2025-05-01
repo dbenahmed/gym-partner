@@ -56,50 +56,95 @@ export default function StartSession() {
 
 
     const saveSession = async () => {
-        if (!sessionName || !date) {
-            console.log('sesions name or date not included')
-            Alert.alert('Error', 'Please enter a session name and date');
-            return;
+        const io = async () => {
+            setLoading(true);
+            console.log('llll')
+            // verify session name and date are available
+            if (!sessionName || !date) {
+                console.log('sesions name or date not included')
+                Alert.alert('Error', 'Please enter a session name and date');
+                return;
+            }
+            console.log('Save Session exercises');
+
+            // verify exercises infos are available
+            if (exercises.length === 0) {
+                console.log('No exercises added');
+                Alert.alert('Error', 'Please add at least one exercise to the session');
+                return;
+            }
+
+
+
+            // verify exercises infos are available
+            let exercisesSetsMissing = false;
+
+            for (const exercise of exercises) {
+                if (!exercise.sets || exercise.sets.length === 0) {
+                    console.log('No sets added for exercise', exercise.name);
+                    Alert.alert('Error', `Please add at least one set for the exercise: ${exercise.name}`);
+                    exercisesSetsMissing = true;
+                    break;
+                }
+
+                for (const set of exercise.sets) {
+                    if (!set.reps || !set.weight || set.reps <= 0 || set.weight <= 0 || !["kg", "lbs"].includes(set.unit)) {
+                        console.log('No reps or weight added for this set');
+                        Alert.alert('Error', `Please add reps and weight for the set`);
+                        exercisesSetsMissing = true;
+                        break;
+                    }
+                }
+
+                if (exercisesSetsMissing) break;
+            }
+
+
+            if (exercisesSetsMissing) {
+                return;
+            }
+            const exercisesArray = exercises.map((exercise, index) => ({
+                ...exercise,
+                order: index
+            }));
+            console.log('exercisesArray', exercisesArray);
+            console.log(date)
+            const res = await fetch(`${defaultUrl}/workout/sessions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authenticated}`
+                },
+                body: JSON.stringify({
+                    planId: null,
+                    dueDate: date,
+                    name: sessionName,
+                    startTime: null,
+                    endTime: null,
+                    note: sessionNotes,
+                    rating: null,
+                    exercisesArray: exercisesArray
+                })
+            });
+            console.log('res', res)
+            if (!res.ok) {
+                console.log('Error saving session');
+                Alert.alert('Error', 'Failed to save session');
+                return;
+            }
+            const { success, message, data } = await res.json();
+            if (!success) {
+                console.log('error', message)
+                Alert.alert('Error', message);
+                return;
+            }
+            console.log('Session saved successfully');
+            console.log(data);
+            router.push('/sessions');
         }
-        console.log('Save Session exercises');
-        const exercisesArray = exercises.map((exercise, index) => ({
-            ...exercise,
-            order: index
-        }));
-        console.log('exercisesArray', exercisesArray);
-        console.log(date)
-        const res = await fetch(`${defaultUrl}/workout/sessions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authenticated}`
-            },
-            body: JSON.stringify({
-                planId: null,
-                dueDate: date,
-                name: sessionName,
-                startTime: null,
-                endTime: null,
-                note: sessionNotes,
-                rating: null,
-                exercisesArray: exercisesArray
-            })
+        io().finally(() => {
+            setLoading(false);
         });
-        console.log('res', res)
-        if (!res.ok) {
-            console.log('Error saving session');
-            Alert.alert('Error', 'Failed to save session');
-            return;
-        }
-        const { success, message, data } = await res.json();
-        if (!success) {
-            console.log('error', message)
-            Alert.alert('Error', message);
-            return;
-        }
-        console.log('Session saved successfully');
-        console.log(data);
-        router.push('/sessions');
     }
 
     const updateExerciseData = (id, field, value) => {
@@ -143,8 +188,20 @@ export default function StartSession() {
         setIsLoading(false);
     };
 
+    const [loading, setLoading] = useState(false);
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={Colors.light.tint} />
+                <Text style={{ marginTop: 10 }}>Loading...</Text>
+            </View>
+        );
+
+    }
+
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             {/* Session Name Input */}
 
             <View style={styles.inputContainer}>
@@ -185,14 +242,14 @@ export default function StartSession() {
                     </Text>
                 </View>
             ) : (
-                <FlatList
-                    data={exercises}
-                    keyExtractor={(item) => item.id}
-                    style={styles.flatListStyle}
-                    renderItem={({ item }) => (
-                        <SessionExerciseContainer item={item} removeExercise={removeExercise} updateExerciseData={updateExerciseData} />
-                    )}
-                />
+                exercises.map((exercise, index) => (
+                    <SessionExerciseContainer
+                        key={exercise.id || index}
+                        item={exercise}
+                        removeExercise={removeExercise}
+                        updateExerciseData={updateExerciseData}
+                    />
+                ))
             )}
 
             {exercises.length > 0 && (
@@ -255,7 +312,7 @@ export default function StartSession() {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </ScrollView>
     );
 }
 const styles = StyleSheet.create({
@@ -263,6 +320,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f8f9fa',
         padding: 16,
+        marginBottom: 16,
     },
     textInput: {
         borderWidth: 1,

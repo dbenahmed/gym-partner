@@ -227,6 +227,30 @@ export default function mealsHome() {
 
   };
   const [servingSize, setServingSize] = useState(0)
+
+  const updateMeal = async (id, body) => {
+    console.log(id)
+    const token = authenticated
+    const url = `${defaultUrl}/meals/${id}`
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(body)
+    })
+    if (!res.ok) {
+      Alert.alert("Error", "Failed to update meal")
+      return;
+    }
+    const { message, success } = await res.json()
+    if (!success) {
+      Alert.alert("Error", message)
+      return;
+    }
+    renderUserMealsOnDate()
+  }
   const delateMeal = async (id) => {
     console.log(id)
     const token = authenticated
@@ -520,7 +544,7 @@ export default function mealsHome() {
                     textAlign: "center",
                     fontWeight: "bold",
                     marginBottom: 5,
-                    width: "100%" ,
+                    width: "100%",
                     fontSize: 12,
                     color: Color.light.tint,
                   }}
@@ -634,7 +658,7 @@ export default function mealsHome() {
               <View style={{ flex: 1 }}>
                 <ScrollView style={{ flex: 1 }}>
                   {meals ? meals.map((e) => (
-                    <Meal key={e.id} data={e} onDlate={delateMeal} />
+                    <Meal key={e.id} data={e} onDlate={delateMeal} onUpdate={updateMeal} />
                   )) : <View></View>}
                 </ScrollView>
 
