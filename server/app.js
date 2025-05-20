@@ -61,7 +61,7 @@ app.listen(port, async () => {
 
     serveonet({
         localHost: "localhost",
-        localPort: 3232,
+        localPort: port,
         // Note that for request particular subdomain you need to register in first connection.
         remoteSubdomain: "gympartner",
         remotePort: 80,

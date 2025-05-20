@@ -14,18 +14,27 @@ import { AuthContext } from "@/app/contex/authcontex";
 import useAuth from "@/app/contex/authcontex";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
-
+import { validatePassword, validateUsername } from "@/utils/validation";
 
 
 export default function SignUp() {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("password1");
   const [username, setUsername] = useState("user1");
   const { register, splashLoading, setSplashLoading } = useAuth()
 
 
   const handleRegister = async () => {
+
+    console.log(username)
+    if (validateUsername(username).success === false) {
+      Alert.alert("Error", validateUsername(username).message)
+      return
+    } else if (validatePassword(password).success === false) {
+      Alert.alert("Error", validatePassword(password).message)
+      return
+    }
+
     setSplashLoading(true)
     const res = await register(username, password)
     if (res.success) {
@@ -36,6 +45,9 @@ export default function SignUp() {
     }
     setSplashLoading(false)
   };
+
+
+
 
 
   if (splashLoading) {

@@ -7,11 +7,11 @@ import {
   TextInput,
   Pressable,
   ScrollView,
-  Modal,
   FlatList,
   Alert,
   ActivityIndicator,
 } from "react-native";
+import Modal from 'react-native-modal';
 import React from "react";
 import Color from "@/constants/Colors.ts";
 import { useState, useEffect, useContext } from "react";
@@ -281,11 +281,32 @@ export default function mealsHome() {
   }
   const addFoodToUser = async () => {
     // REQUEST
+    // Check if the serving size is valid
+    if (selectedAdditionFoodItem === null) {
+      Alert.alert("Please select a food item");
+      return;
+    }
+
+    /* // verify serving size does not contain letters or characters but just numbers 
+    if (/^[0-9]*\.?[0-9]+$/.test(servingSize)) {
+      Alert.alert("Please enter a valid serving size");
+    } */
+
+    if (isNaN(parseInt(servingSize))) {
+      Alert.alert("Please enter a valid serving size");
+      return;
+    }
 
     if (parseInt(servingSize) <= 0 || servingSize.length == 0) {
       Alert.alert("Please enter a serving size");
       return;
     }
+
+    if (parseInt(servingSize) > 1000) {
+      Alert.alert("Serving size too large");
+      return;
+    }
+
     setAddFoodLoading(true)
 
     const res = await fetchAddFoodToUser(currentDate.toISOString().split('T')[0], selectedAdditionFoodItem.id, selectedAdditionFoodItem.description, parseInt(servingSize), authenticated)
@@ -310,9 +331,12 @@ export default function mealsHome() {
       return (
         <Modal
           animationType="slide"
-          transparent={true}
           visible={additionModalVisible}
           onRequestClose={() => setAdditionModalVisible(false)}
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            margin: 0,
+          }}
         >
           <View style={styles.modalBackground}>
             <View style={styles.modeleContent}>
@@ -334,7 +358,7 @@ export default function mealsHome() {
                 marginBottom: 16
               }}>
                 <MaterialIcons name="info-outline" size={20} color={Color.light.tint} style={{ marginRight: 8 }} />
-                <Text style={{ color: '#000000', fontSize: 12, fontWeight: '400' }}>
+                <Text style={{ color: '#000000', fontSize: 12, fontWeight: '400', width: '90%', textAlign: 'left', flexWrap: 'wrap', }}>
                   {selectedAdditionFoodItem.description || 'No description available'}
                 </Text>
               </View>
@@ -657,31 +681,34 @@ export default function mealsHome() {
             ) : (
               <View style={{ flex: 1 }}>
                 <ScrollView style={{ flex: 1 }}>
+
+
                   {meals ? meals.map((e) => (
                     <Meal key={e.id} data={e} onDlate={delateMeal} onUpdate={updateMeal} />
-                  )) : <View></View>}
+                  )) : <View>
+
+                  </View>}
+
+                  <TouchableOpacity
+                    style={{ ...styles.button }}
+                    onPress={() => setModalVisible(true)}
+                  >
+                    <Text style={{ fontWeight: "700", color: Color.light.tint }}>
+                      Add a new meal
+                    </Text>
+                  </TouchableOpacity>
                 </ScrollView>
-
-
-
-                <TouchableOpacity
-                  style={{ ...styles.button }}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <Text style={{ fontWeight: "700", color: Color.light.tint }}>
-                    Add a new meal
-                  </Text>
-                </TouchableOpacity>
               </View>)}
             <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => setModalVisible(false)}
+              isVisible={modalVisible}
+              animationIn="slideInUp"
+              animationOut="zoomOut"
+              swipeDirection="down"
+              onSwipeComplete={() => setModalVisible(false)}
+              style={{ margin: 0, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
             >
               <View style={{
                 flex: 1,
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
                 justifyContent: 'flex-end',
               }}>
                 <View style={{
@@ -1353,7 +1380,6 @@ const styles = StyleSheet.create({
   },
   modalBackground: {
     flex: 1,
-    backgroundColor: Color.light.tintLowOpacity,
     padding: (10, 30),
   },
   modeleContent: {
