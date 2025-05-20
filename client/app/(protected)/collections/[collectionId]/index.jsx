@@ -4,6 +4,8 @@ import useAuth from '@/app/contex/authcontex';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
+import { validateName } from '@/utils/validation';
+
 
 import { fetchGetUserPlans, fetchCreatePlan } from '@/lib/api';
 
@@ -51,6 +53,12 @@ const Plans = () => {
   };
 
   const handleCreatePlan = async () => {
+
+    if (validateName(addPlanTitle).success === false) {
+      alert( validateName(addPlanTitle).message);
+      return;
+    }
+
     if (addPlanTitle.trim()) {
       // Make request to create a new plan
       const { data, success, message } = await fetchCreatePlan(authenticated, { collectionId, title: addPlanTitle });

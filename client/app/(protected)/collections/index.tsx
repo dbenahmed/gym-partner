@@ -13,6 +13,7 @@ import useAuth from "@/app/contex/authcontex";
 import { ActivityIndicator } from "react-native";
 import Colors from "@/constants/Colors";
 import { router, useNavigation } from "expo-router";
+import { validateName } from "@/utils/validation";
 
 type Collection = {
   collectionId: number;
@@ -29,6 +30,18 @@ const Collections = () => {
   const [collectionDescription, setCollectionDescription] = useState("");
 
   const handleCreateCollection = async () => {
+    if (validateName(collectionTitle).success === false) {
+      Alert.alert("Invalid title", validateName(collectionTitle).message);
+      return;
+    }
+
+    if (validateName(collectionDescription).success === false) {
+      Alert.alert(
+        "Invalid description",
+        validateName(collectionDescription).message
+      );
+      return;
+    }
     const { success, message, data } = await fetchCreateCollection(
       authenticated,
       {

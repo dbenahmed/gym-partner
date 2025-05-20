@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Button, ScrollView } from 'react-native';
+import Modal from 'react-native-modal';
 import useAuth from '@/app/contex/authcontex';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises } from '@/lib/api'; // Replace with real path
@@ -17,7 +18,7 @@ const Exercises = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(10);
   const [count, setCount] = useState(0);
 
 
@@ -117,13 +118,13 @@ const Exercises = () => {
 
 
   return (
-    <View style={{ padding: 20, flex: 1 }}>
+    <View style={{ flex: 1, padding: 20 }}>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <View style={{ flex: 1, width: '100%' }}>
           <Stack.Screen options={{ headerShown: true, title: `${title} - Exercises` }} />
-          <View style={{ flex: 1, width: '100%' }}>
+          <ScrollView style={{ flex: 1, width: '100%' }}>
             {exercises.map((ex) => (
               <View
                 key={ex.plans_exercises.id}
@@ -157,16 +158,23 @@ const Exercises = () => {
 
               </View>
             ))}
-          </View>
+            <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={() => setModalVisible(true)}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Add New Exercise</Text>
+            </TouchableOpacity>
+          </ScrollView>
 
 
-          <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={() => setModalVisible(true)}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Add New Exercise</Text>
-          </TouchableOpacity>
 
           {/* Modal */}
-          <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
-            <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
+          <Modal
+            isVisible={modalVisible}
+            animationIn="slideInUp"
+            animationOut="zoomOut"
+            swipeDirection="down"
+            onSwipeComplete={() => setModalVisible(false)}
+            style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.05)', }}
+          >
+            <View style={{ height: "75%", justifyContent: 'center', padding: 20, backgroundColor: Colors.light.background, borderRadius: 10 }}>
               <Text style={{ fontSize: 20 }}>Search Exercise</Text>
               <TextInput
                 value={searchQuery}
@@ -193,7 +201,8 @@ const Exercises = () => {
                   <Text>Found Exercises Count : {count}</Text>
                 )
               }
-              <View style={{ flex: 1, marginVertical: 10 }}>
+
+              <ScrollView style={{ flex: 1, marginVertical: 10 }}>
                 {searchResults && searchResults.map((exercise) => (
                   <View>
                     <TouchableOpacity
@@ -228,9 +237,25 @@ const Exercises = () => {
                 }
 
 
-                < TouchableOpacity onPress={() => {
-                  handleLimitChanged(limit + 5)
-                }}>
+                < TouchableOpacity
+                  style={{
+                    backgroundColor: Colors.light.tint,
+                    borderRadius: 8,
+                    padding: 16,
+                    marginHorizontal: 16,
+                    marginTop: 16,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    elevation: 2,
+                  }}
+                  disabled={limit >= count}
+                  onPress={() => {
+                    handleLimitChanged(limit + 5)
+                  }}>
                   <Text>Load More</Text>
                 </TouchableOpacity>
 
@@ -273,7 +298,7 @@ const Exercises = () => {
                 >
                   <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Cancel</Text>
                 </TouchableOpacity>
-              </View>
+              </ScrollView>
             </View>
           </Modal>
         </View>

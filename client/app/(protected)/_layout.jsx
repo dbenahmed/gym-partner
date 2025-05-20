@@ -35,24 +35,24 @@ export default function Layout() {
                     default: {},
                 }),
             }}>
-                <Tabs.Screen name="home" options={{
+                {/* <Tabs.Screen name="home" options={{
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="home" color={color} size={size} />
                     ),
                     tabBarLabel: 'Home',
-                }} />
+                }} /> */}
                 <Tabs.Screen name="mealsHome" options={{
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="food-apple" color={color} size={size} />
                     ),
                     tabBarLabel: 'Meals',
                 }} />
-                <Tabs.Screen name="Profile" options={{
+                {/* <Tabs.Screen name="Profile" options={{
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="account-circle" color={color} size={size} />
                     ),
                     tabBarLabel: 'Profile',
-                }} />
+                }} /> */}
                 <Tabs.Screen name="Collections" options={{
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons name="clipboard-list" color={color} size={size} />
