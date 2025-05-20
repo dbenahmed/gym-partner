@@ -1,6 +1,7 @@
 import db from "../db/index.js";
 import { collections, exercises, plans, users } from "../db/schemas/dev/schema.js";
-import { and, eq, ilike, like } from "drizzle-orm";
+import { and, eq, ilike, like, inArray, sql } from "drizzle-orm";
+
 
 // Get a list of all available exercises
 export const getAllExercises = async (req, res) => {
@@ -13,8 +14,8 @@ export const getAllExercises = async (req, res) => {
       "level": req.query.level,
       "mechanic": req.query.mechanic,
       "equipment": req.query.equipment,
-      "primarymuscles": req.query.primarymuscles,
-      "secondarymuscles": req.query.secondarymuscles,
+      "primarymuscles": req.query.primarymuscle,
+      "secondarymuscles": req.query.secondarymuscle,
       "category": req.query.category,
     }
     const { page } = req.query
@@ -31,21 +32,56 @@ export const getAllExercises = async (req, res) => {
     }
 
 
-    const andConditions = Object.entries(filteredQueries).map(([key, value]) => {
-      if (key === "name") {
-        return ilike(exercises[key], `%${value}%`)
-      }
-      return eq(exercises[key], value)
-    })
-    const foundExercises = await db.select({
-      ...exercises,
-    }).from(exercises).where(
-      and(
-        ...andConditions
-      )
-    ).limit(limit).offset(page)
 
-    const count = await db.$count(exercises, and(...andConditions))
+    console.log("Filtered Queries: ", filteredQueries)
+
+    const arrayFields = ['primarymuscles', 'secondarymuscles'];
+
+
+
+
+    const andConditions = Object.entries(filteredQueries).map(([key, value]) => {
+      console.log('Key:', key, 'Value:', value, 'Type:', Array.isArray(value) ? 'array' : typeof value);
+
+      // Handle name field with ilike
+      if (key === 'name') {
+        if (typeof value !== 'string') {
+          console.warn(`Invalid value for name: ${value}, expected string`);
+          return null;
+        }
+        return ilike(exercises[key], `%${value.trim()}%`);
+      }
+
+      // Handle array fields
+      if (arrayFields.includes(key)) {
+        if (typeof value === 'string') {
+          // Use raw SQL for array overlap
+          return sql`${exercises[key]} && ARRAY[${value}]::text[]`;
+        } else if (Array.isArray(value)) {
+          return sql`${exercises[key]} && ARRAY[${value.join(',')}]::text[]`;
+        } else {
+          console.warn(`Invalid value for ${key}: ${value}, expected string or array`);
+          return null;
+        }
+      }
+
+      // Handle scalar fields
+      if (typeof value === 'string' || typeof value === 'number') {
+        return eq(exercises[key], value);
+      } else {
+        console.warn(`Invalid value for ${key}: ${value}, expected string or number`);
+        return null;
+      }
+    }).filter(condition => condition !== null); // Remove null conditions
+
+
+    console.log('andConditions:', andConditions);
+
+    const foundExercises = await db.select().from(exercises).where(
+      andConditions.length > 0 ? and(...andConditions) : undefined
+    ).limit(limit).offset(page * limit)
+
+    const count = await db.$count(exercises, andConditions.length > 0 ? and(...andConditions) : undefined)
 
     res.status(200).json({
       success: true, data: {
@@ -55,7 +91,7 @@ export const getAllExercises = async (req, res) => {
     })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ message: 'Error retrieving all exercises', error: error.message });
+    res.status(500).json({ success: false, message: 'Error retrieving all exercises', error: error.message });
   }
 };
 

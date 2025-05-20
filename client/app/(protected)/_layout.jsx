@@ -29,7 +29,7 @@ export default function Layout() {
                         height: 60, // reduce height
                         paddingBottom: 5,
                         paddingTop: 5,
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.2)',
                         borderTopWidth: 0,
                     },
                     default: {},
@@ -40,6 +40,7 @@ export default function Layout() {
                         <MaterialCommunityIcons name="home" color={color} size={size} />
                     ),
                     tabBarLabel: 'Home',
+                    
                 }} /> */}
                 <Tabs.Screen name="mealsHome" options={{
                     tabBarIcon: ({ color, size }) => (
@@ -52,6 +53,7 @@ export default function Layout() {
                         <MaterialCommunityIcons name="account-circle" color={color} size={size} />
                     ),
                     tabBarLabel: 'Profile',
+                    tabBarButton: () => null, // hides tab button
                 }} /> */}
                 <Tabs.Screen name="Collections" options={{
                     tabBarIcon: ({ color, size }) => (

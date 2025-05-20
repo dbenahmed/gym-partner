@@ -65,24 +65,7 @@ export default function MealDetails() {
         <View style={{ flex: 1 }}>
 
             <View style={styles.container}>
-                <Stack.Screen
-                    options={{
-                        headerStyle: {
-                            backgroundColor: Color.light.background,
-                            elevation: 4,
-                            shadowOpacity: 0.3,
-                            borderBottomWidth: 1,
-                            borderBottomColor: '#e0e0e0',
-                        },
-                        headerTitleStyle: {
-                            fontSize: 24,
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                        },
-                        headerShadowVisible: true,
-                        title: "Meal Details",
-                    }}
-                />
+
                 <ScrollView>
                     <View style={styles.mainCard}>
                         <View style={styles.headerSection}>

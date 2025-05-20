@@ -14,7 +14,7 @@ export default function Index() {
   }
 
   if (authenticated) { // logged in 
-    return <Redirect href="/(protected)/home" />;
+    return <Redirect href="/(protected)/mealsHome" />;
   }
 
   return <Redirect href="/(auth)/landing" />;
