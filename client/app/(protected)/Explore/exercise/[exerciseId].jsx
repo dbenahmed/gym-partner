@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { defaultUrl } from '@/constants/constants';
 import Colors from '@/constants/Colors';
 import useAuth from '@/app/contex/authcontex';
 import { Stack } from 'expo-router';
-
+import ImageViewing from 'react-native-image-viewing';
 
 export default function ExerciseDetails() {
     const [exercise, setExercise] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [viewerVisible, setViewerVisible] = useState(false);
+    const [viewerIndex, setViewerIndex] = useState(0);
     const { authenticated } = useAuth();
 
     const { exerciseId } = useLocalSearchParams();
@@ -60,20 +62,22 @@ export default function ExerciseDetails() {
 
     return (
         <View style={{ flex: 1 }}>
+            {/* Image Viewer for fullscreen zoomable images */}
+            {exercise.images && (
+                <ImageViewing
+                    images={exercise.images.map(img => ({
+                        uri: `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${img}`
+                    }))}
+                    imageIndex={viewerIndex}
+                    visible={viewerVisible}
+                    onRequestClose={() => setViewerVisible(false)}
+                />
+            )}
 
             <ScrollView style={styles.container}>
                 <View style={styles.mainCard}>
                     <Text style={styles.title}>{exercise.name}</Text>
                     <Text style={styles.description}>{exercise.description}</Text>
-                    {exercise.images && exercise.images.length > 0 && (
-                        <View style={styles.imageContainer}>
-                            {/*  <Image
-                            source={{ uri: exercise.images[0] }}
-                            style={styles.image}
-                            resizeMode="contain"
-                        /> */}
-                        </View>
-                    )}
 
                     <View style={styles.infoRow}>
                         <View style={styles.infoCard}>
@@ -134,6 +138,36 @@ export default function ExerciseDetails() {
                             ))}
                         </View>
                     </View>
+
+
+                    <View style={styles.fullWidthCard}>
+                        <Text style={styles.cardTitle}>Images</Text>
+
+                        {/* Horizontal images scroll */}
+                        {exercise.images && exercise.images.length > 0 && (
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={true}
+                                style={styles.horizontalImageScroll}
+                                contentContainerStyle={styles.horizontalImageContent}
+                            >
+                                {exercise.images.map((img, idx) => (
+                                    <Pressable
+                                        key={idx}
+                                        onPress={() => {
+                                            setViewerIndex(idx);
+                                            setViewerVisible(true);
+                                        }}
+                                    >
+                                        <Image
+                                            source={{ uri: `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${img}` }}
+                                            style={styles.horizontalImage}
+                                        />
+                                    </Pressable>
+                                ))}
+                            </ScrollView>
+                        )}
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -182,14 +216,26 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         textAlign: 'center',
     },
-    imageContainer: {
-        alignItems: 'center',
-        marginBottom: 15,
+    horizontalImageScroll: {
+        maxHeight: 500,
+        width: 350,
+        marginTop: 10,
+        marginBottom: 5,
+        backgroundColor: Colors.light.background,
     },
-    image: {
-        width: '100%',
-        height: 200,
-        borderRadius: 8,
+    horizontalImageContent: {
+        paddingHorizontal: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    horizontalImage: {
+        width: 250,
+        maxHeight: "100%",
+        aspectRatio: 1,
+        resizeMode: 'fill',
+        borderRadius: 12,
+        marginRight: 10,
+        backgroundColor: '#eee',
     },
     infoRow: {
         flexDirection: 'row',

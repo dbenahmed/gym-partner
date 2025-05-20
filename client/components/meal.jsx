@@ -12,7 +12,28 @@ export default function Meal({ data, onDlate, onUpdate }) {
   const [updatedServingSize, setUpdatedServingSize] = useState(data.servingsizeG.toString());
   const [updateLoading, setUpdateLoading] = useState(false);
 
+  const [deleting, setDeleting] = useState(false);
+
   const handleUpdateMeal = () => {
+
+    if (isNaN(parseInt(updatedServingSize)) || updatedServingSize <= 0) {
+      alert("Please enter a valid serving size.");
+      return;
+    }
+    if (parseInt(updatedServingSize) === data.servingsizeG) {
+      alert("No changes made to the serving size.");
+      setUpdateModalVisible(false);
+      return;
+    }
+    if (parseInt(updatedServingSize) > 1000) {
+      alert("Serving size cannot exceed 1000g.");
+      return;
+    }
+    if (parseInt(updatedServingSize) < 1) {
+      alert("Serving size cannot be less than 1g.");
+      return;
+    }
+
     setUpdateLoading(true);
     onUpdate(data.id, {
       servingsizeG: parseFloat(updatedServingSize),
@@ -21,6 +42,15 @@ export default function Meal({ data, onDlate, onUpdate }) {
       setUpdateModalVisible(false);
     });
   };
+
+
+  if (deleting) {
+    return (
+      <View style={style.parent}>
+        <ActivityIndicator size="small" color={Color.light.tint} />
+      </View>
+    );
+  }
 
 
   return (
@@ -233,10 +263,20 @@ export default function Meal({ data, onDlate, onUpdate }) {
           </TouchableOpacity>
         </View>
       </View>
-      <Pressable onPress={() => {
-        console.log('data', data)
-        onDlate(data.id)
-      }} style={{ position: 'absolute', top: 5, right: 10 }}>
+      <Pressable
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        onPress={() => {
+          console.log('data', data)
+          setDeleting(true)
+          onDlate(data.id)
+            .then(() => {
+              setDeleting(false)
+            })
+            .catch((err) => {
+              console.log(err)
+              setDeleting(false)
+            })
+        }} style={{ position: 'absolute', top: 5, right: 10 }}>
         <Text style={{ color: 'red', fontWeight: '900', fontSize: 15 }}>X</Text>
       </Pressable>
     </View >

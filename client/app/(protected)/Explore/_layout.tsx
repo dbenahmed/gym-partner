@@ -4,37 +4,34 @@ import Colors from "@/constants/Colors";
 
 export default function ExploreLayout() {
   return (
-    <Stack screenOptions={{ headerShown: true }}>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: Colors.light.background,
+        },
+        headerTintColor: Colors.light.tint,
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+        contentStyle: {
+          backgroundColor: Colors.light.background,
+        },
+      }}
+    >
       <Stack.Screen
-        options={{ title: "Explore", headerShown: false }}
+        options={{ title: "Explore", headerShown: true }}
         name="index"
       />
       <Stack.Screen
         name="exercise/[exerciseId]"
         options={{
           title: "Exercise Details",
-          headerStyle: {
-            backgroundColor: Colors.light.background,
-          },
-          headerTitleStyle: {
-            fontSize: 24,
-            fontWeight: "bold",
-          },
-          headerShadowVisible: true,
         }}
       />
       <Stack.Screen
         name="meals/[mealId]"
         options={{
           title: "Meal Details",
-
-          headerStyle: {
-            backgroundColor: Colors.light.background,
-          },
-          headerTitleStyle: {
-            fontSize: 24,
-            fontWeight: "bold",
-          },
         }}
       />
     </Stack>

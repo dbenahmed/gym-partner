@@ -4,8 +4,8 @@ import 'dotenv/config';
 
 export default {
     "expo": {
-        "name": "Gym_app",
-        "slug": "Gym_app",
+        "name": "Gym Partner",
+        "slug": "gym-partner",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
@@ -13,7 +13,7 @@ export default {
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
         "ios": {
-            "supportsTablet": true
+            "supportsTablet": true,
         },
         "android": {
             "adaptiveIcon": {
@@ -44,6 +44,7 @@ export default {
         }, "extra": {
             "BACKEND_URL": process.env.BACKEND_URL,
             "PORT": process.env.PORT,
+            
         }
     }
 };

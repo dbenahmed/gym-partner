@@ -76,6 +76,7 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (e) {
             const errorResponse = handleError(e);
+            console.log(errorResponse)
             return errorResponse
         }
     }
