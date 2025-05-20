@@ -9,6 +9,7 @@ import useAuth from '@/app/contex/authcontex';
 import { ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
+import { validateName, validateNumber } from '@/utils/validation';
 
 
 
@@ -58,6 +59,17 @@ export default function StartSession() {
     const saveSession = async () => {
         const io = async () => {
             setLoading(true);
+            if (validateName(sessionName).success === false) {
+                console.log('session name not valid')
+                Alert.alert('Error', validateName(sessionName).message);
+                return;
+            }
+            console.log('save session')
+            if (validateName(sessionNotes).success === false) {
+                console.log('session notes not valid')
+                Alert.alert('Error', validateName(sessionNotes).message);
+                return;
+            }
             console.log('llll')
             // verify session name and date are available
             if (!sessionName || !date) {
