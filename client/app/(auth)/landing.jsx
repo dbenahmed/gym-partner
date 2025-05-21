@@ -1,81 +1,82 @@
-import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
 import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
-
+import CheckBox from "react-native-check-box";
+import { useState } from "react";
 
 export default function Landing({ navigation }) {
   const router = useRouter();
-    
+
+  const [isChecked, setIsChecked] = useState(false);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Color.light.background,
-      }}
+    <ImageBackground
+      source={require("@/assets/images/manLog.jpg")}
+      style={styles.backgroundLog}
     >
-      <Image
-        source={require("@/assets/images/man.jpg")}
+      <Text
         style={{
-          width: "100%",
-          height: 300,
+          color: "#F0B294",
+          fontSize: 13,
+          fontWeight: "700",
+          fontSize: 32,
+          width: "48%",
+          position: "absolute",
+          left: 5,
+          top: "35%",
+          lineHeight: 40,
+          textAlign: "center",
         }}
-      />
+      >
+        TRACK YOUR MEALS IMPROVE YOUR WORKOUT
+      </Text>
+
       <View
         style={{
           padding: 25,
-          backgroundColor: Color.light.background,
-          height: "100%",
           borderTopRightRadius: 35,
           borderTopLeftRadius: 35,
+          height: "25%",
+          marginTop: "auto",
         }}
       >
-        <Text
-          style={{
-            fontSize: 25,
-            textAlign: "center",
-            color: Color.light.tint,
-            fontFamily: "outfitb",
-          }}
-        >
-          Welcome to Gym Partner       
-        </Text>
-        <Text
-          style={{
-            fontSize: 15,
-            textAlign: "center",
-            color: Color.light.tint,
-            marginTop: 20,
-            fontFamily: "outfitr",
-          }}
-        >
-          Lorem ipsum dolor sit adipisicing elit.aklsmd alskmda kqjwkj AJSBDKJA
-          kajsdbkjbd aksndk snd ,an ,n a
-        </Text>
-        <TouchableOpacity
-          style={styles.botton}
-          onPress={() => router.push("/(auth)/signUp")}
-        >
-          <Text style={[styles.bottonText]}>
-            Get Started 
-          </Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.botton,
             {
-              backgroundColor: Color.light.tint,
+              backgroundColor: "#CF8765",
               borderWidth: 1,
               borderColor: Color.light.tint,
+              marginBottom: "8",
             },
           ]}
           onPress={() => router.push("/(auth)/signIn")}
         >
           <Text style={[styles.bottonText, { color: Color.light.background }]}>
-            already have an account?
+            Get Started
           </Text>
         </TouchableOpacity>
+
+        <CheckBox
+          isChecked={isChecked}
+          onClick={() => setIsChecked(!isChecked)}
+          rightText={
+            <Text style={{ color: "#FFFFFF", fontSize: 13, fontWeight: "400" }}>
+              I read and agreed to the Terms and Conditions.
+            </Text>
+          }
+          rightTextStyle={{ color: "#000" }}
+          checkBoxColor="#CF8765"
+        />
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -84,11 +85,18 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: Color.light.tint,
     marginTop: 20,
-    borderRadius: 10,
+    borderRadius: 50,
   },
   bottonText: {
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 24,
     color: Color.light.background,
+    fontWeight: 800,
+  },
+  backgroundLog: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    position: "relative",
   },
 });

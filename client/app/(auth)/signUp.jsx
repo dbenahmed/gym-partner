@@ -14,15 +14,15 @@ import { AuthContext } from "@/app/contex/authcontex";
 import useAuth from "@/app/contex/authcontex";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
-import { validatePassword, validateUsername } from "@/utils/validation";
-
+import { validatePassword, validateUsername } from "@/utils/validation";import { ImageBackground } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function SignUp() {
   const router = useRouter();
+  const [confpasword, setconfpasword] = useState("password1");
   const [password, setPassword] = useState("password1");
   const [username, setUsername] = useState("user1");
-  const { register, splashLoading, setSplashLoading } = useAuth()
-
+  const { register, splashLoading, setSplashLoading } = useAuth();
 
   const handleRegister = async () => {
 
@@ -43,98 +43,156 @@ export default function SignUp() {
     } else {
       Alert.alert("Error", res.message)
     }
-    setSplashLoading(false)
   };
-
-
-
-
-
   if (splashLoading) {
-    return <SplashScreen />
+    return <SplashScreen />;
   }
   return (
-    <View
-      style={{
-        Color: "white",
-        display: "flex",
-        alignItems: "center",
-        padding: 20,
-      }}
+    <ImageBackground
+      source={require("@/assets/images/manLog.jpg")}
+      style={styles.backgroundLog}
     >
-
-      <Image
-        source={require("@/assets/images/logo.jpg")}
-        style={{ width: 180, height: 180, margin: 50 }}
-      />
-      <Text
-        style={{ fontSize: 25, textAlign: "center", fontFamily: "outfitb" }}
-      >
-        Create new account
-      </Text>
-
-      <TextInput
-        placeholder="username"
-        value={username}
-        style={styles.textInput}
-        onChangeText={(text) => setUsername(text)}
-      />
-      <TextInput
-        placeholder="password"
-        secureTextEntry={true}
-        value={password}
-        style={styles.textInput}
-        onChangeText={(text) => setPassword(text)}
-      />
-      <TouchableOpacity
+      <LinearGradient
+        colors={[
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgb(0, 0, 0)",
+          "rgba(93, 91, 91, 0.11)",
+          "rgba(98, 96, 96, 0)"
+        ]}
+        start={{ x: 0.5, y: 1 }}
+        end={{ x: 0.5, y: 0 }}
         style={{
-          padding: 15,
-          backgroundColor: Color.light.background,
-          width: "100%",
-          marginTop: 20,
-          borderRadius: 15,
+          Color: "white",
+          alignItems: "center",
+          padding: 20,
+          marginTop: "auto",
+          height: "50%",
         }}
       >
-        <Text
+        <View style={styles.inputContainer}>
+          <Image
+            source={require("@/assets/images/people.png")}
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Name"
+            value={username}
+            placeholderTextColor={"#fffaf0"}
+            style={styles.textInput}
+            onChangeText={(text) => setUsername(text)}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Image
+            source={require("@/assets/images/key.png")}
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Set Password"
+            secureTextEntry={true}
+            placeholderTextColor={"#fffaf0"}
+            value={password}
+            style={styles.textInput}
+            onChangeText={(text) => setPassword(text)}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Image
+            source={require("@/assets/images/key.png")}
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Confirm Password"
+            secureTextEntry={true}
+            placeholderTextColor={"#fffaf0"}
+            value={confpasword}
+            style={styles.textInput}
+            onChangeText={(text) => setconfpasword(text)}
+          />
+        </View>
+        <TouchableOpacity
           style={{
-            textAlign: "center",
-            color: Color.light.tint,
-            fontSize: 18,
-            fontFamily: "outfitb",
-          }}
-          onPress={() => {
-            handleRegister()
+            padding: 15,
+            backgroundColor: "#CF8765",
+            width: "100%",
+            marginTop: 20,
+            borderRadius: 50,
           }}
         >
-          Create account
-        </Text>
-      </TouchableOpacity>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          marginTop: 20,
-          gap: 10,
-        }}
-      >
-        <Text>Already have an account?</Text>
-        <Pressable onPress={() => router.push("/(auth)/signIn")}>
-          <Text style={{ color: Color.light.background, fontFamily: "outfitb" }}>
-            sign In Here
+          <Text
+            style={{
+              textAlign: "center",
+              color: "#FFFFFF",
+              fontSize: 20,
+              fontFamily: "outfitb",
+              fontWeight: "600",
+            }}
+            onPress={() => {
+              handleRegister();
+            }}
+          >
+            Create account
           </Text>
-        </Pressable>
-      </View>
-    </View>
+        </TouchableOpacity>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            marginTop: 20,
+            gap: 10,
+          }}
+        >
+          <Text style={{ color: "#FFFFFF" }}>Already have an account?</Text>
+          <Pressable onPress={() => router.push("/(auth)/signIn")}>
+            <Text style={{ color: "#CF8765", fontFamily: "outfitb" }}>
+              sign In Here
+            </Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   textInput: {
-    borderWidth: 1,
+    borderWidth: 3,
     width: "100%",
     padding: 15,
-    borderRadius: 15,
-    fontSize: 18,
+    borderRadius: 50,
+    fontSize: 16,
     marginTop: 20,
+    borderColor: "#CF8765",
+    color: "#CF8765",
+    paddingLeft: 60,
+  },
+  backgroundLog: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    position: "relative",
+  },
+  inputContainer: {
+    width: "100%",
+    position: "relative",
+  },
+  icon: {
+    position: "absolute",
+    top: "50%",
+    left: "19",
   },
 });
