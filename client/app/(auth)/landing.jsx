@@ -10,6 +10,7 @@ import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
 import CheckBox from "react-native-check-box";
 import { useState } from "react";
+import { Alert } from "react-native";
 
 export default function Landing({ navigation }) {
   const router = useRouter();
@@ -57,7 +58,13 @@ export default function Landing({ navigation }) {
               marginBottom: "8",
             },
           ]}
-          onPress={() => router.push("/(auth)/signIn")}
+          onPress={() => {
+            if (isChecked) {
+              router.push("/(auth)/signIn");
+            } else {
+              Alert.alert("Error", "Please Accept Terms of Service");
+            }
+          }}
         >
           <Text style={[styles.bottonText, { color: Color.light.background }]}>
             Get Started

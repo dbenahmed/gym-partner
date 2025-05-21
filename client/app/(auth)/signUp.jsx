@@ -14,7 +14,8 @@ import { AuthContext } from "@/app/contex/authcontex";
 import useAuth from "@/app/contex/authcontex";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
-import { validatePassword, validateUsername } from "@/utils/validation";import { ImageBackground } from "react-native";
+import { validatePassword, validateUsername } from "@/utils/validation";
+import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function SignUp() {
@@ -25,23 +26,27 @@ export default function SignUp() {
   const { register, splashLoading, setSplashLoading } = useAuth();
 
   const handleRegister = async () => {
+    console.log(username);
 
-    console.log(username)
     if (validateUsername(username).success === false) {
-      Alert.alert("Error", validateUsername(username).message)
-      return
+      Alert.alert("Error", validateUsername(username).message);
+      return;
     } else if (validatePassword(password).success === false) {
-      Alert.alert("Error", validatePassword(password).message)
-      return
+      Alert.alert("Error", validatePassword(password).message);
+      return;
+    }
+    if (!(confpasword === password)) {
+      Alert.alert("Error", "Passwords Do Not Match");
+      return;
     }
 
-    setSplashLoading(true)
-    const res = await register(username, password)
+    setSplashLoading(true);
+    const res = await register(username, password);
     if (res.success) {
-      Alert.alert("Success", res.message)
-      router.push("/(auth)/signIn")
+      Alert.alert("Success", res.message);
+      router.push("/(auth)/signIn");
     } else {
-      Alert.alert("Error", res.message)
+      Alert.alert("Error", res.message);
     }
   };
   if (splashLoading) {
@@ -69,7 +74,7 @@ export default function SignUp() {
           "rgb(0, 0, 0)",
           "rgb(0, 0, 0)",
           "rgba(93, 91, 91, 0.11)",
-          "rgba(98, 96, 96, 0)"
+          "rgba(98, 96, 96, 0)",
         ]}
         start={{ x: 0.5, y: 1 }}
         end={{ x: 0.5, y: 0 }}
