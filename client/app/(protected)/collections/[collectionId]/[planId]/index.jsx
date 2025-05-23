@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Button, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import useAuth from '@/app/contex/authcontex';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises } from '@/lib/api'; // Replace with real path
+import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises, fetchDeletePlan } from '@/lib/api'; // Replace with real path
 import Colors from '@/constants/Colors';
 import { Alert } from 'react-native';
-
 
 const Exercises = () => {
   const { authenticated } = useAuth();
@@ -20,7 +19,6 @@ const Exercises = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [limit, setLimit] = useState(10);
   const [count, setCount] = useState(0);
-
 
   const handleSearchExercise = async (query) => {
     if (query.length === 0) {
@@ -37,8 +35,7 @@ const Exercises = () => {
     }
   };
 
-  const { collectionId, planId, title } = useLocalSearchParams(); // 'id' is planId
-
+  const { collectionId, planId, title } = useLocalSearchParams();
 
   const handleLimitChanged = async (newLimit) => {
     setLimit(newLimit);
@@ -54,6 +51,7 @@ const Exercises = () => {
       setExercises(data);
     }
   };
+
   useEffect(() => {
     const run = async () => {
       setLoading(true);
@@ -62,7 +60,6 @@ const Exercises = () => {
     }
     run();
   }, [planId]);
-
 
   const handleSearch = async (query) => {
     const { success, data, message } = await fetchSearchExercises(query);
@@ -73,14 +70,14 @@ const Exercises = () => {
     }
   };
 
-  const handleSelectExercise = (exercise) => {
-    setSelectedExercises([...selectedExercises, exercise]);
-    setSearchResults(searchResults.filter(e => e.id !== exercise.id));
-  };
-
-  const handleAddSelectedExercises = async () => {
-    const idsList = selectedExercises.map(e => e.id)
-    const { success, message, data } = await fetchAddExerciseToPlan(authenticated, { planId, exercisesIds: idsList });
+  const handleSelectExercise = async (exercise) => {
+    // verify if the exercise is already inside the plan exercises ( exercises )
+    const isAlreadySelected = exercises.some((ex) => ex.exercises.id === exercise.id);
+    if (isAlreadySelected) {
+      Alert.alert('Exercise already added to the plan');
+      return;
+    }
+    const { success, message, data } = await fetchAddExerciseToPlan(authenticated, { planId, exercisesIds: [exercise.id] });
     if (!success) {
       if (data?.missingExercises) {
         Alert.alert(message, `Missing exercises: ${data.missingExercises.join(", ")}`);
@@ -98,7 +95,7 @@ const Exercises = () => {
       console.log("fetching data")
       await fetchData();
       setLoading(false);
-      Alert.alert('Exercises added successfully');
+      Alert.alert('Exercise added successfully');
     }
   };
 
@@ -111,71 +108,99 @@ const Exercises = () => {
     }
   };
 
-  const handleDeleteExercise = async (exercise) => {
-    setSelectedExercises(selectedExercises.filter(e => e.id !== exercise.id));
-    setSearchResults([...searchResults, exercise]);
-  };
+
+  const deletePlan = async () => {
+    Alert.alert(
+      'Delete Plan',
+      'Are you sure you want to delete this plan?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            const { success, message } = await fetchDeletePlan(authenticated, planId);
+            if (!success) {
+              Alert.alert(message);
+            } else {
+              router.back();
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
 
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
+    <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: title === undefined ? 'Exercises' : `${title} Exercises`,
+          headerRight: () => (
+            <TouchableOpacity onPress={() => deletePlan()} style={{ padding: 10 }}>
+              <Text style={{ color: Colors.light.tint }}>Delete</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.light.tint} />
+        </View>
       ) : (
-        <View style={{ flex: 1, width: '100%' }}>
-          <Stack.Screen options={{ headerShown: true, title: `${title} - Exercises` }} />
-          <ScrollView style={{ flex: 1, width: '100%' }}>
+        <View style={styles.contentContainer}>
+          <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
             {exercises.map((ex) => (
-              <View
-                key={ex.plans_exercises.id}
-                style={{ padding: 15, marginBottom: 10, backgroundColor: Colors.light.background, borderRadius: 8 }}
-              >
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{ex.exercises.name}</Text>
-                {
-                  ex.exercises.primarymuscles?.length > 0 && (
-                    <View>
-                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Primary Muscles :</Text>
-                      <Text style={{ fontSize: 16, fontWeight: "500" }}>{ex.exercises.primarymuscles.join(", ")}</Text>
-                    </View>
-                  )
-                }
-                {
-                  ex.exercises.secondarymuscles?.length > 0 && (
-                    <View>
-                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Secondary Muscles :</Text>
-                      <Text style={{ fontSize: 16, fontWeight: "500" }}>{ex.exercises.secondarymuscles.join(", ")}</Text>
-                    </View>
-                  )
-                }
-                {
-                  ex.exercises.equipment && (
-                    <View>
-                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Equipment : </Text>
-                      <Text style={{ fontSize: 16, fontWeight: "500" }}>{ex.exercises.equipment}</Text>
-                    </View>
-                  )
-                }
+              <View key={ex.plans_exercises.id} style={styles.exerciseCard}>
+                <Text style={styles.exerciseTitle}>{ex.exercises.name}</Text>
 
+                {ex.exercises.primarymuscles?.length > 0 && (
+                  <View style={styles.muscleSection}>
+                    <Text style={styles.muscleLabel}>Primary Muscles:</Text>
+                    <Text style={styles.muscleText}>{ex.exercises.primarymuscles.join(", ")}</Text>
+                  </View>
+                )}
+
+                {ex.exercises.secondarymuscles?.length > 0 && (
+                  <View style={styles.muscleSection}>
+                    <Text style={styles.muscleLabel}>Secondary Muscles:</Text>
+                    <Text style={styles.muscleText}>{ex.exercises.secondarymuscles.join(", ")}</Text>
+                  </View>
+                )}
+
+                {ex.exercises.equipment && (
+                  <View style={styles.muscleSection}>
+                    <Text style={styles.muscleLabel}>Equipment:</Text>
+                    <Text style={styles.muscleText}>{ex.exercises.equipment}</Text>
+                  </View>
+                )}
               </View>
             ))}
-            <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={() => setModalVisible(true)}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Add New Exercise</Text>
+
+            <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+              <Text style={styles.addButtonText}>Add New Exercise</Text>
             </TouchableOpacity>
           </ScrollView>
-
-
 
           {/* Modal */}
           <Modal
             isVisible={modalVisible}
             animationIn="slideInUp"
-            animationOut="zoomOut"
+            animationOut="slideOutDown"
             swipeDirection="down"
             onSwipeComplete={() => setModalVisible(false)}
-            style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.05)', }}
+            style={styles.modalContainer}
           >
-            <View style={{ height: "75%", justifyContent: 'center', padding: 20, backgroundColor: Colors.light.background, borderRadius: 10 }}>
-              <Text style={{ fontSize: 20 }}>Search Exercise</Text>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Search Exercise</Text>
+              </View>
+
               <TextInput
                 value={searchQuery}
                 onChangeText={(text) => {
@@ -183,120 +208,38 @@ const Exercises = () => {
                   handleSearchExercise(text);
                 }}
                 placeholder="Search for exercises"
-                style={{
-                  height: 40,
-                  borderColor: '#ccc',
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  marginVertical: 10,
-                  paddingHorizontal: 10,
-                }}
+                style={styles.searchInput}
+                placeholderTextColor="#999"
               />
 
+              {count > 0 && (
+                <Text style={styles.countText}>Found Exercises Count: {count}</Text>
+              )}
 
-
-              {/* Search Results */}
-              {
-                count > 0 && (
-                  <Text>Found Exercises Count : {count}</Text>
-                )
-              }
-
-              <ScrollView style={{ flex: 1, marginVertical: 10 }}>
+              <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
                 {searchResults && searchResults.map((exercise) => (
-                  <View>
-                    <TouchableOpacity
-                      key={exercise.id}
-                      style={{
-                        padding: 10,
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#eee',
-                        backgroundColor: selectedExercises.some(e => e.id === exercise.id) ? '#e6f7ff' : 'transparent'
-                      }}
-                      onPress={() => handleSelectExercise(exercise)}
-                    >
-                      <Text>{exercise.name}</Text>
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    key={exercise.id}
+                    style={styles.searchResultItem}
+                    onPress={() => handleSelectExercise(exercise)}
+                  >
+                    <Text style={styles.searchResultText}>{exercise.name}</Text>
+                  </TouchableOpacity>
                 ))}
 
-                {/* Selected Exercises */}
-                {
-                  selectedExercises.length > 0 && (
-                    <View style={{ marginVertical: 10 }}>
-                      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Selected Exercises:</Text>
-                      {selectedExercises.map((exercise) => (
-                        <TouchableOpacity onPress={() => handleDeleteExercise(exercise)}>
-                          <View key={exercise.id} style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
-                            <Text>{exercise.name}</Text>
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  )
-                }
-
-
-                < TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.light.tint,
-                    borderRadius: 8,
-                    padding: 16,
-                    marginHorizontal: 16,
-                    marginTop: 16,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 2,
-                  }}
+                <TouchableOpacity
+                  style={[styles.modalButton, limit >= count && styles.disabledButton]}
                   disabled={limit >= count}
-                  onPress={() => {
-                    handleLimitChanged(limit + 5)
-                  }}>
-                  <Text>Load More</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.light.tint,
-                    borderRadius: 8,
-                    padding: 16,
-                    marginHorizontal: 16,
-                    marginTop: 16,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 2,
-                  }}
-                  onPress={handleAddSelectedExercises}
+                  onPress={() => handleLimitChanged(limit + 5)}
                 >
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Add Selected Exercises</Text>
+                  <Text style={styles.modalButtonText}>Load More</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.light.tint,
-                    borderRadius: 8,
-                    padding: 16,
-                    marginHorizontal: 16,
-                    marginTop: 16,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 2,
-                  }}
+                  style={[styles.modalButton, styles.cancelButton]}
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Cancel</Text>
+                  <Text style={styles.modalButtonText}>Cancel</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
@@ -306,5 +249,159 @@ const Exercises = () => {
     </View>
   );
 };
-``
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.light.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  exerciseCard: {
+    backgroundColor: Colors.light.background,
+    borderRadius: 12,
+    padding: 20,
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  exerciseTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: Colors.light.text,
+    letterSpacing: 0.3,
+    marginBottom: 12,
+  },
+  muscleSection: {
+    marginVertical: 6,
+  },
+  muscleLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.light.text,
+    marginBottom: 4,
+  },
+  muscleText: {
+    fontSize: 15,
+    fontWeight: "400",
+    color: '#666',
+    lineHeight: 20,
+  },
+  addButton: {
+    backgroundColor: Colors.light.tint,
+    borderRadius: 12,
+    padding: 20,
+    marginVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  addButtonText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.3,
+  },
+  modalContainer: {
+    margin: 0,
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: Colors.light.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '85%',
+    minHeight: '75%',
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.light.text,
+    letterSpacing: 0.3,
+  },
+  searchInput: {
+    height: 50,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderWidth: 1,
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    backgroundColor: '#f8f9fa',
+  },
+  countText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+    fontWeight: '500',
+  },
+  modalScrollView: {
+    flex: 1,
+  },
+  searchResultItem: {
+    padding: 16,
+    borderRadius: 8,
+    marginVertical: 4,
+    backgroundColor: '#f8f9fa',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  searchResultText: {
+    fontSize: 16,
+    color: Colors.light.text,
+    fontWeight: '500',
+  },
+  modalButton: {
+    backgroundColor: Colors.light.tint,
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
+  },
+  cancelButton: {
+    backgroundColor: '#6c757d',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.3,
+  },
+});
+
 export default Exercises;

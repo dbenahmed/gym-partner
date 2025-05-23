@@ -1,376 +1,638 @@
-import { View, Text, StyleSheet, TouchableOpacity, Pressable, Modal, TextInput, ActivityIndicator, MaterialIcons } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, Modal, TextInput, ActivityIndicator } from "react-native";
 import React from "react";
 import Color from "@/constants/Colors.ts";
 import { router } from "expo-router";
 import { useState } from "react";
 
-
-export default function Meal({ data, onDlate, onUpdate }) {
-  console.log(data)
+export default function Meal({ data, onDelete, onUpdate }) {
+  console.log(data);
 
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [updatedServingSize, setUpdatedServingSize] = useState(data.servingsizeG.toString());
   const [updateLoading, setUpdateLoading] = useState(false);
-
   const [deleting, setDeleting] = useState(false);
 
   const handleUpdateMeal = () => {
+    const newServingSize = parseFloat(updatedServingSize);
 
-    if (isNaN(parseInt(updatedServingSize)) || updatedServingSize <= 0) {
+    if (isNaN(newServingSize) || newServingSize <= 0) {
       alert("Please enter a valid serving size.");
       return;
     }
-    if (parseInt(updatedServingSize) === data.servingsizeG) {
+    if (newServingSize === data.servingsizeG) {
       alert("No changes made to the serving size.");
       setUpdateModalVisible(false);
       return;
     }
-    if (parseInt(updatedServingSize) > 1000) {
+    if (newServingSize > 1000) {
       alert("Serving size cannot exceed 1000g.");
       return;
     }
-    if (parseInt(updatedServingSize) < 1) {
+    if (newServingSize < 1) {
       alert("Serving size cannot be less than 1g.");
       return;
     }
 
     setUpdateLoading(true);
     onUpdate(data.id, {
-      servingsizeG: parseFloat(updatedServingSize),
+      servingsizeG: newServingSize,
     }).finally(() => {
       setUpdateLoading(false);
       setUpdateModalVisible(false);
     });
   };
 
+  const handleDelete = () => {
+    setDeleting(true);
+    onDelete(data.id)
+      .then(() => setDeleting(false))
+      .catch((err) => {
+        console.log(err);
+        setDeleting(false);
+      });
+  };
+
+  const calculateNutrient = (valuePer100g, servingSize) => {
+    return ((valuePer100g * servingSize) / 100).toFixed(1);
+  };
+
+  const calculateCalories = (caloriesPer100g, servingSize) => {
+    return Math.round((caloriesPer100g * servingSize) / 100);
+  };
 
   if (deleting) {
     return (
-      <View style={style.parent}>
+      <View style={[styles.parent, styles.loadingContainer]}>
         <ActivityIndicator size="small" color={Color.light.tint} />
+        <Text style={styles.loadingText}>Deleting...</Text>
       </View>
     );
   }
 
-
   return (
-    <View style={style.parent}>
+    <>
+      {/* Update Modal */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={updateModalVisible}
         onRequestClose={() => setUpdateModalVisible(false)}
       >
-        <View style={style.modalBackground}>
-          <View style={style.modeleContent}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Text style={{ fontWeight: "800", fontSize: 19, color: Color.light.text }}>
-                {data.food.foodname}
-              </Text>
-              <TouchableOpacity onPress={() => setUpdateModalVisible(false)}>
-                <Text style={{ fontSize: 24, color: Color.light.tint }}>×</Text>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <View style={styles.modalTitleContainer}>
+                <Text style={styles.modalTitle} numberOfLines={2}>
+                  {data.food.foodname}
+                </Text>
+                <Text style={styles.modalSubtitle}>Update Serving Size</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setUpdateModalVisible(false)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={styles.closeButtonText}>×</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: Color.light.tintLighter,
-              padding: 10,
-              borderRadius: 8,
-              marginBottom: 16
-            }}>
-              <Text style={{ color: '#000000', fontSize: 12, fontWeight: '400' }}>
-                {data.food.description || 'No description available'}
-              </Text>
-            </View>
+            {/* Food Description */}
+            {data.food.description && (
+              <View style={styles.descriptionContainer}>
+                <Text style={styles.descriptionText}>
+                  {data.food.description}
+                </Text>
+              </View>
+            )}
 
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 16,
-              justifyContent: 'space-between'
-            }}>
-              <Text style={{ fontWeight: '600', color: '#000000', fontSize: 13 }}>
-                Serving Size (g):
-              </Text>
+            {/* Serving Size Input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Serving Size (g):</Text>
               <TextInput
-                style={{
-                  borderWidth: 0.7,
-                  borderColor: Color.light.tint,
-                  borderRadius: 8,
-                  padding: 10,
-                  color: Color.light.text,
-                  backgroundColor: 'transparent',
-                  placeholderTextColor: 'rgba(0, 0, 0, 0.5)',
-                  width: '50%',
-                  marginLeft: 10
-                }}
+                style={styles.textInput}
                 placeholder="Enter serving size"
                 keyboardType="numeric"
                 value={updatedServingSize}
-                onChangeText={(value) => setUpdatedServingSize(value)}
+                onChangeText={setUpdatedServingSize}
+                selectTextOnFocus
               />
             </View>
 
-            <Text style={{ fontWeight: "700", fontSize: 16, color: '#000000', marginBottom: 12 }}>
-              Nutrition Facts (per 100g)
-            </Text>
+            {/* Nutrition Preview */}
+            <View style={styles.nutritionPreviewContainer}>
+              <Text style={styles.nutritionPreviewTitle}>
+                Nutrition Preview
+              </Text>
 
-            <View style={{
-              backgroundColor: 'white',
-              borderRadius: 10,
-              padding: 14,
-              marginBottom: 16,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.1,
-              shadowRadius: 2,
-              elevation: 2,
-            }}>
-              <View style={{ marginBottom: 6 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <Text style={{ fontWeight: '700', color: '#000000', fontSize: 13, width: '33%' }}>Nutrient</Text>
-                  <Text style={{ fontWeight: '700', color: '#666666', fontSize: 13, width: '33%', textAlign: 'center' }}>Per 100g</Text>
-                  <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 13, width: '33%', textAlign: 'right' }}>Total</Text>
+              <View style={styles.nutritionTable}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Nutrient</Text>
+                  <Text style={styles.tableHeaderText}>Per 100g</Text>
+                  <Text style={[styles.tableHeaderText, styles.totalColumn]}>Total</Text>
                 </View>
 
-                <View style={{ height: 1, backgroundColor: '#e0e0e0', marginVertical: 4 }} />
+                <View style={styles.tableDivider} />
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
-                  <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Calories</Text>
-                  <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
-                    {data.food.calories} kcal
-                  </Text>
-                  <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
-                    {updatedServingSize ? Math.round((data.food.calories * updatedServingSize) / 100) : 0} kcal
-                  </Text>
-                </View>
-
-                <View style={{ height: 1, backgroundColor: '#f0f0f0', marginVertical: 3 }} />
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
-                  <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Protein</Text>
-                  <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
-                    {data.food.proteinper100g}g
-                  </Text>
-                  <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
-                    {updatedServingSize ? ((data.food.proteinper100g * updatedServingSize) / 100).toFixed(1) : 0}g
-                  </Text>
-                </View>
-
-                <View style={{ height: 1, backgroundColor: '#f0f0f0', marginVertical: 3 }} />
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
-                  <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Carbs</Text>
-                  <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
-                    {data.food.carbohydratesper100g}g
-                  </Text>
-                  <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
-                    {updatedServingSize ? ((data.food.carbohydratesper100g * updatedServingSize) / 100).toFixed(1) : 0}g
-                  </Text>
-                </View>
-
-                <View style={{ height: 1, backgroundColor: '#f0f0f0', marginVertical: 3 }} />
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 3 }}>
-                  <Text style={{ fontWeight: '500', color: '#000000', fontSize: 12, width: '33%' }}>Fat</Text>
-                  <Text style={{ fontWeight: '600', color: '#666666', fontSize: 12, width: '33%', textAlign: 'center' }}>
-                    {data.food.fatper100g}g
-                  </Text>
-                  <Text style={{ fontWeight: '700', color: Color.light.tint, fontSize: 12, width: '33%', textAlign: 'right' }}>
-                    {updatedServingSize ? ((data.food.fatper100g * updatedServingSize) / 100).toFixed(1) : 0}g
-                  </Text>
-                </View>
+                {[
+                  {
+                    name: 'Calories',
+                    per100g: `${data.food.calories} kcal`,
+                    total: `${updatedServingSize ? calculateCalories(data.food.calories, updatedServingSize) : 0} kcal`
+                  },
+                  {
+                    name: 'Protein',
+                    per100g: `${data.food.proteinper100g}g`,
+                    total: `${updatedServingSize ? calculateNutrient(data.food.proteinper100g, updatedServingSize) : 0}g`
+                  },
+                  {
+                    name: 'Carbs',
+                    per100g: `${data.food.carbohydratesper100g}g`,
+                    total: `${updatedServingSize ? calculateNutrient(data.food.carbohydratesper100g, updatedServingSize) : 0}g`
+                  },
+                  {
+                    name: 'Fat',
+                    per100g: `${data.food.fatper100g}g`,
+                    total: `${updatedServingSize ? calculateNutrient(data.food.fatper100g, updatedServingSize) : 0}g`
+                  }
+                ].map((nutrient, index) => (
+                  <View key={nutrient.name}>
+                    <View style={styles.tableRow}>
+                      <Text style={styles.tableCell}>{nutrient.name}</Text>
+                      <Text style={styles.tableCellCenter}>{nutrient.per100g}</Text>
+                      <Text style={[styles.tableCellRight, styles.totalValue]}>
+                        {nutrient.total}
+                      </Text>
+                    </View>
+                    {index < 3 && <View style={styles.tableRowDivider} />}
+                  </View>
+                ))}
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: Color.light.tint,
-                  padding: 10,
-                  borderRadius: 6,
-                  width: '100%',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                }}
-                onPress={handleUpdateMeal}
-              >
-                <Text style={{
-                  color: Color.light.background,
-                  fontWeight: '600',
-                  fontSize: 14,
-                  marginLeft: 6
-                }}>
-                  {!updateLoading ? "Update Meal" : "Updating..."}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {updateLoading && (
-              <View style={{ marginTop: 16, alignItems: 'center' }}>
-                <ActivityIndicator size="small" color={Color.light.tint} />
-              </View>
-            )}
+            {/* Update Button */}
+            <TouchableOpacity
+              style={[styles.updateButton, updateLoading && styles.updateButtonDisabled]}
+              onPress={handleUpdateMeal}
+              disabled={updateLoading}
+            >
+              {updateLoading ? (
+                <ActivityIndicator size="small" color={Color.light.background} />
+              ) : (
+                <Text style={styles.updateButtonText}>Update Meal</Text>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
+      {/* Main Meal Card */}
+      <View style={styles.parent}>
+        {/* Delete Button */}
+        <Pressable
+          style={styles.deleteButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          onPress={handleDelete}
+        >
+          <Text style={styles.deleteButtonText}>×</Text>
+        </Pressable>
 
-
-
-
-
-      <Text style={{ color: Color.light.text, fontSize: 20, fontWeight: 'bold' }}>{data.food.foodname}</Text>
-      <Text style={{ color: Color.light.text, fontSize: 13, fontWeight: "700", paddingBottom: 10 }}>{data.food.description}</Text>
-      <View style={{ gap: 0, color: Color.light.text }}>
-        <View style={style.nutritionContainer}>
-          <View style={style.nutritionCard}>
-            <Text style={style.nutritionLabel}>Calories</Text>
-            <Text style={style.nutritionValue}>{Math.round(data.food.calories * (data.servingsizeG / 100))} Cal</Text>
-          </View>
-          <View style={style.nutritionCard}>
-            <Text style={style.nutritionLabel}>Protein</Text>
-            <Text style={style.nutritionValue}>{Math.round(data.food.proteinper100g * (data.servingsizeG / 100))}g</Text>
-          </View>
-          <View style={style.nutritionCard}>
-            <Text style={style.nutritionLabel}>Fat</Text>
-            <Text style={style.nutritionValue}>{Math.round(data.food.fatper100g * (data.servingsizeG / 100))}g</Text>
-          </View>
-          <View style={style.nutritionCard}>
-            <Text style={style.nutritionLabel}>Carbs</Text>
-            <Text style={style.nutritionValue}>{Math.round(data.food.carbohydratesper100g * (data.servingsizeG / 100))}g</Text>
-          </View>
+        {/* Food Info */}
+        <View style={styles.foodInfo}>
+          <Text style={styles.foodName} numberOfLines={2}>
+            {data.food.foodname}
+          </Text>
+          {data.food.description && (
+            <Text style={styles.foodDescription} numberOfLines={2}>
+              {data.food.description}
+            </Text>
+          )}
+          <Text style={styles.servingSize}>
+            Serving: {data.servingsizeG}g
+          </Text>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+        {/* Nutrition Cards */}
+        <View style={styles.nutritionContainer}>
+          {[
+            {
+              label: 'Protein',
+              value: `${calculateNutrient(data.food.proteinper100g, data.servingsizeG)}`,
+              unit: 'g',
+              color: '#4ECDC4'
+            },
+            {
+              label: 'Calories',
+              value: `${calculateCalories(data.food.calories, data.servingsizeG)}`,
+              unit: 'Cal',
+              color: '#FF6B6B'
+            },
+            
+            {
+              label: 'Carbs',
+              value: `${calculateNutrient(data.food.carbohydratesper100g, data.servingsizeG)}`,
+              unit: 'g',
+              color: '#45B7D1'
+            },
+            {
+              label: 'Fat',
+              value: `${calculateNutrient(data.food.fatper100g, data.servingsizeG)}`,
+              unit: 'g',
+              color: '#FFA07A'
+            }
+          ].map((nutrition) => (
+            <View key={nutrition.label} style={[styles.nutritionCard, { backgroundColor: nutrition.color }]}>
+              <Text style={styles.nutritionLabel}>{nutrition.label}</Text>
+              <Text style={styles.nutritionValue}>
+                {nutrition.value}
+                <Text style={styles.nutritionUnit}>{nutrition.unit}</Text>
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={[style.detailButton, { flex: 1, marginRight: 5 }]}
+            style={[styles.actionButton, styles.detailButton]}
             onPress={() => {
-              router.push(`/Explore/meals/${data.food.id}`);
+              router.push(`/Explore/`)
+              router.push(`/Explore/meals/${data.food.id}`)
             }}
           >
-            <Text style={style.detailButtonText}>Show Detailed Food Info</Text>
+            <Text style={styles.actionButtonText}>View Details</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-            style={[style.detailButton, { flex: 1, marginLeft: 5 }]}
-            onPress={() => {
-              setUpdateModalVisible(true)
-            }}
+            style={[styles.actionButton, styles.updateMealButton]}
+            onPress={() => setUpdateModalVisible(true)}
           >
-            <Text style={style.detailButtonText}>Update Meal Data</Text>
+            <Text style={styles.updateMealButtonText}>Update</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <Pressable
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        onPress={() => {
-          console.log('data', data)
-          setDeleting(true)
-          onDlate(data.id)
-            .then(() => {
-              setDeleting(false)
-            })
-            .catch((err) => {
-              console.log(err)
-              setDeleting(false)
-            })
-        }} style={{ position: 'absolute', top: 5, right: 10 }}>
-        <Text style={{ color: 'red', fontWeight: '900', fontSize: 15 }}>X</Text>
-      </Pressable>
-    </View >
+    </>
   );
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   parent: {
     backgroundColor: Color.light.background,
-    marginVertical: 10,
-    marginHorizontal: 30,
-    padding: 15,
-    borderRadius: 10,
-    position: 'relative',
+    marginVertical: 8,
+    marginHorizontal: 16,
+    padding: 16,
+    borderRadius: 12,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    position: 'relative',
   },
-  child: {
+
+  loadingContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 80,
   },
+
+  loadingText: {
+    marginLeft: 8,
+    color: Color.light.text,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+  deleteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+
+  deleteButtonText: {
+    color: '#FF4757',
+    fontSize: 18,
+    fontWeight: '600',
+    lineHeight: 18,
+  },
+
+  foodInfo: {
+    marginBottom: 16,
+    paddingRight: 32,
+  },
+
+  foodName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Color.light.text,
+    marginBottom: 4,
+    lineHeight: 24,
+  },
+
+  foodDescription: {
+    fontSize: 13,
+    color: Color.light.text,
+    opacity: 0.7,
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+
+  servingSize: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Color.light.tint,
+    backgroundColor: Color.light.tintLighter || 'rgba(0, 0, 0, 0.05)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+
   nutritionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginBottom: 16,
+    gap: 8,
   },
+
   nutritionCard: {
-    backgroundColor: Color.light.tint,
-    borderRadius: 8,
-    padding: 8,
-    minWidth: 70,
+    flex: 1,
+    borderRadius: 10,
+    padding: 12,
     alignItems: 'center',
+    minHeight: 60,
+    justifyContent: 'center',
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
+
   nutritionLabel: {
-    color: Color.light.background,
-    fontSize: 12,
+    color: 'white',
+    fontSize: 11,
     fontWeight: '600',
     marginBottom: 4,
+    textAlign: 'center',
   },
+
   nutritionValue: {
-    color: Color.light.background,
+    color: 'white',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    textAlign: 'center',
   },
-  detailButton: {
-    backgroundColor: Color.light.background,
+
+  nutritionUnit: {
+    fontSize: 10,
+    fontWeight: '500',
+  },
+
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+
+  actionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    padding: 10,
-    marginTop: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2
   },
-  detailButtonText: {
+
+  detailButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Color.light.tint,
+  },
+
+  updateMealButton: {
+    backgroundColor: Color.light.tint,
+  },
+
+  actionButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
     color: Color.light.tint,
-    fontSize: 10,
-    fontWeight: 'bold',
   },
+  updateMealButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Color.light.background,
+
+  },
+
+  // Modal Styles
   modalBackground: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
-  modeleContent: {
-    width: '90%',
+
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
     backgroundColor: Color.light.background,
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 20,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  }
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+
+  modalTitleContainer: {
+    flex: 1,
+    paddingRight: 16,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Color.light.text,
+    marginBottom: 4,
+    lineHeight: 24,
+  },
+
+  modalSubtitle: {
+    fontSize: 14,
+    color: Color.light.text,
+    opacity: 0.7,
+    fontWeight: '500',
+  },
+
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  closeButtonText: {
+    fontSize: 24,
+    color: Color.light.text,
+    fontWeight: '300',
+    lineHeight: 24,
+  },
+
+  descriptionContainer: {
+    backgroundColor: Color.light.tintLighter || 'rgba(0, 0, 0, 0.05)',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+
+  descriptionText: {
+    fontSize: 12,
+    color: Color.light.text,
+    opacity: 0.8,
+    lineHeight: 16,
+  },
+
+  inputContainer: {
+    marginBottom: 20,
+  },
+
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Color.light.text,
+    marginBottom: 8,
+  },
+
+  textInput: {
+    borderWidth: 1,
+    borderColor: Color.light.tint,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: Color.light.text,
+    backgroundColor: 'transparent',
+  },
+
+  nutritionPreviewContainer: {
+    marginBottom: 20,
+  },
+
+  nutritionPreviewTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Color.light.text,
+    marginBottom: 12,
+  },
+
+  nutritionTable: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  tableHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+
+  tableHeaderText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#666666',
+    flex: 1,
+    textAlign: 'left',
+  },
+
+  totalColumn: {
+    textAlign: 'right',
+    color: Color.light.tint,
+  },
+
+  tableDivider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 8,
+  },
+
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+  },
+
+  tableRowDivider: {
+    height: 1,
+    backgroundColor: '#f5f5f5',
+    marginVertical: 2,
+  },
+
+  tableCell: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Color.light.text,
+    flex: 1,
+  },
+
+  tableCellCenter: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#666666',
+    flex: 1,
+    textAlign: 'center',
+  },
+
+  tableCellRight: {
+    fontSize: 12,
+    flex: 1,
+    textAlign: 'right',
+  },
+
+  totalValue: {
+    fontWeight: '700',
+    color: Color.light.tint,
+  },
+
+  updateButton: {
+    backgroundColor: Color.light.tint,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  updateButtonDisabled: {
+    opacity: 0.7,
+  },
+
+  updateButtonText: {
+    color: Color.light.background,
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

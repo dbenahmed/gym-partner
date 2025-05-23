@@ -29,10 +29,10 @@ export const AuthProvider = ({ children }) => {
 
 
 
-    const register = async (username, password) => {
+    const register = async (username, password, firstname, lastname) => {
         try {
             const { data, headers } = await axios.post(`${defaultUrl}/auth/register`, {
-                username, password
+                username, password, firstname, lastname
             })
             if (data.success) {
                 return {
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
                     await SecureStore.setItemAsync('user-id', JSON.stringify(data.data.id));
                     await SecureStore.setItemAsync('access-token', data.data.accessToken);
                 }
-                console.log('settings user id to ',data.data.id)
+                console.log('settings user id to ', data.data.id)
                 setUserId(data.data.id)
                 setAuthenticated(data.data.accessToken);
                 return {
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }) => {
             console.log('data', data)
             if (data.success) {
                 let userId = await parseInt(await SecureStore.getItemAsync('user-id'));
-                console.log('validation',userId)
+                console.log('validation', userId)
                 setUserId(userId);
                 setAuthenticated(token);
                 return {

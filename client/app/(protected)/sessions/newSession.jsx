@@ -152,7 +152,7 @@ export default function StartSession() {
             }
             console.log('Session saved successfully');
             console.log(data);
-            router.push('/sessions');
+            router.back()
         }
         io().finally(() => {
             setLoading(false);

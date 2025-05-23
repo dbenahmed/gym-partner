@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ActivityIndicator, TouchableOpacity, Modal, TextInput, StyleSheet, FlatList, Alert } from 'react-native';
 import useAuth from '@/app/contex/authcontex';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { validateName } from '@/utils/validation';
+import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises, fetchDeleteCollection } from '@/lib/api'; // Replace with real path
 
 
 import { fetchGetUserPlans, fetchCreatePlan } from '@/lib/api';
@@ -24,18 +25,21 @@ const Plans = () => {
     if (success) {
       setPlans(plans);
     } else {
-      alert(message);
+      Alert.alert(message);
     }
   };
-  useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      await fetchPlans();
-      setLoading(false);
-    }
-    run();
-  }, [collectionId]); // Refetch plans when collectionId changes
+  const run = async () => {
+    setLoading(true);
+    await fetchPlans();
+    setLoading(false);
+  }
 
+
+  useFocusEffect(
+    useCallback(() => {
+      run()
+    }, [])
+  );
   const handlePlanPress = (plan) => {
     // Navigate to the specific plan's page
     router.push({
@@ -55,7 +59,7 @@ const Plans = () => {
   const handleCreatePlan = async () => {
 
     if (validateName(addPlanTitle).success === false) {
-      alert( validateName(addPlanTitle).message);
+      Alert.alert(validateName(addPlanTitle).message);
       return;
     }
 
@@ -63,7 +67,7 @@ const Plans = () => {
       // Make request to create a new plan
       const { data, success, message } = await fetchCreatePlan(authenticated, { collectionId, title: addPlanTitle });
       if (!success) {
-        alert(message);
+        Alert.alert(message);
       } else {
         setModalVisible(false); // Close the modal after creating the plan
         setLoading(true);
@@ -73,62 +77,85 @@ const Plans = () => {
         setLoading(false);
       }
     } else {
-      alert('Please enter a plan title');
+      Alert.alert('Please enter a plan title');
     }
   };
 
+
+  const deleteCollection = async (collectionId) => {
+    Alert.alert(
+      'Delete Collection',
+      'Are you sure you want to delete this collection?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            console.log("running")
+            // Call your delete collection API here
+            const { success, message } = await fetchDeleteCollection(authenticated, collectionId);
+            console.log('Delete collection response:', success, message);
+            if (success) {
+              router.back();
+              // Optionally, you can show a success message or refresh the collection list
+            } else {
+              Alert.alert(message);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
   return (
-    <View style={{ padding: 20, height: '100%' }}>
+    <View style={{ height: '100%' }}>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: title === undefined ? 'Plan' : title,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => deleteCollection(collectionId)}
+              style={{ padding: 10 }}
+            >
+              <Text style={{ color: Colors.light.tint }}>Delete</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <View style={{ height: '100%' }}>
-          <Stack.Screen
-            options={{
-              headerShown: true,
-              title: title,
-            }}
-          />
+        <View style={{ height: '100%', paddingVertical: 16, paddingHorizontal: 16 }}>
+
           <View style={{ marginVertical: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Description</Text>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.text }}>Description</Text>
             <Text>{description}</Text>
           </View>
 
           {/* <Text style={{ marginVertical: 10, fontSize: 18, fontWeight: 'bold' }}>Plans:</Text> */}
-          <View style={{ marginVertical: 10, flex: 1 }}>
-            {plans.map((plan) => (
+          <FlatList
+            style={styles.listContainer}
+            data={plans}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                key={plan.id}
-                onPress={() => handlePlanPress(plan)}
-                style={{
-                  padding: 15,
-                  marginBottom: 10,
-                  backgroundColor: Colors.light.background,
-                  borderColor: "black",
-                  borderWidth: 1,
-                  borderRadius: 12,
-                }}
+                style={styles.planItem}
+                onPress={() => handlePlanPress(item)}
+                activeOpacity={0.7}
               >
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{plan.title}</Text>
+                <Text style={styles.planTitle}>{item.title}</Text>
               </TouchableOpacity>
-            ))}
-          </View>
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 10 }}
+          />
 
-          <TouchableOpacity style={{
-            backgroundColor: Colors.light.tint,
-            borderRadius: 8,
-            padding: 16,
-            marginHorizontal: 16,
-            marginTop: 16,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 2,
-          }} onPress={() => setModalVisible(true)}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.background }}>Add New Plan</Text>
+          <TouchableOpacity style={styles.buttonContainer} onPress={() => setModalVisible(true)}>
+            <Text style={styles.buttonText}>Add New Plan</Text>
           </TouchableOpacity>
 
           {/* Modal for creating a new plan */}
@@ -167,3 +194,48 @@ const Plans = () => {
 };
 
 export default Plans;
+
+
+const styles = StyleSheet.create({
+  listContainer: {
+    flex: 1,
+  },
+  planItem: {
+    backgroundColor: Colors.light.background,
+    borderRadius: 12,
+    padding: 20,
+
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  planTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: Colors.light.text,
+    letterSpacing: 0.3,
+  },
+  buttonContainer: {
+    backgroundColor: Colors.light.tint,
+    borderRadius: 8,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+});

@@ -12,7 +12,7 @@ dotenv.config();
 
 //the registration controller 
 export const registerUser = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, firstname, lastname } = req.body;
   // checkinng if the user is already exist
   const existUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
   if (existUser.length > 0) {
@@ -30,6 +30,8 @@ export const registerUser = async (req, res) => {
     await db.insert(users).values({
       username: username,
       password: hashedPassword,
+      firstname: firstname,
+      lastname: lastname,
       salt: "nosaltcurrently"
     })
     res.status(201).send({

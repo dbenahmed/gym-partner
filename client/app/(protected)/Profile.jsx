@@ -1,431 +1,302 @@
 import {
-  Image,
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
   TextInput,
-  Pressable,
-  ScrollView,
   Modal,
-  FlatList,
   Alert,
-  Button,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useState, useContext } from "react";
 import Color from "@/constants/Colors.ts";
-import { useContext } from "react";
 import { AuthContext } from "../contex/authcontex";
+import { defaultUrl } from "@/constants/constants.ts";
+import { validateEmail, validateUsername, validateName } from "@/utils/validation.ts";
+import SplashScreen from "@/components/SplashScreen";
+
+
+
 
 export default function Profile() {
-  const { logout } = useContext(AuthContext);
 
-  const modification = () => {
-    if (username.length == 0 || email.length == 0 || fullName.length == 0 || phone.length == 0 || address.length == 0 || height.length == 0 || weight.length == 0) {
-      Alert.alert('there empty input')
-    } else {
-      setVisible(false);
-      setUserInfo({
-        username: username,
-        email: email,
-        fullName: fullName,
-        phone: phone,
-        address: address,
-        height: height,
-        weight: weight,
-        avatarUrl: `https://robohash.org/${username}.png`,
-      })
-    }
-  }
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [loadingSaving, setLoadingSaving] = useState(false);
+
+  const { logout } = useContext(AuthContext);
+  const { authenticated, userId } = useAuth();
 
   const [userInfo, setUserInfo] = useState({
-    username: "JohnDoe",
-    email: "johndoe@example.com",
-    fullName: "John Doe",
-    phone: "123456789",
-    address: "123 Main St, City, Country",
-    bio: "Fitness enthusiast and bodybuilder.",
-    avatarUrl: "https://robohash.org/lf.png",
-    height: "180 cm", // User height
-    weight: "75 kg", // User weight});
+    username: "",
+    firstName: "",
+    lastName: "",
   });
 
-  const [vatarUrl, setvatarUrl] = useState("https://robohash.org/lf.png");
+
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`${defaultUrl}/auth/me`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authenticated}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+        console.log('here')
+        const { success, data, message } = await response.json();
+        if (success) {
+          console.log("data", data)
+          setUserInfo({
+            username: data.username,
+            firstName: data.firstname,
+            lastName: data.lastname,
+          });
+        } else {
+          Alert.alert("Error", message);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        setError(error);
+        // Handle error (e.g., show an alert or set an error state)
+        Alert.alert("Error", "Failed to fetch user profile");
+        setLoading(false);
+      }
+    };
+    // Fetch user profile data
+    fetchUserProfile();
+  }, []);
+
+
+
   const [visible, setVisible] = useState(false);
-  const [username, setusername] = useState("JohnDoe");
-  const [fullName, setfullName] = useState("John Doe");
-  const [email, setemail] = useState("johndoe@example.com");
-  const [phone, setphone] = useState("123456789");
-  const [address, setaddress] = useState("123 Main St, City, Country");
-  const [weight, setweight] = useState("75 kg");
-  const [height, setheight] = useState("180 cm");
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  const handleSaveChanges = async () => {
+    try {
+      setLoadingSaving(true);
+      if (!validateUsername(username).success || !validateName(firstName).success || !validateName(lastName).success) {
+        Alert.alert("Error", "Please enter valid information");
+        return;
+      }
+
+
+      const response = await fetch(`${defaultUrl}/auth/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authenticated}`,
+        },
+        body: JSON.stringify({
+          username,
+          firstname: firstName,
+          lastname: lastName,
+        }),
+      });
+
+      if (!response.ok) {
+        Alert.alert("Error", "Failed to update profile");
+        return;
+      }
+      const { success, message } = await response.json();
+      if (!success) {
+        Alert.alert("Error", message);
+        return;
+      }
+
+      Alert.alert("Success", "Profile updated successfully");
+      // Update the userInfo state with the new values
+      setUserInfo({
+        username: username.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      });
+      setVisible(false);
+    } finally {
+      setLoadingSaving(false);
+    }
+  };
+
+  const openEditModal = () => {
+    setUsername(userInfo.username);
+    setFirstName(userInfo.firstName);
+    setLastName(userInfo.lastName);
+    setVisible(true);
+  };
+
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <SplashScreen />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: Color.light.tint, fontSize: 20 }}>Error</Text>
+        <Text style={{ color: Color.light.tint, fontSize: 20 }}>{error.message}</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+        <Text style={{ color: Color.light.tint, fontSize: 20 }}>Please try again later</Text>
+        <Text style={{ color: Color.light.tint, fontSize: 20 }}>Or contact support</Text>
+      </View>
+    );
+  }
+
   return (
     <>
-      <View
-        style={{
-          flexDirection: "column",
-          alignItems: "center",
-          height: "100%",
-          position: "relative",
-        }}
-      >
-        <View style={styles.avatarpare}>
-          <Image
-            source={{ uri: userInfo.avatarUrl }}
-            style={{ width: "100%", height: "100%", resizeMode: "cover" }}
-          />
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profile</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </View>
-        <Text
-          style={{
-            fontSize: 30,
-            color: Color.light.tint,
-            fontWeight: "900",
-            letterSpacing: 2,
-            marginTop: 30,
-          }}
-        >
-          {fullName} Profile
-        </Text>
-        <View
-          style={{
-            backgroundColor: Color.light.tint,
-            width: "100%",
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            height: "100%",
-          }}
-        >
-          <Text
-            style={{
-              color: Color.light.background,
-              textAlign: "center",
-              margin: 10,
-              fontSize: 40,
-              fontWeight: "500",
-              borderBottomWidth: 2,
-              borderColor: Color.light.background,
-            }}
-          >
-            {" "}
-            user info
+
+        {/* Profile Card */}
+        <View style={styles.profileCard}>
+          {/*  <View style={styles.userInitials}>
+            <Text style={styles.initialsText}>
+              {userInfo.firstName ? userInfo.firstName : ""} {userInfo.lastName ? userInfo.lastName : ""}
+            </Text>
+          </View> */}
+
+          <Text style={styles.userName}>
+            {userInfo.firstName || userInfo.lastName ? `${userInfo.firstName} ${userInfo.lastName}` : "User"}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              margin: 10,
-              gap: 40,
-              marginTop: 20,
-            }}
-          >
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 18,
-                fontWeight: "500",
-                letterSpacing: 1,
-                padding: 12,
-              }}
-            >
-              USER NANE :
-            </Text>
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-              }}
-            >
-              {userInfo.username}
-            </Text>
+          <Text style={styles.userHandle}>@{userInfo.username}</Text>
+
+          <View style={styles.infoSection}>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Username</Text>
+              <Text style={styles.infoValue}>{userInfo.username}</Text>
+            </View>
+            {/* 
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>First Name</Text>
+              <Text style={styles.infoValue}>{userInfo.firstName}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Last Name</Text>
+              <Text style={styles.infoValue}>{userInfo.lastName}</Text>
+            </View>
+ */}
+            {/* <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Email</Text>
+              <Text style={styles.infoValue}>{userInfo.email ? userInfo.email : "None"}</Text>
+            </View>
+            */}
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              margin: 10,
-              gap: 40,
-            }}
-          >
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 18,
-                fontWeight: "500",
-                letterSpacing: 1,
-                padding: 10,
-              }}
-            >
-              EMAIL :
-            </Text>
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-              }}
-            >
-              {userInfo.email}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              margin: 10,
-              gap: 40,
-            }}
-          >
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 18,
-                fontWeight: "500",
-                letterSpacing: 1,
-                padding: 10,
-              }}
-            >
-              PHONE :
-            </Text>
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-              }}
-            >
-              {userInfo.phone}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              margin: 10,
-              gap: 40,
-            }}
-          >
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 18,
-                fontWeight: "500",
-                letterSpacing: 1,
-                padding: 10,
-              }}
-            >
-              ADDRESS :
-            </Text>
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-              }}
-            >
-              {userInfo.address}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              margin: 10,
-              gap: 40,
-            }}
-          >
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 18,
-                fontWeight: "500",
-                letterSpacing: 1,
-                padding: 10,
-              }}
-            >
-              HEIGHT :
-            </Text>
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-              }}
-            >
-              {userInfo.height}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              margin: 10,
-              gap: 40,
-            }}
-          >
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 18,
-                fontWeight: "500",
-                letterSpacing: 1,
-                padding: 10,
-              }}
-            >
-              WEIGHT :
-            </Text>
-            <Text
-              style={{
-                color: Color.light.background,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-              }}
-            >
-              {userInfo.weight}
-            </Text>
-          </View>
-          <View style={{ alignItems: "center", padding: 20 }}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: Color.light.background,
-                width: 200,
-                borderRadius: 10,
-              }}
-              onPress={() => setVisible(true)}
-            >
-              <Text
-                style={{
-                  color: Color.light.tint,
-                  fontSize: 20,
-                  fontWeight: "500",
-                  letterSpacing: 1,
-                  padding: 10,
-                  textAlign: "center",
-                }}
-              >
-                Modification
-              </Text>
-            </TouchableOpacity>
-          </View>
+
+          <TouchableOpacity style={styles.editButton} onPress={openEditModal}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "red",
-            width: 60,
-            marginTop: 20,
-            position: "absolute",
-            top: 0,
-            right: 0,
-            borderTopLeftRadius: 10,
-            borderBottomLeftRadius: 10,
-          }}
-          onPress={logout}
-        >
-          <Text
-            style={{
-              color: Color.light.background,
-              fontSize: 10,
-              fontWeight: "500",
-              letterSpacing: 1,
-              padding: 10,
-              textAlign: "center",
-            }}
-          >
-            Logout
-          </Text>
-        </TouchableOpacity>
       </View>
 
+      {/* Edit Modal */}
       <Modal
-        animationType="fade"
+        animationType="slide"
         transparent={true}
         visible={visible}
         onRequestClose={() => setVisible(false)}
       >
-        <View style={styles.modalBackground}>
-          <View style={styles.modeleContent}>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 25,
-                color: Color.light.background,
-                fontWeight: "600",
-                letterSpacing: 2,
-              }}
-            >
-              YOUR NEW INFO
-            </Text>
-            <TextInput
-              placeholder="user name"
-              style={styles.InfoInput}
-              value={username}
-              onChangeText={(e) => setusername(e)}
-            />
-            <TextInput
-              placeholder="Full name"
-              style={styles.InfoInput}
-              value={fullName}
-              onChangeText={(e) => setfullName(e)}
-            />
-            <TextInput
-              placeholder="email"
-              style={styles.InfoInput}
-              value={email}
-              onChangeText={(e) => setemail(e)}
-            />
-            <TextInput
-              placeholder="phone"
-              style={styles.InfoInput}
-              value={phone}
-              onChangeText={(e) => setphone(e)}
-            />
-            <TextInput
-              placeholder="adress"
-              style={styles.InfoInput}
-              value={address}
-              onChangeText={(e) => setaddress(e)}
-            />
-            <TextInput
-              placeholder="height"
-              style={styles.InfoInput}
-              value={height}
-              onChangeText={(e) => setheight(e)}
-            />
-            <TextInput
-              placeholder="weight"
-              style={styles.InfoInput}
-              value={weight}
-              onChangeText={(e) => setweight(e)}
-            />
-            <View style={{ alignItems: "center", padding: 20 }}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Profile</Text>
               <TouchableOpacity
-                style={{
-                  backgroundColor: Color.light.background,
-                  width: 200,
-                  borderRadius: 10,
-                }}
-                onPress={() => modification()}
+                style={styles.closeButton}
+                onPress={() => setVisible(false)}
               >
-                <Text
-                  style={{
-                    color: Color.light.tint,
-                    fontSize: 20,
-                    fontWeight: "500",
-                    letterSpacing: 1,
-                    padding: 10,
-                    textAlign: "center",
-                  }}
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
 
-                >
-                  OK
-                </Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Username</Text>
+              <TextInput
+                style={styles.input}
+                value={username}
+                onChangeText={setUsername}
+                placeholder="Enter username"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>First Name</Text>
+              <TextInput
+                style={styles.input}
+                value={firstName}
+                onChangeText={setFirstName}
+                placeholder="Enter first name"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Last Name</Text>
+              <TextInput
+                style={styles.input}
+                value={lastName}
+                onChangeText={setLastName}
+                placeholder="Enter last name"
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            {/* <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter email"
+                placeholderTextColor="#999"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View> */}
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveChanges}
+              >
+                {
+                  !loadingSaving ? (
+                    <Text style={styles.saveButtonText}>Save Changes</Text>
+                  ) : (
+                    <View>
+                      <ActivityIndicator size="small" color="#fff" />
+                      <Text style={styles.saveButtonText}>Saving...</Text>
+                    </View>
+                  )
+                }
               </TouchableOpacity>
             </View>
           </View>
@@ -434,32 +305,197 @@ export default function Profile() {
     </>
   );
 }
-//  <Button title="logout" color="red" onPress={logout} />
 
 const styles = StyleSheet.create({
-  avatarpare: {
-    width: "40%",
-    height: 100,
-    borderRadius: "50%",
-    borderColor: Color.light.tint,
-    borderWidth: 3,
-    overflow: "hidden",
-    marginTop: 30,
-  },
-  modalBackground: {
+  container: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.7)",
-    padding: (70, 30),
-    justifyContent: "center",
+    backgroundColor: Color.light.background,
   },
-  modeleContent: {
-    padding: 20,
-    backgroundColor: Color.light.tint,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    paddingTop: 50,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: Color.light.tint,
+    letterSpacing: 1,
+  },
+  logoutButton: {
+    backgroundColor: '#ff4444',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     borderRadius: 20,
   },
-  InfoInput: {
-    backgroundColor: Color.light.background,
+  logoutText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  profileCard: {
+    backgroundColor: '#fff',
+    margin: 20,
+    borderRadius: 20,
+    padding: 30,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  userInitials: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Color.light.tint,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  initialsText: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: Color.light.background,
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Color.light.tint,
+    marginBottom: 5,
+  },
+  userHandle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 30,
+  },
+  infoSection: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  infoLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Color.light.tint,
+    flex: 1,
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#333',
+    flex: 2,
+    textAlign: 'right',
+  },
+  editButton: {
+    backgroundColor: Color.light.tint,
+    paddingHorizontal: 40,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  editButtonText: {
+    color: Color.light.background,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 25,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 25,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Color.light.tint,
+  },
+  closeButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: '#666',
+    fontWeight: '300',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Color.light.tint,
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#fafafa',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 10,
-    borderRadius: 4,
+    gap: 15,
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#f8f8f8',
+  },
+  cancelButtonText: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: Color.light.tint,
+  },
+  saveButtonText: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    color: Color.light.background,
   },
 });

@@ -1,16 +1,17 @@
 type ValidationResult = { success: boolean; message: string };
 
 export const validateUsername = (username: string): ValidationResult => {
-  if (username.length < 3)
+  if (username.length <= 3)
     return {
       success: false,
-      message: "Username must be at least 3 characters",
+      message: "Username must be at least 4 characters",
     };
   if (username.length > 20)
     return {
       success: false,
       message: "Username must be at most 20 characters",
     };
+
   if (!/^[a-zA-Z0-9_]+$/.test(username))
     return {
       success: false,
@@ -44,6 +45,12 @@ export const validateName = (name: string): ValidationResult => {
       success: false,
       message: "Name can only contain letters and spaces",
     };
+  if (name.length > 30) {
+    return {
+      success: false,
+      message: "Name must be at most 30 characters",
+    };
+  }
   return { success: true, message: "Valid name" };
 };
 
