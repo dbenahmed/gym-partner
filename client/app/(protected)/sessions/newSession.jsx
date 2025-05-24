@@ -10,6 +10,7 @@ import { ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 import { validateName, validateNumber } from '@/utils/validation';
+import { Stack } from 'expo-router';
 
 
 
@@ -152,7 +153,7 @@ export default function StartSession() {
             }
             console.log('Session saved successfully');
             console.log(data);
-            router.push('/sessions');
+            router.back()
         }
         io().finally(() => {
             setLoading(false);
@@ -213,118 +214,121 @@ export default function StartSession() {
     }
 
     return (
-        <ScrollView style={styles.container}>
-            {/* Session Name Input */}
+        <View style={{ flex: 1 }}>
+            
+            <ScrollView style={styles.container}>
+                {/* Session Name Input */}
 
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Session Name</Text>
-                <TextInput
-                    style={styles.textInput}
-                    placeholder="Enter session name"
-                    value={sessionName}
-                    onChangeText={setSessionName}
-                />
-            </View>
-
-            {/* Session Notes Input */}
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Notes (optional)</Text>
-                <TextInput
-                    style={[styles.textInput]}
-                    placeholder="Add notes about this session"
-                    value={sessionNotes}
-                    onChangeText={setSessionNotes}
-                    multiline={true}
-                    numberOfLines={3}
-                />
-            </View>
-
-            <TouchableOpacity
-                style={styles.searchButton}
-                onPress={() => setModalVisible(true)}
-            >
-                <MaterialCommunityIcons name="magnify" size={20} color="#fff" />
-                <Text style={styles.searchButtonText}>Search Exercises</Text>
-            </TouchableOpacity>
-
-            {exercises.length === 0 ? (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyStateText}>
-                        No exercises added yet. Search and add exercises to your session.
-                    </Text>
-                </View>
-            ) : (
-                exercises.map((exercise, index) => (
-                    <SessionExerciseContainer
-                        key={exercise.id || index}
-                        item={exercise}
-                        removeExercise={removeExercise}
-                        updateExerciseData={updateExerciseData}
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Session Name</Text>
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder="Enter session name"
+                        value={sessionName}
+                        onChangeText={setSessionName}
                     />
-                ))
-            )}
-
-            {exercises.length > 0 && (
-                <TouchableOpacity style={styles.saveButton}
-                    onPress={() => {
-                        saveSession();
-                    }}
-                    disabled={exercises.length === 0}
-                >
-                    <Text style={styles.saveButtonText}>Save Session</Text>
-                </TouchableOpacity>
-            )}
-
-            {/* Exercise Search Modal */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Search Exercises</Text>
-                            <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                <MaterialCommunityIcons name="close" size={24} color="#333" />
-                            </TouchableOpacity>
-                        </View>
-
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Search exercises..."
-                            value={searchQuery}
-                            onChangeText={searchExercises}
-                        />
-
-                        {isLoading ? (
-                            <View style={styles.loadingContainer}>
-                                <ActivityIndicator size="large" color={Colors.light.tint} />
-                                <Text style={styles.loadingText}>Loading exercises...</Text>
-                            </View>
-                        ) : (
-                            <FlatList
-                                data={filteredExercises}
-                                keyExtractor={(item) => item.id}
-                                renderItem={({ item }) => (
-                                    <TouchableOpacity
-                                        style={styles.searchResultItem}
-                                        onPress={() => addExerciseToSession(item)}
-                                    >
-                                        <Text style={styles.searchResultName}>{item.name}</Text>
-                                        <Text style={styles.searchResultCategory}>{item.category}</Text>
-                                    </TouchableOpacity>
-                                )}
-                                ListEmptyComponent={
-                                    <Text style={styles.emptySearchText}>No exercises found</Text>
-                                }
-                            />
-                        )}
-                    </View>
                 </View>
-            </Modal>
-        </ScrollView>
+
+                {/* Session Notes Input */}
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Notes (optional)</Text>
+                    <TextInput
+                        style={[styles.textInput]}
+                        placeholder="Add notes about this session"
+                        value={sessionNotes}
+                        onChangeText={setSessionNotes}
+                        multiline={true}
+                        numberOfLines={3}
+                    />
+                </View>
+
+                <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={() => setModalVisible(true)}
+                >
+                    <MaterialCommunityIcons name="magnify" size={20} color="#fff" />
+                    <Text style={styles.searchButtonText}>Search Exercises</Text>
+                </TouchableOpacity>
+
+                {exercises.length === 0 ? (
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyStateText}>
+                            No exercises added yet. Search and add exercises to your session.
+                        </Text>
+                    </View>
+                ) : (
+                    exercises.map((exercise, index) => (
+                        <SessionExerciseContainer
+                            key={exercise.id || index}
+                            item={exercise}
+                            removeExercise={removeExercise}
+                            updateExerciseData={updateExerciseData}
+                        />
+                    ))
+                )}
+
+                {exercises.length > 0 && (
+                    <TouchableOpacity style={styles.saveButton}
+                        onPress={() => {
+                            saveSession();
+                        }}
+                        disabled={exercises.length === 0}
+                    >
+                        <Text style={styles.saveButtonText}>Save Session</Text>
+                    </TouchableOpacity>
+                )}
+
+                {/* Exercise Search Modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => setModalVisible(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>Search Exercises</Text>
+                                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                    <MaterialCommunityIcons name="close" size={24} color="#333" />
+                                </TouchableOpacity>
+                            </View>
+
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search exercises..."
+                                value={searchQuery}
+                                onChangeText={searchExercises}
+                            />
+
+                            {isLoading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color={Colors.light.tint} />
+                                    <Text style={styles.loadingText}>Loading exercises...</Text>
+                                </View>
+                            ) : (
+                                <FlatList
+                                    data={filteredExercises}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity
+                                            style={styles.searchResultItem}
+                                            onPress={() => addExerciseToSession(item)}
+                                        >
+                                            <Text style={styles.searchResultName}>{item.name}</Text>
+                                            <Text style={styles.searchResultCategory}>{item.category}</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    ListEmptyComponent={
+                                        <Text style={styles.emptySearchText}>No exercises found</Text>
+                                    }
+                                />
+                            )}
+                        </View>
+                    </View>
+                </Modal>
+            </ScrollView>
+        </View>
     );
 }
 const styles = StyleSheet.create({

@@ -215,7 +215,7 @@ export const getWorkoutPlans = async (req, res) => {
       )
     ).limit(1)
     if (foundCollections.length === 0) {
-      res.status(401).json({
+      return res.status(401).json({
         success: false,
         message: 'Collection does not exist or user is unauthorized'
       })
@@ -234,6 +234,7 @@ export const getWorkoutPlans = async (req, res) => {
     })
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving workout plans', error: error.message });
+    return
   }
 };
 

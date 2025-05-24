@@ -1,12 +1,12 @@
 
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '@/app/contex/authcontex';
 import Colors from '@/constants/Colors';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { defaultUrl } from '@/constants/constants';
 
@@ -18,47 +18,53 @@ export default function Sessions() {
     const { authenticated } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
 
-    useEffect(() => {
-        // Fetch sessions data
-        const fetchSessions = async () => {
-            setLoading(true);
-            console.log('Fetching sessions for date:', currentDate.toISOString().split('T')[0]);
-            try {
-                // Replace with actual API call when available
-                // Example: const response = await fetchGetUserSessions(authenticated);
 
-                const res = await fetch(`${defaultUrl}/workout/sessions?date=${currentDate.toISOString().split('T')[0]}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authenticated}`
+    useFocusEffect(
+        useCallback(() => {
+            // Fetch sessions data
+            const fetchSessions = async () => {
+                setLoading(true);
+                console.log('Fetching sessions for date:', currentDate.toISOString().split('T')[0]);
+                try {
+                    // Replace with actual API call when available
+                    // Example: const response = await fetchGetUserSessions(authenticated);
+
+                    const res = await fetch(`${defaultUrl}/workout/sessions?date=${currentDate.toISOString().split('T')[0]}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authenticated}`
+                        }
+                    })
+                    if (!res.ok) {
+                        Alert.alert('Error', 'Failed to load workout sessions');
+                        setLoading(false);
+                        return;
                     }
-                })
-                if (!res.ok) {
+
+                    const { success, userSessions, message } = await res.json();
+
+                    if (!success) {
+                        Alert.alert('Error', message);
+                        setLoading(false);
+                        return;
+                    }
+
+                    setSessions(userSessions);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error fetching sessions:', error);
                     Alert.alert('Error', 'Failed to load workout sessions');
                     setLoading(false);
-                    return;
                 }
+            };
 
-                const { success, userSessions, message } = await res.json();
+            fetchSessions();
+        }, [currentDate])
+    );
 
-                if (!success) {
-                    Alert.alert('Error', message);
-                    setLoading(false);
-                    return;
-                }
 
-                setSessions(userSessions);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching sessions:', error);
-                Alert.alert('Error', 'Failed to load workout sessions');
-                setLoading(false);
-            }
-        };
 
-        fetchSessions();
-    }, [currentDate]);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
 
@@ -151,7 +157,7 @@ export default function Sessions() {
                 <ActivityIndicator size="large" color={Colors.light.tint} />
             ) : (
                 <FlatList
-                    style={{ marginBottom: 20, flex: 1,paddingHorizontal:20 }} // Added marginBottom to avoid overlap with button
+                    style={{ marginBottom: 20, flex: 1, paddingHorizontal: 20 }} // Added marginBottom to avoid overlap with button
                     contentContainerStyle={{ paddingBottom: 80 }} // Added paddingBottom to avoid overlap with button
                     showsVerticalScrollIndicator={true}
                     data={sessions}

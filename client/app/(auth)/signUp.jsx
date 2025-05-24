@@ -14,7 +14,7 @@ import { AuthContext } from "@/app/contex/authcontex";
 import useAuth from "@/app/contex/authcontex";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
-import { validatePassword, validateUsername } from "@/utils/validation";
+import { validatePassword, validateUsername, validateName } from "@/utils/validation";
 import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -22,7 +22,9 @@ export default function SignUp() {
   const router = useRouter();
   const [confpasword, setconfpasword] = useState("password1");
   const [password, setPassword] = useState("password1");
-  const [username, setUsername] = useState("user1");
+  const [username, setUsername] = useState("moh");
+  const [firstName, setFirstName] = useState("Hmouda");
+  const [lastName, setLastName] = useState("Naas");
   const { register, splashLoading, setSplashLoading } = useAuth();
 
   const handleRegister = async () => {
@@ -31,8 +33,11 @@ export default function SignUp() {
     if (validateUsername(username).success === false) {
       Alert.alert("Error", validateUsername(username).message);
       return;
-    } else if (validatePassword(password).success === false) {
+    } else if (validateName(firstName).success === false) {
       Alert.alert("Error", validatePassword(password).message);
+      return;
+    } else if (validateName(lastName).success === false) {
+      Alert.alert("Error", validatePassword(confpasword).message);
       return;
     }
     if (!(confpasword === password)) {
@@ -41,12 +46,15 @@ export default function SignUp() {
     }
 
     setSplashLoading(true);
-    const res = await register(username, password);
+    const res = await register(username, password , firstName, lastName);
+    console.log("res",res);
     if (res.success) {
       Alert.alert("Success", res.message);
       router.push("/(auth)/signIn");
+      setSplashLoading(false)
     } else {
       Alert.alert("Error", res.message);
+      setSplashLoading(false);
     }
   };
   if (splashLoading) {
@@ -83,16 +91,45 @@ export default function SignUp() {
           alignItems: "center",
           padding: 20,
           marginTop: "auto",
-          height: "50%",
+          height: "80%",
         }}
       >
+
         <View style={styles.inputContainer}>
           <Image
             source={require("@/assets/images/people.png")}
             style={styles.icon}
           />
           <TextInput
-            placeholder="Name"
+            placeholder="First Name"
+            value={firstName}
+            placeholderTextColor={"#fffaf0"}
+            style={styles.textInput}
+            onChangeText={(text) => setFirstName(text)}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Image
+            source={require("@/assets/images/people.png")}
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Last Name"
+            value={lastName}
+            placeholderTextColor={"#fffaf0"}
+            style={styles.textInput}
+            onChangeText={(text) => setLastName(text)}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Image
+            source={require("@/assets/images/people.png")}
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Username"
             value={username}
             placeholderTextColor={"#fffaf0"}
             style={styles.textInput}
@@ -106,7 +143,7 @@ export default function SignUp() {
             style={styles.icon}
           />
           <TextInput
-            placeholder="Set Password"
+            placeholder="Password"
             secureTextEntry={true}
             placeholderTextColor={"#fffaf0"}
             value={password}

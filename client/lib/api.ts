@@ -384,3 +384,69 @@ export const fetchCreateCustomMeal = async (
     };
   }
 };
+
+
+export const fetchDeletePlan = async (
+  accessToken: String,
+  planId: Number
+) => {
+  try {
+    const url = `${defaultUrl}/workout/plans/${planId}`;
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to delete plan");
+    }
+    const { success, message } = await res.json();
+    if (!success) {
+      throw new Error(message);
+    }
+    return {
+      success: true,
+      message: message,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}
+
+
+export const fetchDeleteCollection = async (
+  accessToken: String,
+  collectionId: Number
+) => {  
+  try {
+    const url = `${defaultUrl}/workout/collections/${collectionId}`;
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to delete collection");
+    }
+    const { success, message } = await res.json();
+    if (!success) {
+      throw new Error(message);
+    }
+    return {
+      success: true,
+      message: message,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+}

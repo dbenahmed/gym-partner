@@ -2,19 +2,22 @@ import { Stack } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Alert } from "react-native";
+
+import Colors from "@/constants/Colors";
+
 export default function CollectionsLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTransparent: false,
-        headerShown: false,
-        headerTitleAlign: "left",
         headerStyle: {
-          backgroundColor: "rgba(255,255,255,0.9)",
+          backgroundColor: Colors.light.background,
         },
+        headerTintColor: Colors.light.tint,
         headerTitleStyle: {
-          fontSize: 24,
           fontWeight: "bold",
+        },
+        contentStyle: {
+          backgroundColor: Colors.light.background,
         },
       }}
     >

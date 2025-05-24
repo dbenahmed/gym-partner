@@ -65,8 +65,8 @@ app.listen(port, async () => {
         // Note that for request particular subdomain you need to register in first connection.
         remoteSubdomain: "gympartner",
         remotePort: 80,
-        serverAliveInterval: 60,
-        serverAliveCountMax: 3,
+        serverAliveInterval: 10, // after 10 seconds I send you a verification
+        serverAliveCountMax: 1, // if I did not respond for 1 time, I will close the connection
     })
         .on("connect", (connection) => {
             console.log(

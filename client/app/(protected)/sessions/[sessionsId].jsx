@@ -48,7 +48,7 @@ export default function SessionDetails() {
         setLoading(false);
         return;
       }
-      router.push("/sessions");
+      router.back();
       setLoading(false);
       Alert.alert("Success", "Session deleted successfully");
     } catch (error) {
