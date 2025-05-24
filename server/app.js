@@ -16,7 +16,7 @@ import exerciseDatabaseRouter from './routes/exerciseDatabaseRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
 import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
-import { serveonet } from 'serveonet';
+import serveonet from 'serveonet';
 
 
 dotenv.config();
