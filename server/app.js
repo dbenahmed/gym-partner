@@ -18,9 +18,11 @@ import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
 
 
-import serveonet from "serveonet";
 
 dotenv.config();
+
+
+const isLocal = process.argv.includes('--local');
 
 
 const app = express()
@@ -59,37 +61,39 @@ app.get('/', async (req, res) => {
 app.listen(port, async () => {
     console.log(`server started at http://localhost:${port}`);
 
-    serveonet({
-        localHost: "localhost",
-        localPort: port,
-        // Note that for request particular subdomain you need to register in first connection.
-        remoteSubdomain: "gympartner",
-        remotePort: 80,
-        serverAliveInterval: 10, // after 10 seconds I send you a verification
-        serverAliveCountMax: 1, // if I did not respond for 1 time, I will close the connection
-    })
-        .on("connect", (connection) => {
-            console.log(
-                "Forwarding to localhost:" + connection.localPort,
-                "ssh pid: " + connection.pid
-            );
-        })
-        .on("data", (data) => {
-            console.log(data);
-        })
-        .on("timeout", (connection) => {
-            console.log("Connection to " + connection.host + " timed out.");
-        })
-        .on("error", (event) => {
-            console.error(event.message);
-        })
-        .on("close", (event) => {
-            console.error("SSH exited with code " + event.code);
-            event.onrestart = () => console.info("Restarted");
-        });
 
+    if (isLocal) {
+        const serveonet = require('serveonet');
 
-
+        serveonet({
+            localHost: "localhost",
+            localPort: port,
+            // Note that for request particular subdomain you need to register in first connection.
+            remoteSubdomain: "gympartner",
+            remotePort: 80,
+            serverAliveInterval: 10, // after 10 seconds I send you a verification
+            serverAliveCountMax: 1, // if I did not respond for 1 time, I will close the connection
+        })
+            .on("connect", (connection) => {
+                console.log(
+                    "Forwarding to localhost:" + connection.localPort,
+                    "ssh pid: " + connection.pid
+                );
+            })
+            .on("data", (data) => {
+                console.log(data);
+            })
+            .on("timeout", (connection) => {
+                console.log("Connection to " + connection.host + " timed out.");
+            })
+            .on("error", (event) => {
+                console.error(event.message);
+            })
+            .on("close", (event) => {
+                console.error("SSH exited with code " + event.code);
+                event.onrestart = () => console.info("Restarted");
+            });
+    }
 })
 
 export default app;
