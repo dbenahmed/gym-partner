@@ -227,7 +227,7 @@ export default function Meal({ data, onDelete, onUpdate }) {
               unit: 'Cal',
               color: '#FF6B6B'
             },
-            
+
             {
               label: 'Carbs',
               value: `${calculateNutrient(data.food.carbohydratesper100g, data.servingsizeG)}`,
@@ -256,8 +256,7 @@ export default function Meal({ data, onDelete, onUpdate }) {
           <TouchableOpacity
             style={[styles.actionButton, styles.detailButton]}
             onPress={() => {
-              router.push(`/Explore/`)
-              router.push(`/Explore/meals/${data.food.id}`)
+              router.push(`/Explore/meals/${data.food.id}`);
             }}
           >
             <Text style={styles.actionButtonText}>View Details</Text>

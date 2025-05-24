@@ -26,18 +26,7 @@ export default function SessionsLayout() {
                 contentStyle: {
                     backgroundColor: Colors.light.background,
                 },
-                headerLeft: () => (
-                    <Pressable
-                        onPress={() =>
-                            Alert.alert('Confirm', 'Are you sure you want to go back? You will Lose All your Session Details!', [
-                                { text: 'Cancel', style: 'cancel' },
-                                { text: 'Yes', onPress: () => router.back() },
-                            ])
-                        }
-                    >
-                        <Ionicons name="arrow-back" size={24} color={Colors.light.tint} />
-                    </Pressable>
-                ),
+
             }}
         >
             <Stack.Screen
@@ -51,7 +40,18 @@ export default function SessionsLayout() {
                 options={{
                     title: "New Session",
                     presentation: "card",
-
+                    headerLeft: () => (
+                        <Pressable
+                            onPress={() =>
+                                Alert.alert('Confirm', 'Are you sure you want to go back? You will Lose All your Session Details!', [
+                                    { text: 'Cancel', style: 'cancel' },
+                                    { text: 'Yes', onPress: () => router.back() },
+                                ])
+                            }
+                        >
+                            <Ionicons name="arrow-back" size={24} color={Colors.light.tint} />
+                        </Pressable>
+                    ),
                 }}
             />
         </Stack>

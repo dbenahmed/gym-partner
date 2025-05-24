@@ -231,8 +231,8 @@ export default function Explore() {
 										placeholder="Search exercises..."
 										onChangeText={(text) => {
 											if (text === "" || text === null || text === undefined) {
+												setExercises([]);
 												setExerciseSearchQuery(null);
-												fetchExercises(null);
 											} else {
 												setExerciseSearchQuery(text);
 												fetchExercises(text);
@@ -487,8 +487,8 @@ export default function Explore() {
 										placeholder="Search food..."
 										onChangeText={(text) => {
 											if (text === "" || text === null || text === undefined) {
+												setFoods([]);
 												setFoodSearchQuery(null);
-												fetchFoods(null);
 											} else {
 												setFoodSearchQuery(text);
 												fetchFoods(text);

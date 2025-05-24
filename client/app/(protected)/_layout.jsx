@@ -15,6 +15,7 @@ export default function Layout() {
     return (
       <Tabs
         screenOptions={{
+          lazy: false, // Load all tabs at once when the app starts instead of on first access
           tabBarActiveTintColor: Colors.light.tint,
           headerShown: false,
           tabBarBackground: TabBarBackground,
