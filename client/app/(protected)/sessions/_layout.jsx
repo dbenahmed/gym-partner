@@ -1,10 +1,18 @@
 
 
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import { Alert, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
 import Colors from '@/constants/Colors';
 
+
+
 export default function SessionsLayout() {
+
+    const router = useRouter();
+
     return (
         <Stack
             screenOptions={{
@@ -18,6 +26,18 @@ export default function SessionsLayout() {
                 contentStyle: {
                     backgroundColor: Colors.light.background,
                 },
+                headerLeft: () => (
+                    <Pressable
+                        onPress={() =>
+                            Alert.alert('Confirm', 'Are you sure you want to go back? You will Lose All your Session Details!', [
+                                { text: 'Cancel', style: 'cancel' },
+                                { text: 'Yes', onPress: () => router.back() },
+                            ])
+                        }
+                    >
+                        <Ionicons name="arrow-back" size={24} color={Colors.light.tint} />
+                    </Pressable>
+                ),
             }}
         >
             <Stack.Screen
@@ -31,8 +51,10 @@ export default function SessionsLayout() {
                 options={{
                     title: "New Session",
                     presentation: "card",
+
                 }}
             />
         </Stack>
     );
+
 }
