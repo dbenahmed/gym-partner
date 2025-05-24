@@ -16,7 +16,7 @@ import exerciseDatabaseRouter from './routes/exerciseDatabaseRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
 import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
-
+import { serveonet } from 'serveonet';
 
 
 dotenv.config();
@@ -69,7 +69,6 @@ app.get('/', async (req, res) => {
 if (isLocal) {
     app.listen(port, async () => {
         console.log(`server started at http://localhost:${port}`);
-        const serveonet = require('serveonet');
         serveonet({
             localHost: "localhost",
             localPort: port,
