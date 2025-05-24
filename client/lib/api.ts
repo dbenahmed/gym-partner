@@ -354,7 +354,7 @@ export const fetchCreateCustomMeal = async (
   body: CreateCustomMealBodyType
 ) => {
   try {
-    console.log('adding custom food now')
+    console.log("adding custom food now");
     const url = `${defaultUrl}/meals/custom`;
     const res = await fetch(url, {
       method: "POST",
@@ -365,10 +365,11 @@ export const fetchCreateCustomMeal = async (
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-      throw new Error("Failed to create custom meal");
+      console.error("response not ok", res);
+      throw new Error("Server Error: Failed to create custom meal");
     }
     const { success, message, data } = await res.json();
-    console.log(success)
+    console.log(success);
     if (!success) {
       throw new Error(message);
     }
@@ -385,11 +386,7 @@ export const fetchCreateCustomMeal = async (
   }
 };
 
-
-export const fetchDeletePlan = async (
-  accessToken: String,
-  planId: Number
-) => {
+export const fetchDeletePlan = async (accessToken: String, planId: Number) => {
   try {
     const url = `${defaultUrl}/workout/plans/${planId}`;
     const res = await fetch(url, {
@@ -416,13 +413,12 @@ export const fetchDeletePlan = async (
       message: error.message,
     };
   }
-}
-
+};
 
 export const fetchDeleteCollection = async (
   accessToken: String,
   collectionId: Number
-) => {  
+) => {
   try {
     const url = `${defaultUrl}/workout/collections/${collectionId}`;
     const res = await fetch(url, {
@@ -449,4 +445,4 @@ export const fetchDeleteCollection = async (
       message: error.message,
     };
   }
-}
+};

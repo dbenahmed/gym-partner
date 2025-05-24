@@ -7,6 +7,7 @@ const Colors = {
   light: {
     text: "#11181C",
     background: "rgba(255, 255, 255, 1)",
+    // tint: "rgba(10, 126, 164, 1)",
     tint: "rgba(10, 126, 164, 1)",
     tintLighter: "#E3F2FD",
     tintLowOpacity: "rgba(10, 126, 164, 0.2)",

@@ -3,9 +3,16 @@ import React from "react";
 import Color from "@/constants/Colors.ts";
 import { router } from "expo-router";
 import { useState } from "react";
+import useAuth from "@/app/contex/authcontex";
+
+
 
 export default function Meal({ data, onDelete, onUpdate }) {
   console.log(data);
+
+
+  const { userId } = useAuth();
+
 
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [updatedServingSize, setUpdatedServingSize] = useState(data.servingsizeG.toString());
@@ -207,10 +214,18 @@ export default function Meal({ data, onDelete, onUpdate }) {
               {data.food.description}
             </Text>
           )}
-          <Text style={styles.servingSize}>
-            Serving: {data.servingsizeG}g
-          </Text>
+          <View>
+            <Text style={styles.servingSize}>
+              Serving: {data.servingsizeG}g
+            </Text>
+            {data.food.createBy === userId && (
+              <Text style={styles.servingSize}>
+                Serving: {data.servingsizeG}g
+              </Text>
+            )}
+          </View>
         </View>
+
 
         {/* Nutrition Cards */}
         <View style={styles.nutritionContainer}>
