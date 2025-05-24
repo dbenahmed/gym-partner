@@ -99,7 +99,7 @@ if (isLocal) {
             });
     })
 } else {
-    app.listen(port, '0.0.0.0', () => {
+    app.listen(port, async () => {
         console.log(`server started on port ${port}`);
     });
 
