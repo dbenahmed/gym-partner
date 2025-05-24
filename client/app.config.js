@@ -46,7 +46,7 @@ export default {
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/power.png",
+                "foregroundImage": "./assets/images/png.png",
                 "backgroundColor": "#ffffff"
             },
             "package": "com.dbenahmed.gympartner"
@@ -54,14 +54,14 @@ export default {
         "web": {
             "bundler": "metro",
             "output": "static",
-            "favicon": "./assets/images/power.png"
+            "favicon": "./assets/images/png.png"
         },
         "plugins": [
             "expo-router",
             [
                 "expo-splash-screen",
                 {
-                    "image": "./assets/images/power.png",
+                    "image": "./assets/images/png.png",
                     "imageWidth": 200,
                     "resizeMode": "contain",
                     "backgroundColor": "#ffffff"

@@ -2,4 +2,4 @@ import Constants from "expo-constants";
 const url = Constants.expoConfig?.extra?.BACKEND_URL;
 
 // export const defaultUrl = `${url}:${port}`;
-export const defaultUrl = `${url}`;
+export const defaultUrl = `https://gym-partner-production.up.railway.app`;
