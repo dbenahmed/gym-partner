@@ -30,10 +30,18 @@ const port = process.env.PORT || 3000
 
 // Middleware
 app.use(express.json())
-app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS || 'http://localhost:8081', //whatever your default is,
-    credentials: true,  // Allow credentials (cookies, authorization headers)
-}))
+
+
+if (isLocal) {
+    app.use(cors({
+        origin: process.env.ALLOWED_ORIGINS || 'http://localhost:8081', //whatever your default is,
+        credentials: true,  // Allow credentials (cookies, authorization headers)
+    }))
+} else {
+    app.use(cors({
+        credentials: true,  // Allow credentials (cookies, authorization headers)
+    }))
+}
 app.use(cookieParser())
 
 
