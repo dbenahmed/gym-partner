@@ -5,9 +5,9 @@ import { StyleSheet } from "react-native";
 const SplashScreen = () => {
   return (
     <View style={styles.container}>
-      <Image source={require("@/assets/images/logo.jpg")} style={styles.logo} />
+      <Image source={require("@/assets/images/png.png")} style={styles.logo} />
       <Text style={styles.title}>Gym Partner</Text>
-      <ActivityIndicator size="large" color="#fff" />
+      <ActivityIndicator size="large" color="#000000" />
     </View>
   );
 };
@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#000000",
+    backgroundColor: "white",
   },
   logo: {
     width: 100,

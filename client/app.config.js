@@ -20,14 +20,14 @@ const getUniqueIdentifier = () => {
 
 const getAppName = () => {
     if (IS_DEV) {
-        return 'StickerSmash (Dev)';
+        return 'Gym Partner (Dev)';
     }
 
     if (IS_PREVIEW) {
-        return 'StickerSmash (Preview)';
+        return 'Gym Partner (Preview)';
     }
 
-    return 'StickerSmash: Emoji Stickers';
+    return 'Gym Partner';
 };
 
 
@@ -37,7 +37,7 @@ export default {
         "slug": "gym-partner",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/images/power.png",
+        "icon": "./assets/images/png.png",
         "scheme": "myapp",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,

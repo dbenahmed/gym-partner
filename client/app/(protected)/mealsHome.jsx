@@ -998,7 +998,7 @@ export default function mealsHome() {
               alignItems: "center",
             }}
           >
-            <SplashScreen backgroundColor={"transparent"} />
+            <SplashScreen />
             <Text
               style={{
                 flex: 1,
@@ -1122,7 +1122,7 @@ export default function mealsHome() {
                           justifyContent: "center",
                         }}
                       >
-                        <SplashScreen backgroundColor={"transparent"} />
+                        <SplashScreen />
                         <Text
                           style={{
                             fontSize: 16,
@@ -1549,7 +1549,7 @@ export default function mealsHome() {
                           justifyContent: "center",
                         }}
                       >
-                        <SplashScreen backgroundColor={"transparent"} />
+                        <SplashScreen />
                         <Text
                           style={{
                             fontSize: 16,
