@@ -66,13 +66,10 @@ app.get('/', async (req, res) => {
     res.send('server is running')
 })
 
-app.listen(port, async () => {
-    console.log(`server started at http://localhost:${port}`);
-
-
-    if (isLocal) {
+if (isLocal) {
+    app.listen(port, async () => {
+        console.log(`server started at http://localhost:${port}`);
         const serveonet = require('serveonet');
-
         serveonet({
             localHost: "localhost",
             localPort: port,
@@ -101,7 +98,12 @@ app.listen(port, async () => {
                 console.error("SSH exited with code " + event.code);
                 event.onrestart = () => console.info("Restarted");
             });
-    }
-})
+    })
+} else {
+    app.listen(port, '0.0.0.0', () => {
+        console.log(`server started on port ${port}`);
+    });
+
+}
 
 export default app;
