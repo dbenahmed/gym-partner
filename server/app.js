@@ -26,7 +26,7 @@ const isLocal = process.argv.includes('--local');
 
 
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 80
 
 // Middleware
 app.use(express.json())
@@ -99,7 +99,7 @@ if (isLocal) {
             });
     })
 } else {
-    app.listen(port, "0.0.0.0",async () => {
+    app.listen(port, "0.0.0.0", async () => {
         console.log(`server started on port ${port}`);
     });
 
