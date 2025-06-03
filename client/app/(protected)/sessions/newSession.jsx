@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import SessionExerciseContainer from '@/components/sessionExerciseContainer';
 import { defaultUrl } from '@/constants/constants';
-import useAuth from '@/app/contex/authcontex';
+import useAuth from '@/context/authContext';
 import { ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
@@ -13,12 +13,337 @@ import { validateName, validateNumber } from '@/utils/validation';
 
 import ModalSlideUp from '@/components/ui/ModalSlideUp';
 
-
+import useThemeContext from '@/context/themeContext';
 
 
 
 
 export default function StartSession() {
+
+
+    const { colors } = useThemeContext();
+
+
+
+    const styles = useMemo(() => StyleSheet.create({
+        container: {
+            width: '100%',
+            backgroundColor: '#f8f9fa',
+            padding: 16,
+            marginBottom: 16,
+        },
+        textInput: {
+            flex: 1,
+            borderWidth: 1,
+            borderColor: '#e0e0e0',
+            borderRadius: 8,
+            padding: 12,
+            fontSize: 12,
+            backgroundColor: '#fff',
+            marginBottom: 16,
+        },
+        textInputLabel: {
+            fontSize: 14,
+            fontWeight: '500',
+            marginBottom: 6,
+            color: '#333',
+        },
+        textArea: {
+            borderWidth: 1,
+            borderColor: '#e0e0e0',
+            borderRadius: 8,
+            padding: 12,
+            fontSize: 16,
+            backgroundColor: '#fff',
+            marginBottom: 16,
+            textAlignVertical: 'top',
+            minHeight: 100,
+        },
+        header: {
+            marginBottom: 20,
+        },
+        title: {
+            fontSize: 24,
+            fontWeight: 'bold',
+        },
+        buttonsScrollStyles: {
+            gap: 10,
+            flex: 1,
+        },
+        searchButton: {
+            flex: 1,
+            backgroundColor: Colors.light.tint,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 20,
+        },
+        searchButtonText: {
+            color: '#fff',
+            fontWeight: 'bold',
+            marginLeft: 8,
+        },
+        emptyState: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+        },
+        emptyStateText: {
+            textAlign: 'center',
+            color: '#666',
+            fontSize: 16,
+        },
+        flatListStyle: {
+            flex: 1,
+        },
+        saveButton: {
+            backgroundColor: Colors.light.tint,
+            padding: 16,
+            borderRadius: 8,
+            alignItems: 'center',
+            marginVertical: 16,
+        },
+        saveButtonText: {
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: 16,
+        },
+        exerciseCard: {
+            backgroundColor: '#fff',
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 2,
+        },
+        exerciseHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 4,
+        },
+        exerciseName: {
+            fontSize: 18,
+            fontWeight: 'bold',
+        },
+        exerciseCategory: {
+            fontSize: 14,
+            color: '#666',
+            marginBottom: 12,
+        },
+        inputRow: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            height: 60,
+        },
+        inputContainer: {
+            marginHorizontal: 4,
+            flex: 1,
+            justifyContent: 'flex-end',
+        },
+        inputLabel: {
+            fontSize: 14,
+            color: '#666',
+            marginBottom: 4,
+        },
+        input: {
+            backgroundColor: '#f1f3f5',
+            borderRadius: 4,
+            padding: 6,
+            fontSize: 8,
+            height: 36,
+        },
+        setNumber: {
+            width: 24,
+            textAlign: 'center',
+            fontWeight: 'bold',
+            fontSize: 14,
+            color: '#555',
+            alignSelf: 'flex-end',
+            marginBottom: 8,
+        },
+        removeSetButton: {
+            padding: 8,
+            alignSelf: 'flex-end',
+            marginBottom: 4,
+        },
+        addSetButton: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: Colors.light.tint,
+            alignSelf: 'center',
+            marginTop: 8,
+        },
+        previousRepsContainer: {
+            flexDirection: 'row',
+            marginTop: 8,
+            marginBottom: 12,
+            alignItems: 'center',
+            height: 30,
+        },
+        previousRepsLabel: {
+            fontSize: 12,
+            color: '#666',
+            marginRight: 6,
+        },
+        previousRepBox: {
+            backgroundColor: '#e9ecef',
+            paddingVertical: 2,
+            paddingHorizontal: 6,
+            borderRadius: 4,
+            marginRight: 4,
+            flexDirection: 'row',
+            width: '30%',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            height: 24,
+        },
+        previousRepText: {
+            fontSize: 12,
+            color: '#495057',
+            textAlign: 'center',
+        },
+        setRow: {
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            marginBottom: 8,
+            backgroundColor: '#f9f9f9',
+            borderRadius: 6,
+            padding: 8,
+            height: 76,
+        },
+        setInputsContainer: {
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            height: 60,
+        },
+        setInputGroup: {
+            flex: 1,
+            marginHorizontal: 4,
+            height: 60,
+            justifyContent: 'flex-end',
+        },
+        setInputLabel: {
+            fontSize: 12,
+            color: '#666',
+            marginBottom: 2,
+        },
+        setInput: {
+            backgroundColor: '#fff',
+            borderRadius: 4,
+            padding: 6,
+            fontSize: 14,
+            height: 36,
+            borderWidth: 1,
+            borderColor: '#e0e0e0',
+        },
+        modalContainer: {
+            margin: 0,
+            justifyContent: 'flex-end',
+        },
+        modalContent: {
+            backgroundColor: Colors.light.background,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 16,
+            height: "80%",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -3 },
+            shadowOpacity: 0.2,
+            shadowRadius: 5,
+            elevation: 5,
+        },
+        modalHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+        },
+        searchInput: {
+            backgroundColor: '#f1f3f5',
+            padding: 12,
+            borderRadius: 8,
+            margin: 16,
+            fontSize: 16,
+        },
+        searchResultItem: {
+            borderRadius: 8,
+            padding: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+        },
+        searchResultItemSelected: {
+            borderLeftWidth: 4,
+            borderColor: Colors.light.tint,
+        },
+        searchResultName: {
+            fontSize: 16,
+            fontWeight: 'bold',
+        },
+        searchResultCategory: {
+            fontSize: 14,
+            color: '#666',
+            marginTop: 4,
+        },
+        emptySearchText: {
+            textAlign: 'center',
+            padding: 20,
+            color: '#666',
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+        },
+        loadingText: {
+            marginTop: 10,
+            fontSize: 16,
+            color: '#666',
+        },
+        categoryPicker: {
+            backgroundColor: '#f1f3f5',
+            borderRadius: 8,
+            marginVertical: 8,
+        },
+        pickerContainer: {
+            borderWidth: 1,
+            borderColor: '#e0e0e0',
+            borderRadius: 8,
+            overflow: 'hidden',
+        },
+        previousSetInfo: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: 4,
+            height: 20,
+        },
+        previousSetLabel: {
+            fontSize: 11,
+            color: '#888',
+            marginRight: 4,
+        },
+        previousSetValue: {
+            fontSize: 11,
+            color: '#555',
+            fontWeight: '500',
+        },
+    }), [colors]);
+
     const [exercises, setExercises] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -610,321 +935,3 @@ export default function StartSession() {
         </View >
     );
 }
-const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        backgroundColor: '#f8f9fa',
-        padding: 16,
-        marginBottom: 16,
-    },
-    textInput: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 12,
-        backgroundColor: '#fff',
-        marginBottom: 16,
-    },
-    textInputLabel: {
-        fontSize: 14,
-        fontWeight: '500',
-        marginBottom: 6,
-        color: '#333',
-    },
-    textArea: {
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
-        backgroundColor: '#fff',
-        marginBottom: 16,
-        textAlignVertical: 'top',
-        minHeight: 100,
-    },
-    header: {
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-    },
-    buttonsScrollStyles: {
-        gap: 10,
-        flex: 1,
-    },
-    searchButton: {
-        flex: 1,
-        backgroundColor: Colors.light.tint,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 20,
-    },
-    searchButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        marginLeft: 8,
-    },
-    emptyState: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    emptyStateText: {
-        textAlign: 'center',
-        color: '#666',
-        fontSize: 16,
-    },
-    flatListStyle: {
-        flex: 1,
-    },
-    saveButton: {
-        backgroundColor: Colors.light.tint,
-        padding: 16,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginVertical: 16,
-    },
-    saveButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-    exerciseCard: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 16,
-        marginBottom: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    exerciseHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 4,
-    },
-    exerciseName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    exerciseCategory: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 12,
-    },
-    inputRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        height: 60,
-    },
-    inputContainer: {
-        marginHorizontal: 4,
-        flex: 1,
-        justifyContent: 'flex-end',
-    },
-    inputLabel: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 4,
-    },
-    input: {
-        backgroundColor: '#f1f3f5',
-        borderRadius: 4,
-        padding: 6,
-        fontSize: 8,
-        height: 36,
-    },
-    setNumber: {
-        width: 24,
-        textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: 14,
-        color: '#555',
-        alignSelf: 'flex-end',
-        marginBottom: 8,
-    },
-    removeSetButton: {
-        padding: 8,
-        alignSelf: 'flex-end',
-        marginBottom: 4,
-    },
-    addSetButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: Colors.light.tint,
-        alignSelf: 'center',
-        marginTop: 8,
-    },
-    previousRepsContainer: {
-        flexDirection: 'row',
-        marginTop: 8,
-        marginBottom: 12,
-        alignItems: 'center',
-        height: 30,
-    },
-    previousRepsLabel: {
-        fontSize: 12,
-        color: '#666',
-        marginRight: 6,
-    },
-    previousRepBox: {
-        backgroundColor: '#e9ecef',
-        paddingVertical: 2,
-        paddingHorizontal: 6,
-        borderRadius: 4,
-        marginRight: 4,
-        flexDirection: 'row',
-        width: '30%',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        height: 24,
-    },
-    previousRepText: {
-        fontSize: 12,
-        color: '#495057',
-        textAlign: 'center',
-    },
-    setRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginBottom: 8,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 6,
-        padding: 8,
-        height: 76,
-    },
-    setInputsContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        height: 60,
-    },
-    setInputGroup: {
-        flex: 1,
-        marginHorizontal: 4,
-        height: 60,
-        justifyContent: 'flex-end',
-    },
-    setInputLabel: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 2,
-    },
-    setInput: {
-        backgroundColor: '#fff',
-        borderRadius: 4,
-        padding: 6,
-        fontSize: 14,
-        height: 36,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-    },
-    modalContainer: {
-        margin: 0,
-        justifyContent: 'flex-end',
-    },
-    modalContent: {
-        backgroundColor: Colors.light.background,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 16,
-        height: "80%",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 5,
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    searchInput: {
-        backgroundColor: '#f1f3f5',
-        padding: 12,
-        borderRadius: 8,
-        margin: 16,
-        fontSize: 16,
-    },
-    searchResultItem: {
-        borderRadius: 8,
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    searchResultItemSelected: {
-        borderLeftWidth: 4,
-        borderColor: Colors.light.tint,
-    },
-    searchResultName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    searchResultCategory: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 4,
-    },
-    emptySearchText: {
-        textAlign: 'center',
-        padding: 20,
-        color: '#666',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
-    },
-    categoryPicker: {
-        backgroundColor: '#f1f3f5',
-        borderRadius: 8,
-        marginVertical: 8,
-    },
-    pickerContainer: {
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        borderRadius: 8,
-        overflow: 'hidden',
-    },
-    previousSetInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 4,
-        height: 20,
-    },
-    previousSetLabel: {
-        fontSize: 11,
-        color: '#888',
-        marginRight: 4,
-    },
-    previousSetValue: {
-        fontSize: 11,
-        color: '#555',
-        fontWeight: '500',
-    },
-});

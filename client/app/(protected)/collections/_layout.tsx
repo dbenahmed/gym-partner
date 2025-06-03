@@ -4,20 +4,23 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Alert } from "react-native";
 
 import Colors from "@/constants/Colors";
+import useThemeContext from "@/context/themeContext"; // Replace with real path
 
 export default function CollectionsLayout() {
+  const { colors } = useThemeContext();
+
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: Colors.light.background,
+          backgroundColor: colors.background,
         },
-        headerTintColor: Colors.light.tint,
+        headerTintColor: colors.tint,
         headerTitleStyle: {
           fontWeight: "bold",
         },
         contentStyle: {
-          backgroundColor: Colors.light.background,
+          backgroundColor: colors.background,
         },
       }}
     >

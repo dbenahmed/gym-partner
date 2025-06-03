@@ -9,11 +9,37 @@ import {
 import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
 import CheckBox from "react-native-check-box";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert } from "react-native";
 
 export default function Landing({ navigation }) {
   const router = useRouter();
+
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => {
+    return StyleSheet.create({
+      botton: {
+        padding: 20,
+        backgroundColor: colors.tint,
+        marginTop: 20,
+        borderRadius: 50,
+      },
+      bottonText: {
+        textAlign: "center",
+        fontSize: 24,
+        color: colors.background,
+        fontWeight: 800,
+      },
+      backgroundLog: {
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        position: "relative",
+      },
+    });
+  }, [colors]);
+
 
   const [isChecked, setIsChecked] = useState(false);
 
@@ -54,7 +80,7 @@ export default function Landing({ navigation }) {
             {
               backgroundColor: "#CF8765",
               borderWidth: 1,
-              borderColor: Color.light.tint,
+              borderColor: colors.tint,
               marginBottom: "8",
             },
           ]}
@@ -66,7 +92,7 @@ export default function Landing({ navigation }) {
             }
           }}
         >
-          <Text style={[styles.bottonText, { color: Color.light.background }]}>
+          <Text style={[styles.bottonText, { color: colors.background }]}>
             Get Started
           </Text>
         </TouchableOpacity>
@@ -86,24 +112,3 @@ export default function Landing({ navigation }) {
     </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  botton: {
-    padding: 20,
-    backgroundColor: Color.light.tint,
-    marginTop: 20,
-    borderRadius: 50,
-  },
-  bottonText: {
-    textAlign: "center",
-    fontSize: 24,
-    color: Color.light.background,
-    fontWeight: 800,
-  },
-  backgroundLog: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-});

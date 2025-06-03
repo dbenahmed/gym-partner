@@ -1,7 +1,9 @@
 import { useFonts } from "expo-font";
 import { Slot, Stack } from "expo-router";
-import { AuthProvider } from "@/app/contex/authcontex";
+import { AuthProvider } from "@/context/authContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemeProvider } from "@/context/themeContext";
+import React from "react";
 
 export default function RootLayout() {
   useFonts({
@@ -11,9 +13,11 @@ export default function RootLayout() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <AuthProvider>
-        <Slot />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Slot />
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaView>
   );
 }

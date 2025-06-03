@@ -3,11 +3,131 @@ import { View, Text, ScrollView, Image, StyleSheet, ActivityIndicator, Alert, Pr
 import { useLocalSearchParams } from 'expo-router';
 import { defaultUrl } from '@/constants/constants';
 import Colors from '@/constants/Colors';
-import useAuth from '@/app/contex/authcontex';
+import useAuth from '@/context/authContext';
 import { Stack } from 'expo-router';
 import ImageViewing from 'react-native-image-viewing';
+import useThemeContext from "@/context/themeContext"; // Replace with real path
+import { useMemo } from 'react';
+
+
 
 export default function ExerciseDetails() {
+    const { colors } = useThemeContext();
+
+    const styles = useMemo(() => StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.background,
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        errorContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        errorText: {
+            fontSize: 18,
+            color: 'red',
+        },
+        mainCard: {
+            backgroundColor: 'white',
+            borderRadius: 10,
+            padding: 16,
+            margin: 10,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        title: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            marginBottom: 16,
+            textAlign: 'center',
+        },
+        cardTitle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginBottom: 8,
+            textAlign: 'center',
+        },
+        horizontalImageScroll: {
+            maxHeight: 500,
+            width: 350,
+            marginTop: 10,
+            marginBottom: 5,
+            backgroundColor: colors.background,
+        },
+        horizontalImageContent: {
+            paddingHorizontal: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        horizontalImage: {
+            width: 250,
+            maxHeight: "100%",
+            aspectRatio: 1,
+            resizeMode: 'fill',
+            borderRadius: 12,
+            marginRight: 10,
+            backgroundColor: '#eee',
+        },
+        infoRow: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+        },
+        infoCard: {
+            width: '48%',
+            backgroundColor: '#f9f9f9',
+            borderRadius: 8,
+            padding: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 2,
+            elevation: 1,
+        },
+        fullWidthCard: {
+            backgroundColor: '#f9f9f9',
+            borderRadius: 8,
+            padding: 12,
+            marginVertical: 8,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 2,
+            elevation: 1,
+        },
+        infoText: {
+            textAlign: 'center',
+            fontSize: 16,
+            textTransform: 'capitalize',
+        },
+        muscleList: {
+            marginTop: 5,
+        },
+        muscleItem: {
+            fontSize: 16,
+            marginBottom: 5,
+            textTransform: 'capitalize',
+        },
+        instructionsList: {
+            marginTop: 5,
+        },
+        instructionItem: {
+            fontSize: 16,
+            marginBottom: 10,
+            lineHeight: 22,
+        },
+    }), [colors]);
+
+
     const [exercise, setExercise] = useState(null);
     const [loading, setLoading] = useState(true);
     const [viewerVisible, setViewerVisible] = useState(false);
@@ -47,7 +167,7 @@ export default function ExerciseDetails() {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Colors.light.tint} />
+                <ActivityIndicator size="large" color={colors.tint} />
             </View>
         );
     }
@@ -174,115 +294,3 @@ export default function ExerciseDetails() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.light.background,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        fontSize: 18,
-        color: 'red',
-    },
-    mainCard: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 16,
-        margin: 10,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    horizontalImageScroll: {
-        maxHeight: 500,
-        width: 350,
-        marginTop: 10,
-        marginBottom: 5,
-        backgroundColor: Colors.light.background,
-    },
-    horizontalImageContent: {
-        paddingHorizontal: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    horizontalImage: {
-        width: 250,
-        maxHeight: "100%",
-        aspectRatio: 1,
-        resizeMode: 'fill',
-        borderRadius: 12,
-        marginRight: 10,
-        backgroundColor: '#eee',
-    },
-    infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-    },
-    infoCard: {
-        width: '48%',
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-        padding: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
-    },
-    fullWidthCard: {
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-        padding: 12,
-        marginVertical: 8,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
-    },
-    infoText: {
-        textAlign: 'center',
-        fontSize: 16,
-        textTransform: 'capitalize',
-    },
-    muscleList: {
-        marginTop: 5,
-    },
-    muscleItem: {
-        fontSize: 16,
-        marginBottom: 5,
-        textTransform: 'capitalize',
-    },
-    instructionsList: {
-        marginTop: 5,
-    },
-    instructionItem: {
-        fontSize: 16,
-        marginBottom: 10,
-        lineHeight: 22,
-    },
-});

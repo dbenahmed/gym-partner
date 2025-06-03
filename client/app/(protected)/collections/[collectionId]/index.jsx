@@ -1,16 +1,60 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, Modal, TextInput, StyleSheet, FlatList, Alert } from 'react-native';
-import useAuth from '@/app/contex/authcontex';
+import useAuth from '@/context/authContext';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { validateName } from '@/utils/validation';
 import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises, fetchDeleteCollection } from '@/lib/api'; // Replace with real path
+import useThemeContext from '@/context/themeContext'; // Replace with real path
 
 
 import { fetchGetUserPlans, fetchCreatePlan } from '@/lib/api';
+const { colors } = useThemeContext();
 
+const styles = useMemo(() => StyleSheet.create({
+  listContainer: {
+    flex: 1,
+  },
+  planItem: {
+    backgroundColor: Colors.light.background,
+    borderRadius: 12,
+    padding: 20,
 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  planTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: Colors.light.text,
+    letterSpacing: 0.3,
+  },
+  buttonContainer: {
+    backgroundColor: Colors.light.tint,
+    borderRadius: 8,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+}), [colors]);
 const Plans = () => {
   const { authenticated } = useAuth();
   const [plans, setPlans] = useState([]);
@@ -195,47 +239,3 @@ const Plans = () => {
 
 export default Plans;
 
-
-const styles = StyleSheet.create({
-  listContainer: {
-    flex: 1,
-  },
-  planItem: {
-    backgroundColor: Colors.light.background,
-    borderRadius: 12,
-    padding: 20,
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  planTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: Colors.light.text,
-    letterSpacing: 0.3,
-  },
-  buttonContainer: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 8,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-});

@@ -3,7 +3,7 @@ import React from "react";
 import Color from "@/constants/Colors.ts";
 import { router } from "expo-router";
 import { useState } from "react";
-import useAuth from "@/app/contex/authcontex";
+import useAuth from "@/context/authContext";
 
 
 

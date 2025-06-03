@@ -8,25 +8,221 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useState, useContext } from "react";
 import Color from "@/constants/Colors.ts";
-import { AuthContext } from "../contex/authcontex";
 import { defaultUrl } from "@/constants/constants.ts";
 import { validateEmail, validateUsername, validateName } from "@/utils/validation.ts";
 import SplashScreen from "@/components/SplashScreen";
-
-
+import useAuth from "@/context/authContext";
+import useThemeContext from "@/context/themeContext";
 
 
 export default function Profile() {
+  const { colors, toggleTheme } = useThemeContext();
+
+
+  const styles = useMemo(() => {
+    return StyleSheet.create({
+      container: {
+        flex: 1,
+        backgroundColor: colors.background,
+      },
+      header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        paddingTop: 50,
+      },
+      headerTitle: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: colors.tint,
+        letterSpacing: 1,
+      },
+      logoutButton: {
+        backgroundColor: '#ff4444',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 20,
+      },
+      logoutText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+      },
+      profileCard: {
+        backgroundColor: '#fff',
+        margin: 20,
+        borderRadius: 20,
+        padding: 30,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 5,
+      },
+      userInitials: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: colors.tint,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 15,
+      },
+      initialsText: {
+        fontSize: 32,
+        fontWeight: '700',
+        color: colors.background,
+      },
+      userName: {
+        fontSize: 24,
+        fontWeight: '700',
+        color: colors.tint,
+        marginBottom: 5,
+      },
+      userHandle: {
+        fontSize: 16,
+        color: '#666',
+        marginBottom: 30,
+      },
+      infoSection: {
+        width: '100%',
+        marginBottom: 30,
+      },
+      infoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+      },
+      infoLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.tint,
+        flex: 1,
+      },
+      infoValue: {
+        fontSize: 16,
+        color: '#333',
+        flex: 2,
+        textAlign: 'right',
+      },
+      editButton: {
+        backgroundColor: colors.tint,
+        paddingHorizontal: 40,
+        paddingVertical: 12,
+        borderRadius: 25,
+      },
+      editButtonText: {
+        color: colors.background,
+        fontSize: 16,
+        fontWeight: '600',
+      },
+      modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+      },
+      modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 25,
+        maxHeight: '80%',
+      },
+      modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 25,
+        paddingBottom: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+      },
+      modalTitle: {
+        fontSize: 24,
+        fontWeight: '700',
+        color: colors.tint,
+      },
+      closeButton: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: '#f0f0f0',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      closeButtonText: {
+        fontSize: 20,
+        color: '#666',
+        fontWeight: '300',
+      },
+      inputContainer: {
+        marginBottom: 20,
+      },
+      inputLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.tint,
+        marginBottom: 8,
+      },
+      input: {
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        fontSize: 16,
+        color: '#333',
+        backgroundColor: '#fafafa',
+      },
+      modalActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        gap: 15,
+      },
+      cancelButton: {
+        flex: 1,
+        paddingVertical: 12,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        backgroundColor: '#f8f8f8',
+      },
+      cancelButtonText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#666',
+      },
+      saveButton: {
+        flex: 1,
+        paddingVertical: 12,
+        borderRadius: 10,
+        backgroundColor: colors.tint,
+      },
+      saveButtonText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.background,
+      },
+    })
+  }, [colors]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingSaving, setLoadingSaving] = useState(false);
 
-  const { logout } = useContext(AuthContext);
-  const { authenticated, userId } = useAuth();
+  const { authenticated, userId, logout } = useAuth();
 
   const [userInfo, setUserInfo] = useState({
     username: "",
@@ -146,13 +342,13 @@ export default function Profile() {
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={{ color: Color.light.tint, fontSize: 20 }}>Error</Text>
-        <Text style={{ color: Color.light.tint, fontSize: 20 }}>{error.message}</Text>
+        <Text style={{ color: colors.tint, fontSize: 20 }}>Error</Text>
+        <Text style={{ color: colors.tint, fontSize: 20 }}>{error.message}</Text>
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-        <Text style={{ color: Color.light.tint, fontSize: 20 }}>Please try again later</Text>
-        <Text style={{ color: Color.light.tint, fontSize: 20 }}>Or contact support</Text>
+        <Text style={{ color: colors.tint, fontSize: 20 }}>Please try again later</Text>
+        <Text style={{ color: colors.tint, fontSize: 20 }}>Or contact support</Text>
       </View>
     );
   }
@@ -207,7 +403,21 @@ export default function Profile() {
           <TouchableOpacity style={styles.editButton} onPress={openEditModal}>
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
+          <View>
+            <Text style={{ color: colors.tint, fontSize: 16, textAlign: 'center', marginTop: 20 }}>
+              You can edit your profile information by clicking the "Edit Profile" button above.
+            </Text>
+          </View>
+          <View style={{ marginTop: 20 }}>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={toggleTheme}
+            >
+              <Text style={styles.logoutText}>Toggle Theme</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+
       </View>
 
       {/* Edit Modal */}
@@ -305,197 +515,3 @@ export default function Profile() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Color.light.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    paddingTop: 50,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Color.light.tint,
-    letterSpacing: 1,
-  },
-  logoutButton: {
-    backgroundColor: '#ff4444',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  logoutText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  profileCard: {
-    backgroundColor: '#fff',
-    margin: 20,
-    borderRadius: 20,
-    padding: 30,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  userInitials: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Color.light.tint,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  initialsText: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: Color.light.background,
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Color.light.tint,
-    marginBottom: 5,
-  },
-  userHandle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 30,
-  },
-  infoSection: {
-    width: '100%',
-    marginBottom: 30,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  infoLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.light.tint,
-    flex: 1,
-  },
-  infoValue: {
-    fontSize: 16,
-    color: '#333',
-    flex: 2,
-    textAlign: 'right',
-  },
-  editButton: {
-    backgroundColor: Color.light.tint,
-    paddingHorizontal: 40,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  editButtonText: {
-    color: Color.light.background,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 25,
-    maxHeight: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 25,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Color.light.tint,
-  },
-  closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: '#666',
-    fontWeight: '300',
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.light.tint,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fafafa',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-    gap: 15,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#f8f8f8',
-  },
-  cancelButtonText: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: Color.light.tint,
-  },
-  saveButtonText: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.light.background,
-  },
-});

@@ -8,19 +8,23 @@ import {
   Pressable,
   ImageBackground,
 } from "react-native";
-import { AuthContext } from "@/app/contex/authcontex";
 import { useRouter } from "expo-router";
-import Color from "@/constants/Colors.ts";
 import { useState, useContext } from "react";
+import useAuth from "@/context/authContext";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import useThemeContext from "@/context/themeContext";
+
 
 export default function TabTwoScreen() {
+
+  const { colors } = useThemeContext();
+
   const router = useRouter();
   const [password, setPassword] = useState("password1");
   const [username, setUsername] = useState("djilaliben");
-  const { login, splashLoading, setSplashLoading } = useContext(AuthContext);
+  const { login, splashLoading, setSplashLoading } = useAuth();
 
   const handleLogin = async () => {
     setSplashLoading(true);

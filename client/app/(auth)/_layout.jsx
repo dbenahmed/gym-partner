@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { Redirect } from "expo-router";
-import useAuth from "@/app/contex/authcontex";
+import useAuth from "@/context/authContext";
 
 
 

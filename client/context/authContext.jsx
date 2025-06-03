@@ -9,7 +9,7 @@ import * as SecureStore from 'expo-secure-store';
 
 
 
-export const AuthContext = React.createContext();
+const AuthContext = React.createContext();
 
 
 export const getTokenMobile = async () => {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,12 @@ import {
   TextInput,
 } from "react-native";
 import { fetchGetUserCollections, fetchCreateCollection } from "@/lib/api";
-import useAuth from "@/app/contex/authcontex";
+import useAuth from "@/context/authContext";
 import { ActivityIndicator } from "react-native";
 import Colors from "@/constants/Colors";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { validateName } from "@/utils/validation";
-
+import useThemeContext from "@/context/themeContext"; // Replace with real path
 type Collection = {
   collectionId: number;
   title: string;
@@ -23,6 +23,59 @@ type Collection = {
 };
 
 const Collections = () => {
+  const { colors } = useThemeContext();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        cardContainer: {
+          backgroundColor: colors.background,
+          borderRadius: 12,
+          padding: 20,
+          marginHorizontal: 16,
+          marginVertical: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          elevation: 5,
+          borderWidth: 1,
+          borderColor: "rgba(0, 0, 0, 0.05)",
+        },
+        cardTitle: {
+          fontSize: 20,
+          fontWeight: "700",
+          marginBottom: 10,
+          color: colors.text,
+          letterSpacing: 0.3,
+        },
+        cardDescription: {
+          fontSize: 15,
+          color: "#555",
+          lineHeight: 22,
+          opacity: 0.8,
+        },
+        buttonContainer: {
+          backgroundColor: colors.tint,
+          borderRadius: 8,
+          padding: 16,
+          marginHorizontal: 16,
+          marginTop: 16,
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 2,
+        },
+        buttonText: {
+          fontSize: 16,
+          fontWeight: "bold",
+          color: "#fff",
+        },
+      }),
+    [colors]
+  );
   const [collections, setCollections] = useState<Collection[]>([]);
   const { authenticated } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -227,7 +280,7 @@ const Collections = () => {
 
                   <TouchableOpacity
                     style={{
-                      backgroundColor: Colors.light.tint,
+                      backgroundColor: colors.tint,
                       borderRadius: 8,
                       padding: 16,
                       flex: 1,
@@ -255,54 +308,5 @@ const Collections = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  cardContainer: {
-    backgroundColor: Colors.light.background,
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginVertical: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.05)",
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 10,
-    color: Colors.light.text,
-    letterSpacing: 0.3,
-  },
-  cardDescription: {
-    fontSize: 15,
-    color: "#555",
-    lineHeight: 22,
-    opacity: 0.8,
-  },
-  buttonContainer: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 8,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-});
 
 export default Collections;

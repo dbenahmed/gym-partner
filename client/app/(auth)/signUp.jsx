@@ -7,11 +7,9 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
-import { useState, useContext } from "react";
-import { AuthContext } from "@/app/contex/authcontex";
-import useAuth from "@/app/contex/authcontex";
+import { useState } from "react";
+import useAuth from "@/context/authContext";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
 import { validatePassword, validateUsername, validateName } from "@/utils/validation";
@@ -46,8 +44,8 @@ export default function SignUp() {
     }
 
     setSplashLoading(true);
-    const res = await register(username, password , firstName, lastName);
-    console.log("res",res);
+    const res = await register(username, password, firstName, lastName);
+    console.log("res", res);
     if (res.success) {
       Alert.alert("Success", res.message);
       router.push("/(auth)/signIn");
