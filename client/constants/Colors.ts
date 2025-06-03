@@ -14,6 +14,10 @@ const Colors = {
     icon: "#687076",
     tabIconDefault: "#687076",
     tabIconSelected: "rgba(10, 126, 164, 1)",
+    proteinBg: "#4ECDC4",
+    caloriesBg: "#FF6B6B",
+    carbsBg: "#45B7D1",
+    fatBg: "#FFA07A",
   },
   dark: {
     text: "#ECEDEE",

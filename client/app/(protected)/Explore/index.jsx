@@ -533,6 +533,7 @@ export default function Explore() {
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: Color.light.background,
+		paddingTop: 0,
 		padding: 16,
 		width: '100%',
 		flex: 1

@@ -19,7 +19,7 @@ import { LinearGradient } from "expo-linear-gradient";
 export default function TabTwoScreen() {
   const router = useRouter();
   const [password, setPassword] = useState("password1");
-  const [username, setUsername] = useState("user1");
+  const [username, setUsername] = useState("djilaliben");
   const { login, splashLoading, setSplashLoading } = useContext(AuthContext);
 
   const handleLogin = async () => {

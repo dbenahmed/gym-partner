@@ -94,7 +94,7 @@ const Collections = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <View style={{ height: "100%", paddingVertical: 16 }}>
+        <View style={{ height: "100%", paddingBottom: 16 }}>
           <FlatList
             style={{ flex: 1 }}
             data={collections}

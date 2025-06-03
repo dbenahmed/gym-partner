@@ -129,7 +129,7 @@ const Plans = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <View style={{ height: '100%', paddingVertical: 16, paddingHorizontal: 16 }}>
+        <View style={{ height: '100%', paddingBottom: 16, paddingHorizontal: 16 }}>
 
           <View style={{ marginVertical: 10 }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.text }}>Description</Text>

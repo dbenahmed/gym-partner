@@ -26,7 +26,6 @@ export default function SessionsLayout() {
                 contentStyle: {
                     backgroundColor: Colors.light.background,
                 },
-
             }}
         >
             <Stack.Screen

@@ -34,6 +34,9 @@ import { router } from "expo-router";
 import SplashScreen from "@/components/SplashScreen";
 
 export default function mealsHome() {
+
+  
+
   const [meals, setMeals] = useState([]);
 
   const { authenticated, userId } = useAuth();
@@ -881,10 +884,10 @@ export default function mealsHome() {
 
             <View style={styles.nutritionSummary}>
               {[
-                { value: prot, label: 'Protein', unit: 'g', color: '#4ECDC4' },
-                { value: kcal, label: 'Calories', unit: '', color: '#FF6B6B' },
-                { value: carb, label: 'Carbs', unit: 'g', color: '#45B7D1' },
-                { value: fats, label: 'Fat', unit: 'g', color: '#FFA07A' }
+                { value: prot, label: 'Protein', unit: 'g', color: Color.light.proteinBg },
+                { value: kcal, label: 'Calories', unit: '', color: Color.light.caloriesBg },
+                { value: carb, label: 'Carbs', unit: 'g', color: Color.light.carbsBg },
+                { value: fats, label: 'Fat', unit: 'g', color: Color.light.fatBg }
               ].map((nutrient, index) => (
                 <View key={nutrient.label} style={[styles.nutritionItem, { backgroundColor: nutrient.color }]}>
                   <Text style={styles.nutritionValue}>
@@ -1043,10 +1046,11 @@ export default function mealsHome() {
         <Modal
           isVisible={modalVisible}
           animationIn="slideInUp"
-          animationOut="zoomOut"
+          animationOut="slideOutDown"
+          onBackdropPress={() => setModalVisible(false)}
           swipeDirection="down"
           onSwipeComplete={() => setModalVisible(false)}
-          style={{ margin: 0, backgroundColor: "rgba(0, 0, 0, 0.05)" }}
+          style={{ margin: 0 }}
         >
           <View
             style={{

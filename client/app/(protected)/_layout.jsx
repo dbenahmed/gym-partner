@@ -25,7 +25,8 @@ export default function Layout() {
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
-              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              backgroundColor: "white", // semi-transparent white
+              borderTopColor: "transparent", // remove border
               borderTopWidth: 0,
             },
             default: {},
@@ -52,34 +53,10 @@ export default function Layout() {
             tabBarLabel: "Meals",
           }}
         />
+
+
         <Tabs.Screen
-          name="Profile"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="account-circle"
-                color={color}
-                size={size}
-              />
-            ),
-            tabBarLabel: "Profile",
-          }}
-        />
-        <Tabs.Screen
-          name="Collections"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="clipboard-list"
-                color={color}
-                size={size}
-              />
-            ),
-            tabBarLabel: "Collections",
-          }}
-        />
-        <Tabs.Screen
-          name="Sessions"
+          name="sessions"
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
@@ -91,6 +68,21 @@ export default function Layout() {
             tabBarLabel: "Sessions",
           }}
         />
+
+        <Tabs.Screen
+          name="collections"
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="clipboard-list"
+                color={color}
+                size={size}
+              />
+            ),
+            tabBarLabel: "Collections",
+          }}
+        />
+
         <Tabs.Screen
           name="Explore"
           options={{
@@ -102,6 +94,19 @@ export default function Layout() {
               />
             ),
             tabBarLabel: "Explore",
+          }}
+        />
+        <Tabs.Screen
+          name="Profile"
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="account-circle"
+                color={color}
+                size={size}
+              />
+            ),
+            tabBarLabel: "Profile",
           }}
         />
       </Tabs>
