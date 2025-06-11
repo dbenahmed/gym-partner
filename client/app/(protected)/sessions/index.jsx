@@ -9,13 +9,15 @@ import Colors from '@/constants/Colors';
 import { router, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { defaultUrl } from '@/constants/constants';
+import Button from '@/components/ui/Button.jsx';
+
 
 import useThemeContext from '@/context/themeContext';
 
 export default function Sessions() {
 
 
-    const { colors } = useThemeContext();
+    const { colors, theme } = useThemeContext();
 
 
     const [sessions, setSessions] = useState([]);
@@ -170,7 +172,7 @@ export default function Sessions() {
                     renderItem={({ item }) => (
                         <TouchableOpacity
                             style={{
-                                backgroundColor: colors.background,
+                                backgroundColor: colors.tintLighter,
                                 borderRadius: 8,
                                 padding: 16,
                                 marginBottom: 12,
@@ -190,11 +192,11 @@ export default function Sessions() {
                                 });
                             }}
                         >
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: colors.text }}>
                                 {item.name}
                             </Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={{ fontSize: 14, color: '#666' }}>
+                                <Text style={{ fontSize: 14, color: colors.text }}>
                                     {item.note}
                                 </Text>
                             </View>
@@ -210,21 +212,9 @@ export default function Sessions() {
                 />
             )}
 
-            <TouchableOpacity
-                style={{
-                    backgroundColor: colors.tint,
-                    borderRadius: 8,
-                    padding: 16,
-                    margin: 16,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 2,
-                }}
-                onPress={() => {
+            <Button
+                text="Start New Session"
+                onClick={() => {
                     router.push({
                         pathname: '/sessions/newSession',
                         params: {
@@ -232,11 +222,12 @@ export default function Sessions() {
                         }
                     });
                 }}
-            >
-                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>
-                    Start New Session
-                </Text>
-            </TouchableOpacity>
+                type="primary"
+                icon="plus"
+                styles={{
+                    margin: 16,
+                }}
+            />
         </View>
     );
 }

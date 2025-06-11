@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
 import Color from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import useThemeContext from "@/context/themeContext";
 
 interface SlideDownModalProps {
   children?: React.ReactNode;
@@ -18,6 +19,8 @@ export default function ModalSlideUp({
   onClose,
   props,
 }: SlideDownModalProps) {
+  const { theme, colors } = useThemeContext();
+
   return (
     <Modal
       isVisible={isVisible}
@@ -33,11 +36,12 @@ export default function ModalSlideUp({
         style={{
           flex: 1,
           justifyContent: "flex-end",
+          backgroundColor: colors.background,
         }}
       >
         <View
           style={{
-            backgroundColor: Color.light.background,
+            backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             padding: 16,
@@ -61,7 +65,7 @@ export default function ModalSlideUp({
             <Text
               style={{
                 fontWeight: "800",
-                color: Color.light.text,
+                color: colors.tint,
                 fontSize: 20,
               }}
             >
@@ -69,11 +73,7 @@ export default function ModalSlideUp({
             </Text>
             {onClose && (
               <TouchableOpacity onPress={() => onClose()}>
-                <MaterialIcons
-                  name="close"
-                  size={24}
-                  color={Color.light.text}
-                />
+                <MaterialIcons name="close" size={24} color={colors.red} />
               </TouchableOpacity>
             )}
           </View>

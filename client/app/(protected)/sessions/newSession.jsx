@@ -10,7 +10,7 @@ import { ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 import { validateName, validateNumber } from '@/utils/validation';
-
+import Button from '@/components/ui/Button';
 import ModalSlideUp from '@/components/ui/ModalSlideUp';
 
 import useThemeContext from '@/context/themeContext';
@@ -28,25 +28,26 @@ export default function StartSession() {
     const styles = useMemo(() => StyleSheet.create({
         container: {
             width: '100%',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: colors.background,
             padding: 16,
             marginBottom: 16,
         },
         textInput: {
             flex: 1,
             borderWidth: 1,
-            borderColor: '#e0e0e0',
+            borderColor: colors.tint,
             borderRadius: 8,
             padding: 12,
             fontSize: 12,
-            backgroundColor: '#fff',
+            color: colors.text,
+            backgroundColor: 'transparent',
             marginBottom: 16,
         },
         textInputLabel: {
             fontSize: 14,
             fontWeight: '500',
             marginBottom: 6,
-            color: '#333',
+            color: colors.text,
         },
         textArea: {
             borderWidth: 1,
@@ -72,7 +73,7 @@ export default function StartSession() {
         },
         searchButton: {
             flex: 1,
-            backgroundColor: Colors.light.tint,
+            backgroundColor: colors.tint,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -93,14 +94,14 @@ export default function StartSession() {
         },
         emptyStateText: {
             textAlign: 'center',
-            color: '#666',
+            color: colors.text,
             fontSize: 16,
         },
         flatListStyle: {
             flex: 1,
         },
         saveButton: {
-            backgroundColor: Colors.light.tint,
+            backgroundColor: colors.tint,
             padding: 16,
             borderRadius: 8,
             alignItems: 'center',
@@ -150,7 +151,7 @@ export default function StartSession() {
         },
         inputLabel: {
             fontSize: 14,
-            color: '#666',
+            color: colors.text,
             marginBottom: 4,
         },
         input: {
@@ -180,7 +181,7 @@ export default function StartSession() {
             width: 36,
             height: 36,
             borderRadius: 18,
-            backgroundColor: Colors.light.tint,
+            backgroundColor: colors.tint,
             alignSelf: 'center',
             marginTop: 8,
         },
@@ -254,7 +255,7 @@ export default function StartSession() {
             justifyContent: 'flex-end',
         },
         modalContent: {
-            backgroundColor: Colors.light.background,
+            backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             padding: 16,
@@ -274,8 +275,11 @@ export default function StartSession() {
             borderBottomColor: '#eee',
         },
         searchInput: {
-            backgroundColor: '#f1f3f5',
+            backgroundColor: "transparent",
             padding: 12,
+            borderWidth: 1,
+            borderColor: colors.tint,
+            color: colors.text,
             borderRadius: 8,
             margin: 16,
             fontSize: 16,
@@ -284,19 +288,20 @@ export default function StartSession() {
             borderRadius: 8,
             padding: 16,
             borderBottomWidth: 1,
-            borderBottomColor: '#eee',
+            borderBottomColor: colors.tintLighter,
         },
         searchResultItemSelected: {
             borderLeftWidth: 4,
-            borderColor: Colors.light.tint,
+            borderColor: colors.tint,
         },
         searchResultName: {
             fontSize: 16,
             fontWeight: 'bold',
+            color: colors.text,
         },
         searchResultCategory: {
             fontSize: 14,
-            color: '#666',
+            color: colors.text,
             marginTop: 4,
         },
         emptySearchText: {
@@ -696,7 +701,7 @@ export default function StartSession() {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color={Colors.light.tint} />
+                <ActivityIndicator size="large" color={colors.tint} />
                 <Text style={{ marginTop: 10 }}>Loading...</Text>
             </View>
         );
@@ -731,27 +736,33 @@ export default function StartSession() {
                         numberOfLines={3}
                     />
                 </View>
+                <View style={{
+                    height: 40,
+                    marginBottom: 16,
+                }}>
 
-                <ScrollView
-                    contentContainerStyle={styles.buttonsScrollStyles}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                >
-                    <TouchableOpacity
-                        style={styles.searchButton}
-                        onPress={() => setModalVisible(true)}
+                    <ScrollView
+                        contentContainerStyle={styles.buttonsScrollStyles}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        styles={{
+                            height: "100%"
+                        }}
                     >
-                        <MaterialCommunityIcons name="magnify" size={20} color="#fff" />
-                        <Text style={styles.searchButtonText}>Add Exercises</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.searchButton}
-                        onPress={() => importCollectionsButtonPressed()}
-                    >
-                        <MaterialCommunityIcons name="import" size={20} color="#fff" />
-                        <Text style={styles.searchButtonText}>Import Collection</Text>
-                    </TouchableOpacity>
-                </ScrollView>
+                        <Button
+                            text="Add Exercises"
+                            icon="magnify"
+                            type="primary"
+                            onClick={() => setModalVisible(true)}
+                        />
+                        <Button
+                            text="Import Collection"
+                            icon="folder-download"
+                            type="primary"
+                            onClick={() => importCollectionsButtonPressed()}
+                        />
+                    </ScrollView>
+                </View>
 
                 {exercises.length === 0 ? (
                     <View style={styles.emptyState}>
@@ -790,6 +801,9 @@ export default function StartSession() {
                 props={{
                     title: 'Add Exercises',
                 }}
+                styles={{
+                    backgroundColor: colors.background,
+                }}
             >
                 <TextInput
                     style={styles.searchInput}
@@ -800,7 +814,7 @@ export default function StartSession() {
 
                 {isLoadingSearchExercises ? (
                     <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="large" color={Colors.light.tint} />
+                        <ActivityIndicator size="large" color={colors.tint} />
                         <Text style={styles.loadingText}>Loading exercises...</Text>
                     </View>
                 ) : (
@@ -837,7 +851,7 @@ export default function StartSession() {
                     <View >
                         <Text style={styles.inputLabel}>Collections</Text>
                         {isLoadingCollections ? (
-                            <ActivityIndicator size="large" color={Colors.light.tint} />
+                            <ActivityIndicator size="large" color={colors.tint} />
                         ) : (
                             <FlatList
                                 data={collections}
@@ -862,7 +876,7 @@ export default function StartSession() {
                                 <Text style={[styles.inputLabel, { marginTop: 20 }]}>Plans</Text>
 
                                 {isLoadingPlans ? (
-                                    <ActivityIndicator size="large" color={Colors.light.tint} />
+                                    <ActivityIndicator size="large" color={colors.tint} />
                                 ) : (
                                     <FlatList
                                         data={plans}
@@ -888,7 +902,7 @@ export default function StartSession() {
                             <View>
                                 <Text style={[styles.inputLabel, { marginTop: 20 }]}>Exercises Preview</Text>
                                 {isLoadingPlanExercises ? (
-                                    <ActivityIndicator size="large" color={Colors.light.tint} />
+                                    <ActivityIndicator size="large" color={colors.tint} />
                                 ) : (
                                     <FlatList
                                         data={planExercises}

@@ -19,24 +19,24 @@ import useThemeContext from "@/context/themeContext";
 
 export default function SessionDetails() {
 
-  const { colors } = useThemeContext();
+  const { colors, theme } = useThemeContext();
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: Colors.light.background,
+      backgroundColor: colors.background,
       padding: 16,
     },
     loadingContainer: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: Colors.light.background,
+      backgroundColor: colors.background,
     },
     loadingText: {
       marginTop: 16,
       fontSize: 16,
-      color: Colors.light.text,
+      color: colors.text,
     },
     sessionHeader: {
       marginBottom: 24,
@@ -47,24 +47,28 @@ export default function SessionDetails() {
     sessionName: {
       fontSize: 24,
       fontWeight: "bold",
-      color: Colors.light.text,
+      color: colors.text,
       marginBottom: 8,
     },
     sessionDate: {
       fontSize: 16,
-      color: "#666",
+      color: colors.text,
       marginBottom: 8,
     },
     sessionNote: {
       fontSize: 14,
-      color: "#666",
+      color: colors.text,
       fontStyle: "italic",
     },
     statsContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
       marginBottom: 24,
-      backgroundColor: "#f5f5f5",
+      backgroundColor: colors.tintLighter,
+      borderEndWidth: 2,
+      borderStartWidth: 2,
+      borderColor: colors.tint,
+      shadowColor: "#000",
       borderRadius: 8,
       padding: 16,
     },
@@ -75,12 +79,12 @@ export default function SessionDetails() {
     statValue: {
       fontSize: 18,
       fontWeight: "bold",
-      color: Colors.light.text,
+      color: colors.text,
       marginTop: 4,
     },
     statLabel: {
       fontSize: 12,
-      color: "#666",
+      color: colors.text,
       marginTop: 2,
     },
     exercisesContainer: {
@@ -89,7 +93,7 @@ export default function SessionDetails() {
     sectionTitle: {
       fontSize: 20,
       fontWeight: "bold",
-      color: Colors.light.text,
+      color: colors.text,
       marginBottom: 16,
     },
     emptyMessage: {
@@ -100,7 +104,7 @@ export default function SessionDetails() {
       padding: 24,
     },
     exerciseCard: {
-      backgroundColor: "#fff",
+      backgroundColor: colors.tintLighter,
       borderRadius: 8,
       padding: 16,
       marginBottom: 12,
@@ -110,12 +114,12 @@ export default function SessionDetails() {
       shadowRadius: 2,
       elevation: 2,
       borderLeftWidth: 4,
-      borderLeftColor: Colors.light.tint,
+      borderLeftColor: colors.tint,
     },
     exerciseName: {
       fontSize: 18,
       fontWeight: "bold",
-      color: Colors.light.text,
+      color: colors.text,
       marginBottom: 12,
     },
     setsContainer: {
@@ -132,11 +136,11 @@ export default function SessionDetails() {
       width: 60,
       fontSize: 14,
       fontWeight: "bold",
-      color: "#666",
+      color: colors.text,
     },
     setDetail: {
       fontSize: 16,
-      color: Colors.light.text,
+      color: colors.text,
     },
     actionsContainer: {
       flexDirection: "row",
@@ -153,10 +157,10 @@ export default function SessionDetails() {
       marginHorizontal: 8,
     },
     primaryButton: {
-      backgroundColor: Colors.light.tint,
+      backgroundColor: colors.tint,
     },
     dangerButton: {
-      backgroundColor: "#ff4d4d",
+      backgroundColor: colors.red,
     },
     actionButtonText: {
       color: "#fff",
@@ -266,7 +270,7 @@ export default function SessionDetails() {
             title: "Session Details",
           }}
         />
-        <ActivityIndicator size="large" color={Colors.light.tint} />
+        <ActivityIndicator size="large" color={colors.tint} />
         <Text style={styles.loadingText}>Loading session details...</Text>
       </View>
     );
@@ -296,7 +300,7 @@ export default function SessionDetails() {
               <MaterialCommunityIcons
                 name="dumbbell"
                 size={24}
-                color={Colors.light.tint}
+                color={colors.tint}
               />
               <Text style={styles.statValue}>{exercises.length}</Text>
               <Text style={styles.statLabel}>Exercises</Text>
@@ -306,7 +310,7 @@ export default function SessionDetails() {
               <MaterialCommunityIcons
                 name="clock-outline"
                 size={24}
-                color={Colors.light.tint}
+                color={colors.tint}
               />
               <Text style={styles.statValue}>
                 {session.starttime && session.endtime
@@ -321,7 +325,7 @@ export default function SessionDetails() {
               <MaterialCommunityIcons
                 name="star"
                 size={24}
-                color={Colors.light.tint}
+                color={colors.tint}
               />
               <Text style={styles.statValue}>{session.rating || "N/A"}</Text>
               <Text style={styles.statLabel}>Rating</Text>
