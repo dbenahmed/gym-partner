@@ -30,7 +30,7 @@ export default function TabTwoScreen() {
     setSplashLoading(true);
     const res = await login(username, password);
     if (res.success) {
-      router.push("/(protected)/mealsHome"); // should use REDIRECT
+      router.replace("/(protected)/mealsHome"); //todo :  should use REDIRECT
     } else {
       Alert.alert("Error", res.message);
     }
