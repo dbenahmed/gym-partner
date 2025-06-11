@@ -38,7 +38,7 @@ import useThemeContext from "@/context/themeContext";
 export default function mealsHome() {
 
 
-  const { colors } = useThemeContext();
+  const { colors, theme } = useThemeContext();
 
   const styles = useMemo(() => {
     return StyleSheet.create({
@@ -642,9 +642,10 @@ export default function mealsHome() {
         <Modal
           animationType="slide"
           visible={additionModalVisible}
+          propagateSwipe={false}
           onRequestClose={() => setAdditionModalVisible(false)}
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             margin: 0,
           }}
         >
@@ -696,7 +697,7 @@ export default function mealsHome() {
                 />
                 <Text
                   style={{
-                    color: "#000000",
+                    color: colors.text,
                     fontSize: 12,
                     fontWeight: "400",
                     width: "90%",
@@ -718,7 +719,11 @@ export default function mealsHome() {
                 }}
               >
                 <Text
-                  style={{ fontWeight: "600", color: "#000000", fontSize: 13 }}
+                  style={{
+                    fontWeight: "600",
+                    color: colors.text,
+                    fontSize: 13
+                  }}
                 >
                   <MaterialIcons
                     name="restaurant"
@@ -735,13 +740,14 @@ export default function mealsHome() {
                     borderRadius: 8,
                     padding: 10,
                     color: colors.text,
-                    backgroundColor: "transparent",
-                    placeholderTextColor: "rgba(0, 0, 0, 0.5)",
+                    backgroundColor: colors.background,
                     width: "50%",
                     marginLeft: 10,
                   }}
                   placeholder="Enter serving size"
+                  placeholderTextColor={colors.tabIconDefault}
                   keyboardType="numeric"
+                  
                   onChangeText={(value) => {
                     setServingSize(value);
                   }}
@@ -752,7 +758,7 @@ export default function mealsHome() {
                 style={{
                   fontWeight: "700",
                   fontSize: 16,
-                  color: "#000000",
+                  color: colors.text,
                   marginBottom: 12,
                 }}
               >
@@ -767,15 +773,17 @@ export default function mealsHome() {
 
               <View
                 style={{
-                  backgroundColor: "white",
+                  backgroundColor: colors.background,
                   borderRadius: 10,
                   padding: 14,
                   marginBottom: 16,
-                  shadowColor: "#000",
+                  shadowColor: colors.tint,
                   shadowOffset: { width: 0, height: 1 },
                   shadowOpacity: 0.1,
                   shadowRadius: 2,
                   elevation: 2,
+                  borderWidth: 0.5,
+                  borderColor: colors.tintLighter,
                 }}
               >
                 <View style={{ marginBottom: 6 }}>
@@ -789,7 +797,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 13,
                         width: "33%",
                       }}
@@ -799,7 +807,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 13,
                         width: "33%",
                         textAlign: "center",
@@ -823,7 +831,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#e0e0e0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 4,
                     }}
                   />
@@ -838,7 +846,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -848,7 +856,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -878,7 +886,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 3,
                     }}
                   />
@@ -893,7 +901,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -903,7 +911,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -934,7 +942,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 3,
                     }}
                   />
@@ -949,7 +957,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -959,7 +967,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -990,7 +998,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 3,
                     }}
                   />
@@ -1005,7 +1013,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -1015,7 +1023,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -1049,7 +1057,7 @@ export default function mealsHome() {
                     <View
                       style={{
                         height: 1,
-                        backgroundColor: "#e0e0e0",
+                        backgroundColor: colors.tintLighter,
                         marginVertical: 6,
                       }}
                     />
@@ -1059,11 +1067,17 @@ export default function mealsHome() {
                         justifyContent: "space-between",
                       }}
                     >
-                      <Text style={{ fontWeight: "500", color: "#000000" }}>
+                      <Text style={{
+                        fontWeight: "500",
+                        color: colors.text
+                      }}>
                         Brand
                       </Text>
                       <Text
-                        style={{ fontWeight: "700", color: colors.tint }}
+                        style={{
+                          fontWeight: "700",
+                          color: colors.tint
+                        }}
                       >
                         {selectedAdditionFoodItem.brand}
                       </Text>
@@ -1093,7 +1107,7 @@ export default function mealsHome() {
                     addFoodToUser();
                   }}
                 >
-                  <MaterialIcons name="add" size={16} color="#FFFFFF" />
+                  <MaterialIcons name="add" size={16} color={colors.background} />
                   <Text
                     style={{
                       color: colors.background,
@@ -1326,7 +1340,8 @@ export default function mealsHome() {
           animationIn="slideInUp"
           animationOut="slideOutDown"
           onBackdropPress={() => setModalVisible(false)}
-          swipeDirection="down"
+          swipeDirection={additionModalVisible ? [] : ["down"]}
+          propagateSwipe={false}
           onSwipeComplete={() => setModalVisible(false)}
           style={{ margin: 0 }}
         >
