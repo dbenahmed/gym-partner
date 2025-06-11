@@ -13,7 +13,6 @@ dotenv.config();
 //the registration controller 
 export const registerUser = async (req, res) => {
   const { username, password, firstname, lastname } = req.body;
-  // verify all the fields are provided
   // checkinng if the user is already exist
 
   try {
