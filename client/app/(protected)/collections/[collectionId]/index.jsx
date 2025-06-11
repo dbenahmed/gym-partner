@@ -10,52 +10,59 @@ import useThemeContext from '@/context/themeContext'; // Replace with real path
 
 
 import { fetchGetUserPlans, fetchCreatePlan } from '@/lib/api';
-const { colors } = useThemeContext();
 
-const styles = useMemo(() => StyleSheet.create({
-  listContainer: {
-    flex: 1,
-  },
-  planItem: {
-    backgroundColor: Colors.light.background,
-    borderRadius: 12,
-    padding: 20,
 
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  planTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: Colors.light.text,
-    letterSpacing: 0.3,
-  },
-  buttonContainer: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 8,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-}), [colors]);
+
+
 const Plans = () => {
+
+  const { theme, colors } = useThemeContext();
+
+  const styles = useMemo(() => StyleSheet.create({
+    listContainer: {
+      flex: 1,
+    },
+    planItem: {
+      backgroundColor: colors.background,
+      borderRadius: 12,
+      padding: 20,
+
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
+      borderWidth: 1,
+      borderColor: 'rgba(0, 0, 0, 0.05)',
+    },
+    planTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text,
+      letterSpacing: 0.3,
+    },
+    buttonContainer: {
+      backgroundColor: colors.tint,
+      borderRadius: 8,
+      padding: 16,
+      marginHorizontal: 16,
+      marginTop: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: "#fff",
+    },
+  }), [theme]);
+
+
   const { authenticated } = useAuth();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -165,7 +172,7 @@ const Plans = () => {
               onPress={() => deleteCollection(collectionId)}
               style={{ padding: 10 }}
             >
-              <Text style={{ color: Colors.light.tint }}>Delete</Text>
+              <Text style={{ color: colors.tint }}>Delete</Text>
             </TouchableOpacity>
           ),
         }}
@@ -176,7 +183,7 @@ const Plans = () => {
         <View style={{ height: '100%', paddingBottom: 16, paddingHorizontal: 16 }}>
 
           <View style={{ marginVertical: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.text }}>Description</Text>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Description</Text>
             <Text>{description}</Text>
           </View>
 
@@ -223,10 +230,10 @@ const Plans = () => {
                   paddingHorizontal: 10,
                 }}
               />
-              <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={handleCreatePlan}>
+              <TouchableOpacity style={{ backgroundColor: colors.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={handleCreatePlan}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Create Plan</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={() => setModalVisible(false)}>
+              <TouchableOpacity style={{ backgroundColor: colors.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={() => setModalVisible(false)}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Cancel</Text>
               </TouchableOpacity>
             </View>

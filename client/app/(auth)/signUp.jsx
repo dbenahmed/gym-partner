@@ -18,11 +18,11 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function SignUp() {
   const router = useRouter();
-  const [confpasword, setconfpasword] = useState("password1");
-  const [password, setPassword] = useState("password1");
-  const [username, setUsername] = useState("moh");
-  const [firstName, setFirstName] = useState("Hmouda");
-  const [lastName, setLastName] = useState("Naas");
+  const [confpasword, setconfpasword] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const { register, splashLoading, setSplashLoading } = useAuth();
 
   const handleRegister = async () => {
