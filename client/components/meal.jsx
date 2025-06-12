@@ -28,7 +28,6 @@ export default function Meal({ data, onDelete, onUpdate }) {
     parent: {
       backgroundColor: colors.tintLighter,
       marginVertical: 8,
-      marginHorizontal: 16,
       padding: 16,
       borderRadius: 12,
       shadowColor: "#000",

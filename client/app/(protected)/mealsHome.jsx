@@ -23,6 +23,8 @@ import {
   fetchCreateCustomMeal,
 } from "@/lib/api";
 
+import Button from "@/components/ui/Button";
+
 import {
   validateAllNutrition,
   validateNameWithNumbers,
@@ -1308,8 +1310,8 @@ export default function mealsHome() {
 
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1 }}>
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <ScrollView style={{ width: "90%" }}>
               {meals ? (
                 meals.map((e) => (
                   <Meal
@@ -1322,17 +1324,16 @@ export default function mealsHome() {
               ) : (
                 <View></View>
               )}
-
-              <TouchableOpacity
-                style={styles.addMealButton}
-                onPress={() => setModalVisible(true)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.addMealButtonContent}>
-                  <Text style={styles.addMealButtonIcon}>+</Text>
-                  <Text style={styles.addMealButtonText}>Add New Meal</Text>
-                </View>
-              </TouchableOpacity>
+              <Button
+                text="Add New Meal"
+                type="outline"
+                onClick={() => setModalVisible(true)}
+                icon="plus"
+                styles={{
+                  flex: 1,
+                  marginTop: 10,
+                }}
+              />
             </ScrollView>
           </View>
         )}
@@ -2248,7 +2249,7 @@ export default function mealsHome() {
             </View>
           </View>
         </Modal>
-      </View>
+      </View >
 
     </>
   );

@@ -28,12 +28,11 @@ export default function Layout() {
           tabBarBackground: TabBarBackground,
           tabBarStyle: Platform.select({
             ios: {
-              // Use a transparent background on iOS to show the blur effect
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
-              backgroundColor: colors.background, // semi-transparent white
-              borderTopColor: "transparent", // remove border
+              backgroundColor: colors.background,
+              borderTopColor: "transparent",
               borderTopWidth: 0,
             },
             android: {

@@ -23,6 +23,7 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                         ...styles,
                         backgroundColor: colors.tint,
                         flexDirection: 'row',
+                        gap: 6,
                         alignItems: 'center',
                         justifyContent: 'center',
                         padding: 12,
