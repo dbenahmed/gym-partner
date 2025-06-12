@@ -5,12 +5,14 @@ import useThemeContext from "@/context/themeContext";
 
 
 
-export default function Button({ children, styles, onClick, text, icon, type = 'button', disabled = false }) {
+export default function Button({ children = null, styles = {}, onClick, text, icon = undefined, type = 'primary', disabled = false }) {
 
     const { colors, theme } = useThemeContext();
 
 
-
+    if (!type) {
+        console.warn("Button type is not defined. Defaulting to 'primary'.");
+    }
 
 
     switch (type) {

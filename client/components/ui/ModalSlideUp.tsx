@@ -9,12 +9,11 @@ interface SlideDownModalProps {
   children?: React.ReactNode;
   isVisible: boolean;
   onClose?: () => void;
-  customFoodModalVisible: boolean;
   props: any; // Add this line to include props
 }
 
 export default function ModalSlideUp({
-  children,
+  children = null,
   isVisible,
   onClose,
   props,
