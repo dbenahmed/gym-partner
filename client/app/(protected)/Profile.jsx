@@ -19,7 +19,7 @@ import useThemeContext from "@/context/themeContext";
 
 
 export default function Profile() {
-  const { colors, toggleTheme } = useThemeContext();
+  const { colors, theme, toggleTheme } = useThemeContext();
 
 
   const styles = useMemo(() => {
@@ -54,7 +54,7 @@ export default function Profile() {
         fontWeight: '600',
       },
       profileCard: {
-        backgroundColor: '#fff',
+        backgroundColor: theme === "dark" ? colors.tintLighter : colors.background,
         margin: 20,
         borderRadius: 20,
         padding: 30,
@@ -87,7 +87,7 @@ export default function Profile() {
       },
       userHandle: {
         fontSize: 16,
-        color: '#666',
+        color: colors.text,
         marginBottom: 30,
       },
       infoSection: {
@@ -110,7 +110,7 @@ export default function Profile() {
       },
       infoValue: {
         fontSize: 16,
-        color: '#333',
+        color: colors.text,
         flex: 2,
         textAlign: 'right',
       },
