@@ -68,6 +68,29 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                     }}>{text}</Text>
                 </TouchableOpacity>
             );
+        case 'outline':
+            return (
+                <TouchableOpacity
+                    style={{
+                        ...styles,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderColor: colors.tint,
+                        borderWidth: 1,
+                        padding: 12,
+                        borderRadius: 8,
+                    }}
+                    onPress={onClick}
+                    disabled={disabled}
+                >
+                    {icon && <MaterialCommunityIcons name={icon} size={20} color={colors.tint} />}
+                    <Text style={{
+                        color: colors.tint,
+                        fontWeight: 'bold',
+                    }}>{text}</Text>
+                </TouchableOpacity>
+            );
         /* case 'tertiary':
             return (
                 <TouchableOpacity

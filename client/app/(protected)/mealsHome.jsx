@@ -747,7 +747,7 @@ export default function mealsHome() {
                   placeholder="Enter serving size"
                   placeholderTextColor={colors.tabIconDefault}
                   keyboardType="numeric"
-                  
+
                   onChangeText={(value) => {
                     setServingSize(value);
                   }}
@@ -1293,18 +1293,19 @@ export default function mealsHome() {
               alignItems: "center",
             }}
           >
-            <SplashScreen />
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 16,
-                fontWeight: "600",
-                color: colors.text,
-                marginTop: 15,
-              }}
-            >
-              Loading your meals...
-            </Text>
+            <SplashScreen>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: colors.text,
+                  marginBottom: 15,
+                }}
+              >
+                Loading your meals...
+              </Text>
+            </SplashScreen>
+
           </View>
         ) : (
           <View style={{ flex: 1 }}>
