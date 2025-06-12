@@ -34,7 +34,7 @@ export default function ExerciseDetails() {
             color: 'red',
         },
         mainCard: {
-            backgroundColor: 'white',
+            backgroundColor: colors.background,
             borderRadius: 10,
             padding: 16,
             margin: 10,
@@ -48,9 +48,11 @@ export default function ExerciseDetails() {
             fontSize: 24,
             fontWeight: 'bold',
             marginBottom: 16,
+            color: colors.text,
             textAlign: 'center',
         },
         cardTitle: {
+            color: colors.text,
             fontSize: 18,
             fontWeight: 'bold',
             marginBottom: 8,
@@ -58,10 +60,10 @@ export default function ExerciseDetails() {
         },
         horizontalImageScroll: {
             maxHeight: 500,
-            width: 350,
+            width: "100%",
             marginTop: 10,
             marginBottom: 5,
-            backgroundColor: colors.background,
+            backgroundColor: "transparent",
         },
         horizontalImageContent: {
             paddingHorizontal: 10,
@@ -75,7 +77,7 @@ export default function ExerciseDetails() {
             resizeMode: 'fill',
             borderRadius: 12,
             marginRight: 10,
-            backgroundColor: '#eee',
+            backgroundColor: 'transparent',
         },
         infoRow: {
             flexDirection: 'row',
@@ -84,9 +86,9 @@ export default function ExerciseDetails() {
         },
         infoCard: {
             width: '48%',
-            backgroundColor: '#f9f9f9',
             borderRadius: 8,
             padding: 12,
+            backgroundColor: colors.tintLighter,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,
@@ -94,19 +96,13 @@ export default function ExerciseDetails() {
             elevation: 1,
         },
         fullWidthCard: {
-            backgroundColor: '#f9f9f9',
-            borderRadius: 8,
-            padding: 12,
+            width: '100%',
             marginVertical: 8,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.05,
-            shadowRadius: 2,
-            elevation: 1,
         },
         infoText: {
             textAlign: 'center',
             fontSize: 16,
+            color: colors.text,
             textTransform: 'capitalize',
         },
         muscleList: {
@@ -115,6 +111,7 @@ export default function ExerciseDetails() {
         muscleItem: {
             fontSize: 16,
             marginBottom: 5,
+            color: colors.text,
             textTransform: 'capitalize',
         },
         instructionsList: {
@@ -122,6 +119,7 @@ export default function ExerciseDetails() {
         },
         instructionItem: {
             fontSize: 16,
+            color: colors.text,
             marginBottom: 10,
             lineHeight: 22,
         },
@@ -223,12 +221,18 @@ export default function ExerciseDetails() {
                         </View>
                     </View>
 
-                    <View style={styles.fullWidthCard}>
+                    <View style={{
+                        ...styles.infoCard,
+                        ...styles.fullWidthCard,
+                    }}>
                         <Text style={styles.cardTitle}>Equipment</Text>
                         <Text style={styles.infoText}>{exercise.equipment || 'None required'}</Text>
                     </View>
 
-                    <View style={styles.fullWidthCard}>
+                    <View style={{
+                        ...styles.infoCard,
+                        ...styles.fullWidthCard,
+                    }}>
                         <Text style={styles.cardTitle}>Primary Muscles</Text>
                         <View style={styles.muscleList}>
                             {exercise.primarymuscles.map((muscle, index) => (
@@ -238,7 +242,10 @@ export default function ExerciseDetails() {
                     </View>
 
                     {exercise.secondarymuscles && exercise.secondarymuscles.length > 0 && (
-                        <View style={styles.fullWidthCard}>
+                        <View style={{
+                            ...styles.infoCard,
+                            ...styles.fullWidthCard,
+                        }}>
                             <Text style={styles.cardTitle}>Secondary Muscles</Text>
                             <View style={styles.muscleList}>
                                 {exercise.secondarymuscles.map((muscle, index) => (
@@ -248,7 +255,10 @@ export default function ExerciseDetails() {
                         </View>
                     )}
 
-                    <View style={styles.fullWidthCard}>
+                    <View style={{
+                        ...styles.infoCard,
+                        ...styles.fullWidthCard,
+                    }}>
                         <Text style={styles.cardTitle}>Instructions</Text>
                         <View style={styles.instructionsList}>
                             {exercise.instructions.map((instruction, index) => (
@@ -260,13 +270,16 @@ export default function ExerciseDetails() {
                     </View>
 
 
-                    <View style={styles.fullWidthCard}>
+                    <View style={{
+                        ...styles.infoCard,
+                        ...styles.fullWidthCard,
+                    }}>
                         <Text style={styles.cardTitle}>Images</Text>
 
                         {/* Horizontal images scroll */}
                         {exercise.images && exercise.images.length > 0 && (
                             <ScrollView
-                                horizontal
+                                horizontal={true}
                                 showsHorizontalScrollIndicator={true}
                                 style={styles.horizontalImageScroll}
                                 contentContainerStyle={styles.horizontalImageContent}

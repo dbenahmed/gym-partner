@@ -22,7 +22,7 @@ export default function MealDetails() {
     const styles = useMemo(() => StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: Color.light.background,
+            backgroundColor: colors.background,
         },
         loadingContainer: {
             flex: 1,
@@ -39,7 +39,7 @@ export default function MealDetails() {
             color: 'red',
         },
         mainCard: {
-            backgroundColor: 'white',
+            backgroundColor: colors.background,
             borderRadius: 10,
             padding: 16,
             margin: 10,
@@ -56,15 +56,16 @@ export default function MealDetails() {
         title: {
             fontSize: 24,
             fontWeight: 'bold',
+            color: colors.text,
             textAlign: 'center',
         },
         brand: {
             fontSize: 16,
-            color: '#666',
+            color: colors.text,
             marginTop: 4,
         },
         descriptionCard: {
-            backgroundColor: '#f9f9f9',
+            backgroundColor: colors.tintLighter,
             borderRadius: 8,
             padding: 12,
             marginBottom: 16,
@@ -72,7 +73,7 @@ export default function MealDetails() {
         descriptionText: {
             fontSize: 16,
             lineHeight: 22,
-            color: '#333',
+            color: colors.text,
         },
         nutritionHeader: {
             flexDirection: 'row',
@@ -82,14 +83,15 @@ export default function MealDetails() {
         },
         sectionTitle: {
             fontSize: 20,
+            color: colors.text,
             fontWeight: 'bold',
         },
         perServing: {
             fontSize: 14,
-            color: '#666',
+            color: colors.text,
         },
         nutritionCard: {
-            backgroundColor: '#f9f9f9',
+            backgroundColor: colors.tintLighter,
             borderRadius: 8,
             padding: 12,
         },
@@ -101,14 +103,17 @@ export default function MealDetails() {
         nutritionLabel: {
             fontSize: 16,
             fontWeight: '500',
+            color: colors.text,
         },
         nutritionLabelIndented: {
             fontSize: 16,
             marginLeft: 16,
+            color: colors.text,
         },
         nutritionValue: {
             fontSize: 16,
             fontWeight: '500',
+            color: colors.tint,
         },
         divider: {
             height: 1,
@@ -119,6 +124,7 @@ export default function MealDetails() {
             fontSize: 16,
             fontWeight: 'bold',
             marginVertical: 8,
+            color: colors.text,
         },
     }), [colors]);
 
@@ -162,7 +168,7 @@ export default function MealDetails() {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Color.light.tint} />
+                <ActivityIndicator size="large" color={colors.tint} />
             </View>
         );
     }

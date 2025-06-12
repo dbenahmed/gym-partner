@@ -39,7 +39,6 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                     <Text style={{
                         color: '#fff',
                         fontWeight: 'bold',
-                        marginLeft: 8,
                     }}>{text}</Text>
                 </TouchableOpacity>
             );
@@ -48,19 +47,25 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                 <TouchableOpacity
                     style={{
                         ...styles,
-                        backgroundColor: colors.secondary,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        backgroundColor: '#ccc',
                         padding: 12,
                         borderRadius: 8,
-                        marginBottom: 20,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
                     }}
                     onPress={onClick}
                     disabled={disabled}
                 >
                     {icon && <MaterialCommunityIcons name={icon} size={20} color="#fff" />}
-                    <Text style={{}}>{text}</Text>
+                    <Text style={{
+                        color: '#fff',
+                        fontWeight: 'bold',
+                    }}>{text}</Text>
                 </TouchableOpacity>
             );
         /* case 'tertiary':
