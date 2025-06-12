@@ -15,7 +15,7 @@ export default function Layout() {
   const { authenticated } = useAuth();
 
 
-  const {colors} = useThemeContext();
+  const { colors } = useThemeContext();
 
   if (authenticated) {
     // logged in
@@ -33,6 +33,15 @@ export default function Layout() {
               paddingBottom: 5,
               paddingTop: 5,
               backgroundColor: colors.background, // semi-transparent white
+              borderTopColor: "transparent", // remove border
+              borderTopWidth: 0,
+            },
+            android: {
+              // Use a solid background on Android
+              height: 60, // reduce height
+              paddingBottom: 5,
+              paddingTop: 5,
+              backgroundColor: colors.background, // solid white
               borderTopColor: "transparent", // remove border
               borderTopWidth: 0,
             },
