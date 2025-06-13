@@ -22,7 +22,8 @@ import { useRouter } from "expo-router";
 import routesLinks from "@/constants/routes.ts";
 
 function PageButton({ onPress = () => { console.warn("PageButton onPress not defined") }, title = "No Title", icon = null }) {
-  const { colors } = useThemeContext();
+  const { colors, deviceTheme, theme } = useThemeContext();
+
 
   const styles = useMemo(() => {
     return StyleSheet.create({
@@ -44,6 +45,9 @@ function PageButton({ onPress = () => { console.warn("PageButton onPress not def
       },
     });
   }, [colors]);
+  console.warn(deviceTheme)
+  console.warn(theme)
+  console.warn(colors)
   return (
     <TouchableOpacity style={styles.editButton} onPress={onPress}>
       {icon && <MaterialCommunityIcons
@@ -57,44 +61,30 @@ function PageButton({ onPress = () => { console.warn("PageButton onPress not def
   )
 }
 
-function ToggleThemeButton() {
-  const { colors, theme, toggleTheme } = useThemeContext();
-  const styles = useMemo(() => {
-    return StyleSheet.create({
-      logoutButton: {
-        backgroundColor: theme === "dark" ? colors.tintLighter : colors.tint,
-        paddingHorizontal: 15,
-        paddingVertical: 4,
-        borderRadius: 20,
-        height: 35,
-        alignItems: 'center',
-        justifyContent: 'center',
-
-      },
-    });
-  }, [colors, theme]);
-  return (
-    <TouchableOpacity
-      style={styles.logoutButton}
-      onPress={toggleTheme}
-    >
-      <MaterialCommunityIcons
-        name={theme === "dark" ? "weather-night" : "white-balance-sunny"}
-        size={24}
-        color={theme === "dark" ? colors.tint : colors.background}
-      />
-    </TouchableOpacity>
-  )
-}
 
 
 export default function Profile() {
-  const { colors, theme, toggleTheme } = useThemeContext();
+  const { colors, theme, toggleTheme, deviceTheme } = useThemeContext();
+
+  const handleThemeChange = (theTheme) => {
+    toggleTheme(theTheme);
+  }
 
   const router = useRouter();
 
+  const [visibleThemeMenu, setVisibleThemeMenu] = useState(false);
+
+  const toggleThemeMenu = () => {
+    setVisibleThemeMenu(prev => !prev);
+  }
+
   const styles = useMemo(() => {
     return StyleSheet.create({
+
+      changeThemeButton: {
+        backgroundColor: theme === "device" ? deviceTheme === "dark" ? colors.tint : colors.tintLighter : theme === "dark" ? colors.tint : colors.tintLighter,
+
+      },
       container: {
         flex: 1,
         backgroundColor: colors.background,
@@ -113,14 +103,15 @@ export default function Profile() {
         color: colors.tint,
         letterSpacing: 1,
       },
-      logoutButton: {
-        backgroundColor: colors.red,
+      smallButton: {
         paddingHorizontal: 15,
-        height: 35,
+        height: 40,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 8,
         borderRadius: 20,
+      },
+      logoutButton: {
+        backgroundColor: colors.red,
       },
       logoutText: {
         color: "white",
@@ -421,7 +412,9 @@ export default function Profile() {
       <View style={styles.container}>
         <Text style={{ color: colors.tint, fontSize: 20 }}>Error</Text>
         <Text style={{ color: colors.tint, fontSize: 20 }}>{error.message}</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <TouchableOpacity style={{
+          ...styles.logoutButton, ...styles.smallButton
+        }} onPress={logout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
         <Text style={{ color: colors.tint, fontSize: 20 }}>Please try again later</Text>
@@ -434,11 +427,76 @@ export default function Profile() {
     <>
       <View style={styles.container}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { position: "relative" }]}>
           <Text style={styles.headerTitle}>Profile</Text>
 
-          <ToggleThemeButton />
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <TouchableOpacity
+            style={[styles.changeThemeButton, styles.smallButton]}
+            onPress={toggleThemeMenu}
+          >
+            <MaterialCommunityIcons
+              name={theme === "dark" ? "weather-night" : theme === "light" ? "white-balance-sunny" : "theme-light-dark"}
+              size={24}
+              color={theme === "device" ? deviceTheme === "dark" ? colors.background : colors.tint : theme === "dark" ? colors.background : colors.tint}
+            />
+          </TouchableOpacity>
+          {
+            visibleThemeMenu && (
+              <View style={{
+                borderRadius: 16,
+                position: 'absolute', backgroundColor: colors.tintLighter, top: 110, left: 45, right: 45, padding: 10, zIndex: 1000,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                //drop shadow
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.7,
+                shadowRadius: 15,
+              }}>
+
+                <TouchableOpacity
+                  style={[styles.smallButton]}
+                  onPress={() => {
+                    handleThemeChange("dark");
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="weather-night"
+                    size={24}
+                    color={theme === "device" ? deviceTheme === "dark" ? colors.tint : colors.text : theme === "dark" ? colors.tint : colors.text}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.smallButton]}
+                  onPress={() => {
+                    handleThemeChange("light");
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="white-balance-sunny"
+                    size={24}
+                    color={theme === "device" ? deviceTheme === "dark" ? colors.tint : colors.text : theme === "dark" ? colors.tint : colors.text}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.smallButton]}
+                  onPress={() => {
+                    handleThemeChange("device");
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="theme-light-dark"
+                    size={24}
+                    color={theme === "device" ? deviceTheme === "dark" ? colors.tint : colors.text : theme === "dark" ? colors.tint : colors.text}
+                  />
+                </TouchableOpacity>
+
+              </View>
+            )
+
+          }
+          <TouchableOpacity style={[styles.logoutButton, styles.smallButton]} onPress={logout}>
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         </View>
