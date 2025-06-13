@@ -8,6 +8,8 @@ import { StatusBar, useColorScheme } from "react-native";
 import * as SystemUI from "expo-system-ui";
 import useThemeContext from "@/context/themeContext";
 
+import "../styles/globals.css";
+
 export default function RootLayout() {
   useFonts({
     outfitr: require("@/assets/fonts/Outfit-Regular.ttf"),
@@ -24,16 +26,18 @@ export default function RootLayout() {
 }
 
 function InnerLayout() {
-  const { theme, colors } = useThemeContext();
+  const { theme, colors, deviceTheme } = useThemeContext();
 
   useEffect(() => {
-    SystemUI.setBackgroundColorAsync("black");
-  }, []);
+    SystemUI.setBackgroundColorAsync(colors.background);
+  }, [colors]);
 
   return (
     <>
       <SafeAreaView style={{ flex: 1 }}>
-        <StatusBar barStyle={"light-content"} />
+        <StatusBar
+          barStyle={theme === "light" ? "dark-content" : "light-content"}
+        />
         <AuthProvider>
           <Slot />
         </AuthProvider>

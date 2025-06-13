@@ -7,6 +7,7 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useMemo } from "react";
 import { useState, useContext } from "react";
@@ -16,11 +17,81 @@ import { validateEmail, validateUsername, validateName } from "@/utils/validatio
 import SplashScreen from "@/components/SplashScreen";
 import useAuth from "@/context/authContext";
 import useThemeContext from "@/context/themeContext";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import routesLinks from "@/constants/routes.ts";
+
+function PageButton({ onPress = () => { console.warn("PageButton onPress not defined") }, title = "No Title", icon = null }) {
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => {
+    return StyleSheet.create({
+      editButton: {
+        backgroundColor: colors.tint,
+        width: '100%',
+        height: 45,
+        paddingHorizontal: 25,
+        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: 'start',
+        borderRadius: 25,
+      },
+      editButtonText: {
+        color: colors.background,
+        fontSize: 16,
+        fontWeight: '500',
+      },
+    });
+  }, [colors]);
+  return (
+    <TouchableOpacity style={styles.editButton} onPress={onPress}>
+      {icon && <MaterialCommunityIcons
+        name={icon}
+        size={24}
+        color={colors.background}
+        style={{ marginRight: 10 }}
+      />}
+      <Text style={styles.editButtonText}>{title}</Text>
+    </TouchableOpacity>
+  )
+}
+
+function ToggleThemeButton() {
+  const { colors, theme, toggleTheme } = useThemeContext();
+  const styles = useMemo(() => {
+    return StyleSheet.create({
+      logoutButton: {
+        backgroundColor: theme === "dark" ? colors.tintLighter : colors.tint,
+        paddingHorizontal: 15,
+        paddingVertical: 4,
+        borderRadius: 20,
+        height: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
+
+      },
+    });
+  }, [colors, theme]);
+  return (
+    <TouchableOpacity
+      style={styles.logoutButton}
+      onPress={toggleTheme}
+    >
+      <MaterialCommunityIcons
+        name={theme === "dark" ? "weather-night" : "white-balance-sunny"}
+        size={24}
+        color={theme === "dark" ? colors.tint : colors.background}
+      />
+    </TouchableOpacity>
+  )
+}
 
 
 export default function Profile() {
   const { colors, theme, toggleTheme } = useThemeContext();
 
+  const router = useRouter();
 
   const styles = useMemo(() => {
     return StyleSheet.create({
@@ -43,13 +114,16 @@ export default function Profile() {
         letterSpacing: 1,
       },
       logoutButton: {
-        backgroundColor: '#ff4444',
+        backgroundColor: colors.red,
         paddingHorizontal: 15,
+        height: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
         paddingVertical: 8,
         borderRadius: 20,
       },
       logoutText: {
-        color: '#fff',
+        color: "white",
         fontSize: 14,
         fontWeight: '600',
       },
@@ -116,8 +190,11 @@ export default function Profile() {
       },
       editButton: {
         backgroundColor: colors.tint,
-        paddingHorizontal: 40,
-        paddingVertical: 12,
+        width: '100%',
+        height: 45,
+        paddingHorizontal: 30,
+        alignItems: 'left',
+        justifyContent: 'center',
         borderRadius: 25,
       },
       editButtonText: {
@@ -132,7 +209,7 @@ export default function Profile() {
         paddingHorizontal: 20,
       },
       modalContent: {
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
         borderRadius: 20,
         padding: 25,
         maxHeight: '80%',
@@ -155,14 +232,14 @@ export default function Profile() {
         width: 30,
         height: 30,
         borderRadius: 15,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: "transparent",
         justifyContent: 'center',
         alignItems: 'center',
       },
       closeButtonText: {
         fontSize: 20,
-        color: '#666',
-        fontWeight: '300',
+        color: "red",
+        fontWeight: '500',
       },
       inputContainer: {
         marginBottom: 20,
@@ -175,13 +252,13 @@ export default function Profile() {
       },
       input: {
         borderWidth: 1,
-        borderColor: '#e0e0e0',
+        borderColor: colors.tint,
         borderRadius: 10,
         paddingHorizontal: 15,
         paddingVertical: 12,
         fontSize: 16,
-        color: '#333',
-        backgroundColor: '#fafafa',
+        color: colors.text,
+        backgroundColor: 'transparent',
       },
       modalActions: {
         flexDirection: 'row',
@@ -359,6 +436,8 @@ export default function Profile() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Profile</Text>
+
+          <ToggleThemeButton />
           <TouchableOpacity style={styles.logoutButton} onPress={logout}>
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
@@ -399,23 +478,26 @@ export default function Profile() {
             </View>
             */}
           </View>
+          <ScrollView
+            style={{ width: '100%' }}
+            contentContainerStyle={{ gap: 10 }}
+          >
+            <PageButton icon="pen" title={"Edit Profile"} onPress={openEditModal} />
+            <PageButton icon="scale-bathroom" title={"Track Body Weight"} onPress={() => {
+              router.push(
+                {
+                  pathname: `${routesLinks.PROTECTED_PROFILE_BODY_WEIGHT_TRACKING}`,
+                }
+              );
+            }} />
 
-          <TouchableOpacity style={styles.editButton} onPress={openEditModal}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
+          </ScrollView>
           <View>
             <Text style={{ color: colors.tint, fontSize: 16, textAlign: 'center', marginTop: 20 }}>
               You can edit your profile information by clicking the "Edit Profile" button above.
             </Text>
           </View>
-          <View style={{ marginTop: 20 }}>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={toggleTheme}
-            >
-              <Text style={styles.logoutText}>Toggle Theme</Text>
-            </TouchableOpacity>
-          </View>
+
         </View>
 
       </View>

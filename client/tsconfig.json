@@ -16,6 +16,7 @@
     "app/(auth)/SignIn.jsx",
     "app/(tabs)/_layout.jsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
   ]
 }

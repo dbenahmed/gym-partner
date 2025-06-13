@@ -6,7 +6,6 @@ import SplashScreen from "@/components/SplashScreen";
 import useTheme from "@/context/themeContext";
 import { StyleSheet, Text, View } from "react-native";
 
-
 export default function Index() {
 
   const { authenticated, splashLoading } = useAuth();
