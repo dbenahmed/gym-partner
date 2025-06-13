@@ -7,7 +7,8 @@ const themeContext = React.createContext();
 
 export const ThemeProvider = ({ children }) => {
 
-    const [theme, setTheme] = React.useState(useColorScheme() || "light");
+    const deviceTheme = useColorScheme();
+    const [theme, setTheme] = React.useState(deviceTheme || "light");
 
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
@@ -16,7 +17,7 @@ export const ThemeProvider = ({ children }) => {
     const colors = Colors[theme];
 
     return (
-        <themeContext.Provider value={{ theme, toggleTheme, colors }}>
+        <themeContext.Provider value={{ deviceTheme, theme, toggleTheme, colors }}>
             {children}
         </themeContext.Provider>
     );

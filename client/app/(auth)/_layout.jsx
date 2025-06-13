@@ -15,6 +15,7 @@ export default function Layout() {
         return <Stack
             initialRouteName="landing" // 👈 this decides which screen to show first
             screenOptions={{ headerShown: false }}
+            
         >
             <Stack.Screen name="landing" options={{ headerShown: false }} />
             <Stack.Screen name="signIn" options={{ headerShown: false }} />

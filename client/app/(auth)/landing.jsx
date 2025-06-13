@@ -47,10 +47,11 @@ export default function Landing({ navigation }) {
     <ImageBackground
       source={require("@/assets/images/manLog.jpg")}
       style={styles.backgroundLog}
+
     >
       <Text
         style={{
-          color: "#F0B294",
+          color: colors.tint,
           fontSize: 13,
           fontWeight: "700",
           fontSize: 32,
@@ -60,6 +61,12 @@ export default function Landing({ navigation }) {
           top: "35%",
           lineHeight: 40,
           textAlign: "center",
+          // drop shadow
+          textShadowColor: "#000",
+          textShadowOffset: { width: 0, height: 1 },
+          textShadowRadius: 10,
+          fontFamily: "outfitb",
+          textTransform: "uppercase",
         }}
       >
         TRACK YOUR MEALS IMPROVE YOUR WORKOUT
@@ -78,7 +85,7 @@ export default function Landing({ navigation }) {
           style={[
             styles.botton,
             {
-              backgroundColor: "#CF8765",
+              backgroundColor: colors.tint,
               borderWidth: 1,
               borderColor: colors.tint,
               marginBottom: "8",
@@ -106,7 +113,7 @@ export default function Landing({ navigation }) {
             </Text>
           }
           rightTextStyle={{ color: "#000" }}
-          checkBoxColor="#CF8765"
+          checkBoxColor={colors.tint}
         />
       </View>
     </ImageBackground>

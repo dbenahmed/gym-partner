@@ -8,15 +8,51 @@ import {
   Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import useAuth from "@/context/authContext";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
 import { validatePassword, validateUsername, validateName } from "@/utils/validation";
 import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import useThemeContext from "@/context/themeContext";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function SignUp() {
+
+
+  const { colors, theme } = useThemeContext();
+
+
+  const styles = useMemo(() => StyleSheet.create({
+    textInput: {
+      borderWidth: 2,
+      width: "100%",
+      padding: 15,
+      borderRadius: 50,
+      fontSize: 16,
+      marginTop: 20,
+      borderColor: colors.tint,
+      color: colors.text,
+      paddingLeft: 60,
+    },
+    backgroundLog: {
+      flex: 1,
+      width: "100%",
+      height: "100%",
+      position: "relative",
+    },
+    inputContainer: {
+      width: "100%",
+      position: "relative",
+    },
+    icon: {
+      position: "absolute",
+      top: "50%",
+      left: "19",
+    },
+  }), [theme]);
+
   const router = useRouter();
   const [confpasword, setconfpasword] = useState("");
   const [password, setPassword] = useState("");
@@ -94,22 +130,28 @@ export default function SignUp() {
       >
 
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/people.png")}
+
+          <MaterialCommunityIcons
+            name="account-edit-outline"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
           />
           <TextInput
             placeholder="First Name"
             value={firstName}
-            placeholderTextColor={"#fffaf0"}
+            placeholderTextColor={colors.text}
             style={styles.textInput}
             onChangeText={(text) => setFirstName(text)}
           />
         </View>
 
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/people.png")}
+
+          <MaterialCommunityIcons
+            name="account-edit-outline"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
           />
           <TextInput
@@ -122,8 +164,10 @@ export default function SignUp() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/people.png")}
+          <MaterialCommunityIcons
+            name="account"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
           />
           <TextInput
@@ -136,8 +180,10 @@ export default function SignUp() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/key.png")}
+          <MaterialCommunityIcons
+            name="key"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
           />
           <TextInput
@@ -151,8 +197,10 @@ export default function SignUp() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/key.png")}
+          <MaterialCommunityIcons
+            name="key"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
           />
           <TextInput
@@ -167,7 +215,7 @@ export default function SignUp() {
         <TouchableOpacity
           style={{
             padding: 15,
-            backgroundColor: "#CF8765",
+            backgroundColor: colors.tint,
             width: "100%",
             marginTop: 20,
             borderRadius: 50,
@@ -198,7 +246,7 @@ export default function SignUp() {
         >
           <Text style={{ color: "#FFFFFF" }}>Already have an account?</Text>
           <Pressable onPress={() => router.push("/(auth)/signIn")}>
-            <Text style={{ color: "#CF8765", fontFamily: "outfitb" }}>
+            <Text style={{ color: colors.tint, fontFamily: "outfitb" }}>
               sign In Here
             </Text>
           </Pressable>
@@ -207,32 +255,3 @@ export default function SignUp() {
     </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  textInput: {
-    borderWidth: 3,
-    width: "100%",
-    padding: 15,
-    borderRadius: 50,
-    fontSize: 16,
-    marginTop: 20,
-    borderColor: "#CF8765",
-    color: "#CF8765",
-    paddingLeft: 60,
-  },
-  backgroundLog: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-  inputContainer: {
-    width: "100%",
-    position: "relative",
-  },
-  icon: {
-    position: "absolute",
-    top: "50%",
-    left: "19",
-  },
-});
