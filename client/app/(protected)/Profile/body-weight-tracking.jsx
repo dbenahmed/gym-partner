@@ -16,11 +16,16 @@ export default function BodyWeightTrackingScreen() {
     const [data, setData] = useState(fakeData);
 
     const renderItem = ({ item }) => (
-        <View className="bg-blue-500 p-3" >
-            <Text className="">Weight: 24 kg</Text>
-            <Text>Height: 24 cm</Text>
+        <View style={[styles.listItem, { backgroundColor: colors.tintLighter }]}>
+            <Text style={[styles.listItemText, { color: colors.text }]}>
+                Weight: {item.weight} kg
+            </Text>
+            <Text style={[styles.listItemText, { color: colors.text }]}>
+                Height: {item.height} cm
+            </Text>
         </View>
     );
+
 
     const logNewWeight = () => {
         const newEntry = {
@@ -31,10 +36,7 @@ export default function BodyWeightTrackingScreen() {
         setData((prevData) => [...prevData, newEntry]);
     };
     return (
-        <View className="bg-red-500 p-8" style={{ flex: 1 }}>
-
-
-
+        <View className="pr-8 pl-8 pt-4 pb-4" style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>
                 <FlatList
                     data={data}
@@ -47,8 +49,18 @@ export default function BodyWeightTrackingScreen() {
                 />
                 <Button title="Log New Weight" onPress={logNewWeight} />
             </View>
-
         </View>
     );
 }
 
+
+const styles = StyleSheet.create({
+    listItem: {
+        padding: 16,
+        marginVertical: 8,
+        borderRadius: 10,
+    },
+    listItemText: {
+        fontSize: 16,
+    },
+});
