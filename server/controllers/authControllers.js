@@ -5,8 +5,7 @@ import { eq } from 'drizzle-orm';
 import db from "../db/index.js";
 import dotenv from "dotenv"
 import { getAccessToken } from "../middleware/authMiddlewares.js";
-
-dotenv.config();
+import { config } from "../config/env.js"
 
 
 
@@ -34,7 +33,7 @@ export const registerUser = async (req, res) => {
 
   // Insert the new user 
   try {
-    const saltRounds = process.env.SALT_ROUNDS || 5;
+    const saltRounds = config.saltRounds || 5;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     await db.insert(users).values({
       username: username,
@@ -93,12 +92,12 @@ export const loginUser = async (req, res) => {
         {
           id: user.id,
         }
-        , process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
+        , config.jwtSecret,
+        { expiresIn: config.jwtExpiresIn || "1d" }
       )
       res.cookie("access_token", token, {
         httpOnly: true,                // Prevents XSS attacks
-        secure: process.env.NODE_ENV === "production", // true in production, false in development (for HTTP)
+        secure: config.nodeEnv === "production", // true in production, false in development (for HTTP)
         maxAge: 24 * 60 * 60 * 1000,   // Cookie expires in 1 day (same as token expiration)
         path: "/",                     // Ensure the cookie is available across all paths
       });
@@ -200,8 +199,8 @@ export const logoutUser = (req, res) => {
   try {
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: (process.env.NODE_ENV === "production"),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: (config.secure),
+      sameSite: config.nodeEnv === "production" ? "none" : "lax",
       maxAge: 0,
       path: "/"
     })

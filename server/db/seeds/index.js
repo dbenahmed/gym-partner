@@ -2,15 +2,15 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import db from "../index.js";
 import * as schema from "../schemas/schema.js";
+import { config } from "../../config/env.js"
 
-dotenv.config();
 
 const main = async () => {
     await db.transaction(async (tx) => {
         try {
             // filling the exercises db
             //console.log('here 1')
-            const exercisesMock = await Promise.all(
+            /* const exercisesMock = await Promise.all(
                 Array.from({ length: 10 }, async (_, index) => {
                     try {
                         return ({
@@ -31,13 +31,13 @@ const main = async () => {
                         console.error(e);
                     }
                 }))
-            const insertedExercises = await tx.insert(schema.exercises).values(exercisesMock).returning();
+            const insertedExercises = await tx.insert(schema.exercises).values(exercisesMock).returning(); */
             //console.log(insertedExercises)
 
             // filling the users
             const usersMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
-                    const password = await bcrypt.hash(`password${index + 1}`, parseInt(process.env.BCRYPT_SALT_ROUNDS))
+                    const password = await bcrypt.hash(`password${index + 1}`, parseInt(config.BCRYPT_SALT_ROUNDS))
                     return ({
                         username: `user${index + 1}`,
                         password, // Mock password (store hashed in production)
@@ -53,7 +53,7 @@ const main = async () => {
                 }
             }))
             const insertedUsers = await tx.insert(schema.users).values(usersMock).returning();
-            // filling the food db
+            /* // filling the food db
             const getRandomInt = (max) => {
                 return Math.floor(Math.random() * max);
             }
@@ -88,7 +88,7 @@ const main = async () => {
                     console.error(e);
                 }
             }))
-            const insertedFood = await tx.insert(schema.foods).values(foodMock).returning();
+            const insertedFood = await tx.insert(schema.foods).values(foodMock).returning(); */
             // creating the collections
             const collectionsMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {

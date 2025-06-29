@@ -1,15 +1,15 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
-import dotenv from "dotenv";
 
-dotenv.config();
+import { config } from "./config/env.js";
+
+const migrationOutput = config.nodeEnv === "development" ? "/main" : "/dev";
 
 export default defineConfig({
-  out: "./drizzle/main",
+  out: `./drizzle/${migrationOutput}`,
   schema: "./db/schemas/**/*[.js,.ts]",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.SUPABASE_DATABASE_URL!,
+    url: config.databaseUrl!,
   },
-  schemaFilter: ["main"],
 });

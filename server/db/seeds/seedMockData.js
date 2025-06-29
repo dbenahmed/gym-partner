@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import db from "../index.js";
 import * as schema from "../schemas/schema.js";
 import fs from 'fs/promises';
@@ -8,10 +7,10 @@ const foodsData = JSON.parse(await fs.readFile(new URL('./data/foods.json', impo
 
 
 
-dotenv.config();
 
 
 const main = async () => {
+    console.log("start")
     await db.transaction(async (tx) => {
         try {
             // Seed exercises table
@@ -19,7 +18,7 @@ const main = async () => {
 
             // Seed foods table
             const insertedFoods = await tx.insert(schema.foods).values(foodsData).returning();
-            
+
             console.log(`Inserted ${insertedExercises.length} exercises`);
             console.log(`Inserted ${insertedFoods.length} foods`);
 

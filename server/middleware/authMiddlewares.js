@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
 import db from '../db/index.js';
 import { users } from '../db/schemas/schema.js';
 import { eq } from 'drizzle-orm';
-dotenv.config();
+import { config } from "../config/env.js"
 
 
 export const getAccessToken = async (req, res) => {
@@ -28,7 +27,7 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ message: 'No token provided or invalid format' });
         }
         // Verify the token using your secret key
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        const decoded = jwt.verify(token, config.jwtSecret || 'your-secret-key');
         // verify userId is inside the decoded access token
         if (!decoded.id) {
             res.status(400).json({ success: false, message: "Access token invalid no user id included" })

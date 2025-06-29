@@ -1,6 +1,6 @@
 // Get a list of all workout collections for the user
 import db from "../db/index.js";
-import { collections, exercises, plans, plansExercises, schema, users } from "../db/schemas/schema.js";
+import { collections, exercises, plans, plansExercises, users } from "../db/schemas/schema.js";
 import { and, eq, exists, sql, inArray } from "drizzle-orm";
 
 const verifyPlanOwnership = async (userId, planId) => {

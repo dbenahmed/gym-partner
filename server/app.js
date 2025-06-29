@@ -18,15 +18,14 @@ import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
 import serveonet from 'serveonet';
 import OS from 'os';
-
-dotenv.config();
+import {config} from "./config/env.js"
 
 
 const isLocal = process.argv.includes('--local');
 const isServeonet = process.argv.includes('--serveonet');
 
 const app = express()
-const port = process.env.PORT || 80
+const port = config.port || 80
 
 // Middleware
 app.use(express.json())
@@ -34,7 +33,7 @@ app.use(express.json())
 
 if (isLocal) {
     app.use(cors({
-        origin: process.env.ALLOWED_ORIGINS || 'http://localhost:8081', //whatever your default is,
+        origin: config.allowedOrigins || 'http://localhost:8081', //whatever your default is,
         credentials: true,  // Allow credentials (cookies, authorization headers)
     }))
 } else {
@@ -102,7 +101,7 @@ if (isServeonet) {
     app.listen(port, async () => {
         // get the local IP address
         const localIp = OS.networkInterfaces()['Wi-Fi'][1].address;
-        console.log(`server started at http://${localIp}:${port}`);
+        console.log(`server started at http://${localIp}:${port} environment: ${config.nodeEnv}`);
     });
 } else {
     app.listen(port, "0.0.0.0", async () => {
