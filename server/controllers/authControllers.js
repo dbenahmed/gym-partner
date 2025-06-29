@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { users } from '../db/schemas/dev/schema.js';
+import { users } from '../db/schemas/schema.js';
 import { eq } from 'drizzle-orm';
 import db from "../db/index.js";
 import dotenv from "dotenv"

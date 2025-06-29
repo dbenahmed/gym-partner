@@ -1,22 +1,9 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import db from "../index.js";
-import * as devSchemas from "../schemas/dev/schema.js";
-import * as mainSchemas from "../schemas/main/schema.js";
+import * as schema from "../schemas/schema.js";
 
 dotenv.config();
-
-let schema;
-const args = process.argv.slice(2); // Get CLI arguments
-args.forEach(async (arg) => {
-    const [key, value] = arg.split('=');
-    if (key === "--schema")
-        if (value === 'dev') {
-            schema = devSchemas
-        } else if (value === 'main') {
-            schema = mainSchemas
-        }
-});
 
 const main = async () => {
     await db.transaction(async (tx) => {

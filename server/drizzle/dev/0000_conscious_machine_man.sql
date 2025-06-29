@@ -50,6 +50,9 @@ CREATE TABLE "dev"."foods" (
 	"created_by" integer,
 	"creationdate" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updationdate" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"likes" integer DEFAULT 0,
+	"dislikes" integer DEFAULT 0,
+	"status" varchar(50) DEFAULT 'pending',
 	CONSTRAINT "foods_calories_check" CHECK (calories >= 0),
 	CONSTRAINT "foods_carbohydratesper100g_check" CHECK (carbohydratesper100g >= 0),
 	CONSTRAINT "foods_cholesterol_check" CHECK (cholesterol >= 0),
@@ -60,18 +63,20 @@ CREATE TABLE "dev"."foods" (
 	CONSTRAINT "foods_saturatedfatper100g_check" CHECK (saturatedfatper100g >= 0),
 	CONSTRAINT "foods_sodium_check" CHECK (sodium >= 0),
 	CONSTRAINT "foods_sugar_check" CHECK (sugar >= 0),
-	CONSTRAINT "foods_transfat_check" CHECK (transfat >= 0)
+	CONSTRAINT "foods_transfat_check" CHECK (transfat >= 0),
+	CONSTRAINT "foods_status_check" CHECK ((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('refused'::character varying)::text]))
 );
 --> statement-breakpoint
-CREATE TABLE "dev"."meals_logs" (
+CREATE TABLE "dev"."foods_logs" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"meal_id" integer NOT NULL,
+	"food_id" integer NOT NULL,
 	"user_id" integer NOT NULL,
 	"creationdate" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updateddate" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"description" text,
 	"servingsize_g" integer,
-	CONSTRAINT "meals_logs_servingsize_g_check" CHECK (servingsize_g >= 0)
+	"date" date NOT NULL,
+	CONSTRAINT "foods_logs_servingsize_g_check" CHECK (servingsize_g >= 0)
 );
 --> statement-breakpoint
 CREATE TABLE "dev"."plans" (
@@ -95,12 +100,13 @@ CREATE TABLE "dev"."plans_exercises" (
 CREATE TABLE "dev"."sessions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"plan_id" integer,
-	"duedate" timestamp with time zone NOT NULL,
+	"duedate" date NOT NULL,
 	"name" varchar(100) NOT NULL,
-	"starttime" timestamp with time zone NOT NULL,
-	"endtime" timestamp with time zone NOT NULL,
+	"starttime" time,
+	"endtime" time,
 	"note" text,
 	"rating" integer,
+	"created_by" integer NOT NULL,
 	CONSTRAINT "sessions_name_check" CHECK (length((name)::text) >= 1),
 	CONSTRAINT "sessions_rating_check" CHECK ((rating >= 0) AND (rating <= 5))
 );
@@ -111,12 +117,9 @@ CREATE TABLE "dev"."sets_of_sessions_exercises" (
 	"exercise_id" integer NOT NULL,
 	"creationdate" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"order" integer NOT NULL,
-	"weight" integer NOT NULL,
-	"unit" varchar(10) NOT NULL,
-	"reps" integer[] NOT NULL,
-	CONSTRAINT "sets_of_sessions_exercises_reps_check" CHECK (array_length(reps, 1) > 0),
-	CONSTRAINT "sets_of_sessions_exercises_unit_check" CHECK ((unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])),
-	CONSTRAINT "sets_of_sessions_exercises_weight_check" CHECK (weight >= 0)
+	"weight" integer[] NOT NULL,
+	"unit" varchar(10)[] NOT NULL,
+	"reps" integer[] NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "dev"."templates" (
@@ -168,12 +171,13 @@ CREATE TABLE "dev"."weights_logs" (
 --> statement-breakpoint
 ALTER TABLE "dev"."collections" ADD CONSTRAINT "collections_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "dev"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."foods" ADD CONSTRAINT "fk_created_by" FOREIGN KEY ("created_by") REFERENCES "dev"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dev"."meals_logs" ADD CONSTRAINT "fk_meal" FOREIGN KEY ("meal_id") REFERENCES "dev"."foods"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dev"."meals_logs" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "dev"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "dev"."foods_logs" ADD CONSTRAINT "fk_food" FOREIGN KEY ("food_id") REFERENCES "dev"."foods"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "dev"."foods_logs" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "dev"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."plans" ADD CONSTRAINT "plans_collection_id_fkey" FOREIGN KEY ("collection_id") REFERENCES "dev"."collections"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."plans_exercises" ADD CONSTRAINT "fk_exercise" FOREIGN KEY ("exercise_id") REFERENCES "dev"."exercises"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."plans_exercises" ADD CONSTRAINT "fk_plan" FOREIGN KEY ("plan_id") REFERENCES "dev"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."sessions" ADD CONSTRAINT "fk_plan" FOREIGN KEY ("plan_id") REFERENCES "dev"."plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "dev"."sessions" ADD CONSTRAINT "fk_created_by" FOREIGN KEY ("created_by") REFERENCES "dev"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."sets_of_sessions_exercises" ADD CONSTRAINT "fk_session_exercise_id" FOREIGN KEY ("exercise_id") REFERENCES "dev"."exercises"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."sets_of_sessions_exercises" ADD CONSTRAINT "fk_session_id" FOREIGN KEY ("session_id") REFERENCES "dev"."sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "dev"."templates_exercises" ADD CONSTRAINT "fk_exercise" FOREIGN KEY ("exercise_id") REFERENCES "dev"."exercises"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

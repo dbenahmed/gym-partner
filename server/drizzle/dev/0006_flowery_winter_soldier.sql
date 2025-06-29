@@ -1,1 +1,0 @@
-ALTER TABLE "dev"."sessions" ALTER COLUMN "created_by" SET NOT NULL;

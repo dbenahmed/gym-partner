@@ -1,15 +1,15 @@
-import 'dotenv/config';
-import {defineConfig} from 'drizzle-kit';
-import dotenv from 'dotenv';
+import "dotenv/config";
+import { defineConfig } from "drizzle-kit";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 export default defineConfig({
-   out: './drizzle/main',
-   schema: './db/schemas/main/**/*[.js,.ts]',
-   dialect: 'postgresql',
-   dbCredentials: {
-      url: process.env.SUPABASE_DATABASE_URL!,
-   },
-   schemaFilter: ["main"],
+  out: "./drizzle/main",
+  schema: "./db/schemas/**/*[.js,.ts]",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.SUPABASE_DATABASE_URL!,
+  },
+  schemaFilter: ["main"],
 });

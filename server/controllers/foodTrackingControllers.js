@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import db from "../db/index.js";
 import { isYYYYMMDD } from "./functions/isDate.js";
-import { foods, foodsLogs } from "../db/schemas/dev/schema.js";
+import { foods, foodsLogs } from "../db/schemas/schema.js";
 
 // Get a list of meals logged for today
 export const getMeals = async (req, res) => {

@@ -1,5 +1,5 @@
 {
-  "id": "6c09a0fd-0e61-4ebc-b95b-f3537b1b4cd8",
+  "id": "77060c27-db09-4d0f-8ad4-dca824617cc2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -307,6 +307,27 @@
           "primaryKey": false,
           "notNull": true,
           "default": "CURRENT_TIMESTAMP"
+        },
+        "likes": {
+          "name": "likes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "dislikes": {
+          "name": "dislikes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
         }
       },
       "indexes": {},
@@ -373,12 +394,16 @@
         "foods_transfat_check": {
           "name": "foods_transfat_check",
           "value": "transfat >= 0"
+        },
+        "foods_status_check": {
+          "name": "foods_status_check",
+          "value": "(status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('refused'::character varying)::text])"
         }
       },
       "isRLSEnabled": false
     },
-    "dev.meals_logs": {
-      "name": "meals_logs",
+    "dev.foods_logs": {
+      "name": "foods_logs",
       "schema": "dev",
       "columns": {
         "id": {
@@ -387,8 +412,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "meal_id": {
-          "name": "meal_id",
+        "food_id": {
+          "name": "food_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -424,17 +449,23 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "fk_meal": {
-          "name": "fk_meal",
-          "tableFrom": "meals_logs",
+        "fk_food": {
+          "name": "fk_food",
+          "tableFrom": "foods_logs",
           "tableTo": "foods",
           "schemaTo": "dev",
           "columnsFrom": [
-            "meal_id"
+            "food_id"
           ],
           "columnsTo": [
             "id"
@@ -444,7 +475,7 @@
         },
         "fk_user": {
           "name": "fk_user",
-          "tableFrom": "meals_logs",
+          "tableFrom": "foods_logs",
           "tableTo": "users",
           "schemaTo": "dev",
           "columnsFrom": [
@@ -461,8 +492,8 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "meals_logs_servingsize_g_check": {
-          "name": "meals_logs_servingsize_g_check",
+        "foods_logs_servingsize_g_check": {
+          "name": "foods_logs_servingsize_g_check",
           "value": "servingsize_g >= 0"
         }
       },
@@ -631,7 +662,7 @@
         },
         "duedate": {
           "name": "duedate",
-          "type": "timestamp with time zone",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
@@ -643,15 +674,15 @@
         },
         "starttime": {
           "name": "starttime",
-          "type": "timestamp with time zone",
+          "type": "time",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "endtime": {
           "name": "endtime",
-          "type": "timestamp with time zone",
+          "type": "time",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "note": {
           "name": "note",
@@ -664,6 +695,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -675,6 +712,20 @@
           "schemaTo": "dev",
           "columnsFrom": [
             "plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_created_by": {
+          "name": "fk_created_by",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "schemaTo": "dev",
+          "columnsFrom": [
+            "created_by"
           ],
           "columnsTo": [
             "id"
@@ -735,13 +786,13 @@
         },
         "weight": {
           "name": "weight",
-          "type": "integer",
+          "type": "integer[]",
           "primaryKey": false,
           "notNull": true
         },
         "unit": {
           "name": "unit",
-          "type": "varchar(10)",
+          "type": "varchar(10)[]",
           "primaryKey": false,
           "notNull": true
         },
@@ -786,20 +837,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {
-        "sets_of_sessions_exercises_reps_check": {
-          "name": "sets_of_sessions_exercises_reps_check",
-          "value": "array_length(reps, 1) > 0"
-        },
-        "sets_of_sessions_exercises_unit_check": {
-          "name": "sets_of_sessions_exercises_unit_check",
-          "value": "(unit)::text = ANY (ARRAY[('kg'::character varying)::text, ('lbs'::character varying)::text])"
-        },
-        "sets_of_sessions_exercises_weight_check": {
-          "name": "sets_of_sessions_exercises_weight_check",
-          "value": "weight >= 0"
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "dev.templates": {
