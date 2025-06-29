@@ -1,51 +1,44 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
-import authRouter from "./routes/authRoutes.js"
+import authRouter from "./routes/authRoutes.js";
 import workoutPlansRouter from "./routes/workoutPlansRoutes.js";
-import workoutTemplatesRouter from './routes/workoutTemplatesRoutes.js';
-import workoutSessionsRouter from './routes/workoutSessionsRoutes.js';
-import workoutHistoryRouter from './routes/workoutHistoryRoutes.js';
-import weightTrackingRouter from './routes/weightTrackingRoutes.js';
-import nutritionGoalsRouter from './routes/nutritionGoalsRoutes.js';
-import mealDatabaseRouter from './routes/mealDatabaseRoutes.js';
-import mealVotingRouter from './routes/mealVotingRoutes.js';
-import foodTrackingRouter from './routes/foodTrackingRoutes.js';
-import exerciseDatabaseRouter from './routes/exerciseDatabaseRoutes.js';
-import dashboardRouter from './routes/dashboardRoutes.js';
-import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
-import adminDashboardRouter from './routes/adminDashboardRoutes.js';
-import serveonet from 'serveonet';
-import OS from 'os';
-import {config} from "./config/env.js"
-
-
-const isLocal = process.argv.includes('--local');
-const isServeonet = process.argv.includes('--serveonet');
-
-const app = express()
-const port = config.port || 80
-
+import workoutTemplatesRouter from "./routes/workoutTemplatesRoutes.js";
+import workoutSessionsRouter from "./routes/workoutSessionsRoutes.js";
+import workoutHistoryRouter from "./routes/workoutHistoryRoutes.js";
+import weightTrackingRouter from "./routes/weightTrackingRoutes.js";
+import nutritionGoalsRouter from "./routes/nutritionGoalsRoutes.js";
+import mealDatabaseRouter from "./routes/mealDatabaseRoutes.js";
+import mealVotingRouter from "./routes/mealVotingRoutes.js";
+import foodTrackingRouter from "./routes/foodTrackingRoutes.js";
+import exerciseDatabaseRouter from "./routes/exerciseDatabaseRoutes.js";
+import dashboardRouter from "./routes/dashboardRoutes.js";
+import customFoodTrackingRouter from "./routes/customFoodTrackingRoutes.js";
+import adminDashboardRouter from "./routes/adminDashboardRoutes.js";
+//import serveonet from 'serveonet';
+import OS from "os";
+import { config } from "./config/env.js";
+import errorHandler from "./middleware/error.middleware.js";
+const isLocal = process.argv.includes("--local");
+//const isServeonet = process.argv.includes('--serveonet');
+const app = express();
+const port = config.port || 80;
 // Middleware
-app.use(express.json())
-
-
+app.use(express.json());
 if (isLocal) {
     app.use(cors({
-        origin: config.allowedOrigins || 'http://localhost:8081', //whatever your default is,
-        credentials: true,  // Allow credentials (cookies, authorization headers)
-    }))
-} else {
-    app.use(cors({
-        credentials: true,  // Allow credentials (cookies, authorization headers)
-    }))
+        origin: config.allowedOrigins || "http://localhost:8081", //whatever your default is,
+        credentials: true, // Allow credentials (cookies, authorization headers)
+    }));
 }
-app.use(cookieParser())
-
-
+else {
+    app.use(cors({
+        credentials: true, // Allow credentials (cookies, authorization headers)
+    }));
+}
+app.use(cookieParser());
 app.use(authRouter);
-app.use(workoutPlansRouter)
+app.use(workoutPlansRouter);
 app.use(workoutTemplatesRouter);
 app.use(workoutSessionsRouter);
 app.use(workoutHistoryRouter);
@@ -58,13 +51,11 @@ app.use(exerciseDatabaseRouter);
 app.use(dashboardRouter);
 app.use(customFoodTrackingRouter);
 app.use(adminDashboardRouter);
-
-app.get('/', async (req, res) => {
-
-
-    res.send('server is running')
-})
-
+app.use(errorHandler);
+app.get("/", async (req, res) => {
+    res.send("server is running");
+});
+/*
 if (isServeonet) {
     app.listen(port, async () => {
         console.log(`server started at http://localhost:${port}`);
@@ -97,17 +88,17 @@ if (isServeonet) {
                 event.onrestart = () => console.info("Restarted");
             });
     })
-} else if (isLocal) {
+} else  */
+if (isLocal) {
     app.listen(port, async () => {
         // get the local IP address
-        const localIp = OS.networkInterfaces()['Wi-Fi'][1].address;
+        const localIp = OS.networkInterfaces()["Wi-Fi"][1].address;
         console.log(`server started at http://${localIp}:${port} environment: ${config.nodeEnv}`);
     });
-} else {
+}
+else {
     app.listen(port, "0.0.0.0", async () => {
         console.log(`server started on port ${port}`);
     });
-
 }
-
 export default app;

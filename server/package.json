@@ -1,13 +1,13 @@
 {
   "name": "gym-partner",
   "version": "1.0.0",
-  "main": "app.js",
   "type": "module",
   "scripts": {
     "test": "nodemon playground.js",
-    "start": "node app.js",
-    "dev": "nodemon app.js NODE_ENV=development --local",
-    "prod": "node app.js NODE_ENV=production",
+    "build": "tsc",
+    "start": "node --env-file .env.local --loader ts-node/esm app.ts",
+    "dev": "cross-env NODE_ENV=development npx nodemon",
+    "prod": "cross-env NODE_ENV=production npx nodemon",
     "drizzle:generate": "drizzle-kit generate ",
     "drizzle:migrate": "drizzle-kit migrate ",
     "drizzle:push": "drizzle-kit push ",
@@ -25,7 +25,7 @@
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "drizzle-orm": "^0.41.0",
     "drizzle-seed": "^0.3.1",
     "express": "^4.21.2",
@@ -34,9 +34,15 @@
     "serveonet": "^0.0.2"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.7",
     "drizzle-kit": "^0.30.4",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.2"
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3"
   }
 }
