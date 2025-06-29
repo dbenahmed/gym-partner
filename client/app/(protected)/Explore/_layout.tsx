@@ -4,22 +4,24 @@ import { Alert, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import Colors from "@/constants/Colors";
+import useThemeContext from "@/context/themeContext"; // Replace with real path
 
 export default function ExploreLayout() {
   const router = useRouter();
+  const { colors } = useThemeContext();
 
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: Colors.light.background,
+          backgroundColor: colors.background,
         },
-        headerTintColor: Colors.light.tint,
+        headerTintColor: colors.tint,
         headerTitleStyle: {
           fontWeight: "bold",
         },
         contentStyle: {
-          backgroundColor: Colors.light.background,
+          backgroundColor: colors.background,
         },
       }}
     >
@@ -37,7 +39,7 @@ export default function ExploreLayout() {
                 router.push("/Explore");
               }}
             >
-              <Ionicons name="arrow-back" size={24} color={Colors.light.tint} />
+              <Ionicons name="arrow-back" size={24} color={colors.tint} />
             </Pressable>
           ), */
         }}
@@ -52,7 +54,7 @@ export default function ExploreLayout() {
                 router.push("/Explore");
               }}
             >
-              <Ionicons name="arrow-back" size={24} color={Colors.light.tint} />
+              <Ionicons name="arrow-back" size={24} color={colors.tint} />
             </Pressable>
           ), */
         }}

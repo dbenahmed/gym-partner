@@ -1,14 +1,9 @@
 import { Stack } from "expo-router";
-import { TouchableOpacity } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Alert } from "react-native";
 
-import Colors from "@/constants/Colors";
-import useThemeContext from "@/context/themeContext"; // Replace with real path
+import useThemeContext from "@/context/themeContext";
 
-export default function CollectionsLayout() {
+export default function Layout() {
   const { colors } = useThemeContext();
-
   return (
     <Stack
       screenOptions={{
@@ -27,19 +22,14 @@ export default function CollectionsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "My Collections",
-          headerShown: true,
+          title: "Profile",
+          headerShown: false,
         }}
       />
       <Stack.Screen
-        name="/[collectionId]/index"
+        name="body-weight-tracking"
         options={{
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="/[collectionId]/[planId]/index"
-        options={{
+          title: "Body Weight Tracking",
           headerShown: true,
         }}
       />

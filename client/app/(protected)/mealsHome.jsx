@@ -12,9 +12,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Modal from "react-native-modal";
-import React from "react";
+import React, { useMemo } from "react";
 import Color from "@/constants/Colors.ts";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import Meal from "@/components/meal";
 import { defaultUrl } from "@/constants/constants.ts";
 import {
@@ -23,17 +23,300 @@ import {
   fetchCreateCustomMeal,
 } from "@/lib/api";
 
+import Button from "@/components/ui/Button";
+
 import {
   validateAllNutrition,
   validateNameWithNumbers,
   validateName,
 } from "@/utils/validation.ts";
-import useAuth from "@/app/contex/authcontex";
+import useAuth from "@/context/authContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { router } from "expo-router";
 import SplashScreen from "@/components/SplashScreen";
+import useThemeContext from "@/context/themeContext";
+
+
 
 export default function mealsHome() {
+
+
+  const { colors, theme } = useThemeContext();
+
+  const styles = useMemo(() => {
+    return StyleSheet.create({
+      header: {
+        flexDirection: "row",
+        shadowColor: colors.tint,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 2,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.tintLighter,
+        backgroundColor: colors.background,
+        justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
+        height: "fit",
+        backgroundColor: colors.background,
+        padding: 20,
+      },
+      vitamine: {
+        backgroundColor: colors.tint,
+        padding: 5,
+        borderRadius: 5,
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
+      },
+      button: {
+        padding: 10,
+        color: colors.tint,
+        backgroundColor: colors.background,
+        margin: "auto",
+        borderRadius: 10,
+        marginBottom: 10,
+        marginTop: 10,
+      },
+      modalBackground: {
+        flex: 1,
+        padding: (10, 30),
+      },
+      modeleContent: {
+        padding: 20,
+        backgroundColor: colors.background,
+        borderRadius: 20,
+      },
+      foodItem: {
+        padding: 15,
+        backgroundColor: "#f8f8f8",
+        margin: 5,
+        width: "95%",
+        borderRadius: 10,
+      },
+      selectedFood: {
+        backgroundColor: "#ffa726", // تغيير اللون عند التحديد
+      },
+      FoodInput: {
+        backgroundColor: colors.tint,
+        marginTop: 10,
+        borderRadius: 4,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+      },
+      foodVitamineInput: {
+        backgroundColor: colors.tint,
+        width: "23%",
+        marginTop: 10,
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+      },
+      car: {
+        fontSize: 12,
+        color: Color.dark,
+        textAlign: "center",
+        fontWeight: "700",
+      },
+      box: {
+        backgroundColor: colors.background,
+        margin: 2,
+        padding: 4,
+        borderRadius: 5,
+        fontWeight: "800",
+        width: 56,
+      },
+      addMealButton: {
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.tint,
+        borderRadius: 12,
+        marginHorizontal: 16,
+        marginVertical: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        transform: [{ scale: 1 }],
+      },
+
+      addMealButtonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+      },
+
+      addMealButtonIcon: {
+        fontSize: 20,
+        fontWeight: '300',
+        color: colors.tint,
+        lineHeight: 20,
+      },
+
+      addMealButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.tint,
+        letterSpacing: 0.5,
+      },
+
+      // Header Styles
+      header: {
+        alignItems: 'flex-start',
+        backgroundColor: colors.background,
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        marginHorizontal: 16,
+        marginVertical: 8,
+        borderRadius: 16,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 4,
+      },
+
+      headerLeft: {
+        flex: 1,
+        paddingRight: 16,
+      },
+
+      headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: colors.text,
+        marginBottom: 4,
+        lineHeight: 24,
+      },
+
+      headerDate: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: colors.text,
+        opacity: 0.7,
+      },
+
+      headerRight: {
+        alignItems: 'center',
+        minWidth: 160,
+      },
+
+      totalLabel: {
+        fontSize: 10,
+        fontWeight: '700',
+        letterSpacing: 1,
+        color: colors.text,
+        opacity: 0.6,
+        marginBottom: 12,
+        textAlign: 'center',
+      },
+
+      nutritionSummary: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        justifyContent: 'center',
+      },
+
+      nutritionItem: {
+        minWidth: 70,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+      },
+
+      nutritionValue: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: 'white',
+        marginBottom: 2,
+        textAlign: 'center',
+      },
+
+      nutritionLabel: {
+        fontSize: 9,
+        fontWeight: '600',
+        color: 'white',
+        opacity: 0.9,
+        textAlign: 'center',
+      },
+
+      // Alternative compact header style
+      headerCompact: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: colors.background,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        marginHorizontal: 16,
+        marginVertical: 8,
+        borderRadius: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 3,
+        elevation: 2,
+      },
+
+      // Alternative button style - filled
+      addMealButtonFilled: {
+        backgroundColor: colors.tint,
+        borderRadius: 12,
+        marginHorizontal: 16,
+        marginVertical: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        shadowColor: colors.tint,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
+      },
+
+      addMealButtonFilledText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.background,
+        textAlign: 'center',
+        letterSpacing: 0.5,
+      },
+
+      // Alternative button style - minimal
+      addMealButtonMinimal: {
+        backgroundColor: 'transparent',
+        borderRadius: 8,
+        marginHorizontal: 16,
+        marginVertical: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+      },
+
+      addMealButtonMinimalText: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: colors.tint,
+        textAlign: 'center',
+        textDecorationLine: 'underline',
+      },
+    })
+  }, [colors])
+
+
+
+
+
+
   const [meals, setMeals] = useState([]);
 
   const { authenticated, userId } = useAuth();
@@ -361,9 +644,10 @@ export default function mealsHome() {
         <Modal
           animationType="slide"
           visible={additionModalVisible}
+          propagateSwipe={false}
           onRequestClose={() => setAdditionModalVisible(false)}
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             margin: 0,
           }}
         >
@@ -381,7 +665,7 @@ export default function mealsHome() {
                   style={{
                     fontWeight: "800",
                     fontSize: 19,
-                    color: Color.light.text,
+                    color: colors.text,
                   }}
                 >
                   {selectedAdditionFoodItem.foodname}
@@ -392,7 +676,7 @@ export default function mealsHome() {
                   <MaterialIcons
                     name="close"
                     size={24}
-                    color={Color.light.tint}
+                    color={colors.tint}
                   />
                 </TouchableOpacity>
               </View>
@@ -401,7 +685,7 @@ export default function mealsHome() {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  backgroundColor: Color.light.tintLighter,
+                  backgroundColor: colors.tintLighter,
                   padding: 10,
                   borderRadius: 8,
                   marginBottom: 16,
@@ -410,12 +694,12 @@ export default function mealsHome() {
                 <MaterialIcons
                   name="info-outline"
                   size={20}
-                  color={Color.light.tint}
+                  color={colors.tint}
                   style={{ marginRight: 8 }}
                 />
                 <Text
                   style={{
-                    color: "#000000",
+                    color: colors.text,
                     fontSize: 12,
                     fontWeight: "400",
                     width: "90%",
@@ -437,12 +721,16 @@ export default function mealsHome() {
                 }}
               >
                 <Text
-                  style={{ fontWeight: "600", color: "#000000", fontSize: 13 }}
+                  style={{
+                    fontWeight: "600",
+                    color: colors.text,
+                    fontSize: 13
+                  }}
                 >
                   <MaterialIcons
                     name="restaurant"
                     size={16}
-                    color={Color.light.tint}
+                    color={colors.tint}
                     style={{ marginRight: 4 }}
                   />
                   Serving Size (g):
@@ -450,17 +738,18 @@ export default function mealsHome() {
                 <TextInput
                   style={{
                     borderWidth: 0.7,
-                    borderColor: Color.light.tint,
+                    borderColor: colors.tint,
                     borderRadius: 8,
                     padding: 10,
-                    color: Color.light.text,
-                    backgroundColor: "transparent",
-                    placeholderTextColor: "rgba(0, 0, 0, 0.5)",
+                    color: colors.text,
+                    backgroundColor: colors.background,
                     width: "50%",
                     marginLeft: 10,
                   }}
                   placeholder="Enter serving size"
+                  placeholderTextColor={colors.tabIconDefault}
                   keyboardType="numeric"
+
                   onChangeText={(value) => {
                     setServingSize(value);
                   }}
@@ -471,14 +760,14 @@ export default function mealsHome() {
                 style={{
                   fontWeight: "700",
                   fontSize: 16,
-                  color: "#000000",
+                  color: colors.text,
                   marginBottom: 12,
                 }}
               >
                 <MaterialIcons
                   name="pie-chart"
                   size={16}
-                  color={Color.light.tint}
+                  color={colors.tint}
                   style={{ marginRight: 4 }}
                 />
                 Nutrition Facts (per 100g)
@@ -486,15 +775,17 @@ export default function mealsHome() {
 
               <View
                 style={{
-                  backgroundColor: "white",
+                  backgroundColor: colors.background,
                   borderRadius: 10,
                   padding: 14,
                   marginBottom: 16,
-                  shadowColor: "#000",
+                  shadowColor: colors.tint,
                   shadowOffset: { width: 0, height: 1 },
                   shadowOpacity: 0.1,
                   shadowRadius: 2,
                   elevation: 2,
+                  borderWidth: 0.5,
+                  borderColor: colors.tintLighter,
                 }}
               >
                 <View style={{ marginBottom: 6 }}>
@@ -508,7 +799,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 13,
                         width: "33%",
                       }}
@@ -518,7 +809,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 13,
                         width: "33%",
                         textAlign: "center",
@@ -529,7 +820,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
+                        color: colors.tint,
                         fontSize: 13,
                         width: "33%",
                         textAlign: "right",
@@ -542,7 +833,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#e0e0e0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 4,
                     }}
                   />
@@ -557,7 +848,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -567,7 +858,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -578,7 +869,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
+                        color: colors.tint,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "right",
@@ -597,7 +888,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 3,
                     }}
                   />
@@ -612,7 +903,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -622,7 +913,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -633,7 +924,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
+                        color: colors.tint,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "right",
@@ -653,7 +944,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 3,
                     }}
                   />
@@ -668,7 +959,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -678,7 +969,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -689,7 +980,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
+                        color: colors.tint,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "right",
@@ -709,7 +1000,7 @@ export default function mealsHome() {
                   <View
                     style={{
                       height: 1,
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: colors.tintLighter,
                       marginVertical: 3,
                     }}
                   />
@@ -724,7 +1015,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "500",
-                        color: "#000000",
+                        color: colors.text,
                         fontSize: 12,
                         width: "33%",
                       }}
@@ -734,7 +1025,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: "#666666",
+                        color: colors.tabIconDefault,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "center",
@@ -745,7 +1036,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
+                        color: colors.tint,
                         fontSize: 12,
                         width: "33%",
                         textAlign: "right",
@@ -768,7 +1059,7 @@ export default function mealsHome() {
                     <View
                       style={{
                         height: 1,
-                        backgroundColor: "#e0e0e0",
+                        backgroundColor: colors.tintLighter,
                         marginVertical: 6,
                       }}
                     />
@@ -778,11 +1069,17 @@ export default function mealsHome() {
                         justifyContent: "space-between",
                       }}
                     >
-                      <Text style={{ fontWeight: "500", color: "#000000" }}>
+                      <Text style={{
+                        fontWeight: "500",
+                        color: colors.text
+                      }}>
                         Brand
                       </Text>
                       <Text
-                        style={{ fontWeight: "700", color: Color.light.tint }}
+                        style={{
+                          fontWeight: "700",
+                          color: colors.tint
+                        }}
                       >
                         {selectedAdditionFoodItem.brand}
                       </Text>
@@ -800,7 +1097,7 @@ export default function mealsHome() {
               >
                 <TouchableOpacity
                   style={{
-                    backgroundColor: Color.light.tint,
+                    backgroundColor: colors.tint,
                     padding: 10,
                     borderRadius: 6,
                     width: "100%",
@@ -812,10 +1109,10 @@ export default function mealsHome() {
                     addFoodToUser();
                   }}
                 >
-                  <MaterialIcons name="add" size={16} color="#FFFFFF" />
+                  <MaterialIcons name="add" size={16} color={colors.background} />
                   <Text
                     style={{
-                      color: Color.light.background,
+                      color: colors.background,
                       fontWeight: "600",
                       fontSize: 14,
                       marginLeft: 6,
@@ -828,7 +1125,7 @@ export default function mealsHome() {
 
               {addFoodLoading && (
                 <View style={{ marginTop: 16, alignItems: "center" }}>
-                  <ActivityIndicator size="small" color={Color.light.tint} />
+                  <ActivityIndicator size="small" color={colors.tint} />
                 </View>
               )}
             </View>
@@ -870,7 +1167,7 @@ export default function mealsHome() {
   return (
     <>
 
-      <View style={{ flex: 1, paddingBottom: 10, backgroundColor: Color.light.background }}>
+      <View style={{ flex: 1, paddingBottom: 10, backgroundColor: colors.background }}>
         <View style={styles.header}>
 
 
@@ -881,10 +1178,10 @@ export default function mealsHome() {
 
             <View style={styles.nutritionSummary}>
               {[
-                { value: prot, label: 'Protein', unit: 'g', color: '#4ECDC4' },
-                { value: kcal, label: 'Calories', unit: '', color: '#FF6B6B' },
-                { value: carb, label: 'Carbs', unit: 'g', color: '#45B7D1' },
-                { value: fats, label: 'Fat', unit: 'g', color: '#FFA07A' }
+                { value: prot, label: 'Protein', unit: 'g', color: colors.proteinBg },
+                { value: kcal, label: 'Calories', unit: '', color: colors.caloriesBg },
+                { value: carb, label: 'Carbs', unit: 'g', color: colors.carbsBg },
+                { value: fats, label: 'Fat', unit: 'g', color: colors.fatBg }
               ].map((nutrient, index) => (
                 <View key={nutrient.label} style={[styles.nutritionItem, { backgroundColor: nutrient.color }]}>
                   <Text style={styles.nutritionValue}>
@@ -912,7 +1209,7 @@ export default function mealsHome() {
             shadowOpacity: 0.12,
             shadowRadius: 6,
             elevation: 4,
-            backgroundColor: Color.light.background,
+            backgroundColor: colors.background,
             borderRadius: 10,
             marginHorizontal: 16,
             marginVertical: 8,
@@ -921,7 +1218,7 @@ export default function mealsHome() {
           <TouchableOpacity>
             <Text
               style={{
-                color: Color.light.tint,
+                color: colors.tint,
                 fontWeight: "900",
                 fontSize: 30,
               }}
@@ -942,31 +1239,31 @@ export default function mealsHome() {
 
             if (diffDays === 0) {
               return (
-                <Text style={{ fontSize: 15, fontWeight: "700", }}>
+                <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>
                   Today's meals
                 </Text>
               );
             } else if (diffDays === 1) {
               return (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>
                   Yesterday's meals
                 </Text>
               );
             } else if (diffDays === 2) {
               return (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>
                   Day before yesterday
                 </Text>
               );
             } else if (diffDays < 3) {
               return (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>
                   {diffDays} days ago
                 </Text>
               );
             } else {
               return (
-                <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                <Text style={{ fontSize: 15, fontWeight: "700", color: colors.text }}>
                   {currentDate.toDateString()}
                 </Text>
               );
@@ -976,7 +1273,7 @@ export default function mealsHome() {
             <TouchableOpacity>
               <Text
                 style={{
-                  color: Color.light.tint,
+                  color: colors.tint,
                   fontWeight: "900",
                   fontSize: 30,
                 }}
@@ -998,22 +1295,23 @@ export default function mealsHome() {
               alignItems: "center",
             }}
           >
-            <SplashScreen />
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 16,
-                fontWeight: "600",
-                color: Color.light.text,
-                marginTop: 15,
-              }}
-            >
-              Loading your meals...
-            </Text>
+            <SplashScreen>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: colors.text,
+                  marginBottom: 15,
+                }}
+              >
+                Loading your meals...
+              </Text>
+            </SplashScreen>
+
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1 }}>
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <ScrollView style={{ width: "90%" }}>
               {meals ? (
                 meals.map((e) => (
                   <Meal
@@ -1026,27 +1324,28 @@ export default function mealsHome() {
               ) : (
                 <View></View>
               )}
-
-              <TouchableOpacity
-                style={styles.addMealButton}
-                onPress={() => setModalVisible(true)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.addMealButtonContent}>
-                  <Text style={styles.addMealButtonIcon}>+</Text>
-                  <Text style={styles.addMealButtonText}>Add New Meal</Text>
-                </View>
-              </TouchableOpacity>
+              <Button
+                text="Add New Meal"
+                type="outline"
+                onClick={() => setModalVisible(true)}
+                icon="plus"
+                styles={{
+                  flex: 1,
+                  marginTop: 10,
+                }}
+              />
             </ScrollView>
           </View>
         )}
         <Modal
           isVisible={modalVisible}
           animationIn="slideInUp"
-          animationOut="zoomOut"
-          swipeDirection="down"
+          animationOut="slideOutDown"
+          onBackdropPress={() => setModalVisible(false)}
+          swipeDirection={additionModalVisible ? [] : ["down"]}
+          propagateSwipe={false}
           onSwipeComplete={() => setModalVisible(false)}
-          style={{ margin: 0, backgroundColor: "rgba(0, 0, 0, 0.05)" }}
+          style={{ margin: 0 }}
         >
           <View
             style={{
@@ -1056,7 +1355,7 @@ export default function mealsHome() {
           >
             <View
               style={{
-                backgroundColor: Color.light.background,
+                backgroundColor: colors.background,
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
                 padding: 16,
@@ -1080,7 +1379,7 @@ export default function mealsHome() {
                 <Text
                   style={{
                     fontWeight: "800",
-                    color: Color.light.text,
+                    color: colors.text,
                     fontSize: 20,
                   }}
                 >
@@ -1095,7 +1394,7 @@ export default function mealsHome() {
                   <MaterialIcons
                     name="close"
                     size={24}
-                    color={Color.light.text}
+                    color={colors.text}
                   />
                 </TouchableOpacity>
               </View>
@@ -1114,7 +1413,7 @@ export default function mealsHome() {
                     >
                       <View
                         style={{
-                          backgroundColor: Color.light.background,
+                          backgroundColor: colors.background,
                           borderRadius: 20,
                           padding: 20,
                           width: "90%",
@@ -1139,10 +1438,10 @@ export default function mealsHome() {
                     <ScrollView style={{ flex: 1 }}>
                       <View
                         style={{
-                          backgroundColor: Color.light.background,
+                          backgroundColor: colors.background,
                           borderRadius: 10,
                           borderWidth: 1,
-                          borderColor: Color.light.tintLighter,
+                          borderColor: colors.tintLighter,
                           paddingHorizontal: 12,
                           paddingVertical: 4,
                           marginBottom: 12,
@@ -1153,16 +1452,16 @@ export default function mealsHome() {
                         <MaterialIcons
                           name="restaurant"
                           size={20}
-                          color={Color.light.tint}
+                          color={colors.tint}
                           style={{ marginRight: 8 }}
                         />
                         <TextInput
                           placeholder="Food Name"
-                          placeholderTextColor={Color.light.tabIconDefault}
+                          placeholderTextColor={colors.tabIconDefault}
                           style={{
                             flex: 1,
                             fontSize: 14,
-                            color: Color.light.text,
+                            color: colors.text,
                             paddingVertical: 8,
                           }}
                           onChangeText={(e) => setNameFood(e)}
@@ -1172,10 +1471,10 @@ export default function mealsHome() {
                       <View style={{ marginVertical: 8 }}>
                         <View
                           style={{
-                            backgroundColor: Color.light.background,
+                            backgroundColor: colors.background,
                             borderRadius: 10,
                             borderWidth: 1,
-                            borderColor: Color.light.tintLighter,
+                            borderColor: colors.tintLighter,
                             paddingHorizontal: 12,
                             paddingVertical: 4,
                             marginBottom: 12,
@@ -1191,11 +1490,11 @@ export default function mealsHome() {
                           />
                           <TextInput
                             placeholder="Calories per 100g"
-                            placeholderTextColor={Color.light.tabIconDefault}
+                            placeholderTextColor={colors.tabIconDefault}
                             style={{
                               flex: 1,
                               fontSize: 14,
-                              color: Color.light.text,
+                              color: colors.text,
                               paddingVertical: 8,
                             }}
                             keyboardType="numeric"
@@ -1206,10 +1505,10 @@ export default function mealsHome() {
 
                         <View
                           style={{
-                            backgroundColor: Color.light.background,
+                            backgroundColor: colors.background,
                             borderRadius: 10,
                             borderWidth: 1,
-                            borderColor: Color.light.tintLighter,
+                            borderColor: colors.tintLighter,
                             paddingHorizontal: 12,
                             paddingVertical: 4,
                             marginBottom: 12,
@@ -1225,11 +1524,11 @@ export default function mealsHome() {
                           />
                           <TextInput
                             placeholder="Protein per 100g"
-                            placeholderTextColor={Color.light.tabIconDefault}
+                            placeholderTextColor={colors.tabIconDefault}
                             style={{
                               flex: 1,
                               fontSize: 14,
-                              color: Color.light.text,
+                              color: colors.text,
                               paddingVertical: 8,
                             }}
                             keyboardType="numeric"
@@ -1240,10 +1539,10 @@ export default function mealsHome() {
 
                         <View
                           style={{
-                            backgroundColor: Color.light.background,
+                            backgroundColor: colors.background,
                             borderRadius: 10,
                             borderWidth: 1,
-                            borderColor: Color.light.tintLighter,
+                            borderColor: colors.tintLighter,
                             paddingHorizontal: 12,
                             paddingVertical: 4,
                             marginBottom: 12,
@@ -1259,11 +1558,11 @@ export default function mealsHome() {
                           />
                           <TextInput
                             placeholder="Carbs per 100g"
-                            placeholderTextColor={Color.light.tabIconDefault}
+                            placeholderTextColor={colors.tabIconDefault}
                             style={{
                               flex: 1,
                               fontSize: 14,
-                              color: Color.light.text,
+                              color: colors.text,
                               paddingVertical: 8,
                             }}
                             keyboardType="numeric"
@@ -1274,10 +1573,10 @@ export default function mealsHome() {
 
                         <View
                           style={{
-                            backgroundColor: Color.light.background,
+                            backgroundColor: colors.background,
                             borderRadius: 10,
                             borderWidth: 1,
-                            borderColor: Color.light.tintLighter,
+                            borderColor: colors.tintLighter,
                             paddingHorizontal: 12,
                             paddingVertical: 4,
                             marginBottom: 12,
@@ -1293,11 +1592,11 @@ export default function mealsHome() {
                           />
                           <TextInput
                             placeholder="Fat per 100g"
-                            placeholderTextColor={Color.light.tabIconDefault}
+                            placeholderTextColor={colors.tabIconDefault}
                             style={{
                               flex: 1,
                               fontSize: 14,
-                              color: Color.light.text,
+                              color: colors.text,
                               paddingVertical: 8,
                             }}
                             keyboardType="numeric"
@@ -1322,10 +1621,10 @@ export default function mealsHome() {
                         style={{
                           flex: 1,
                           marginRight: 8,
-                          backgroundColor: Color.light.background,
+                          backgroundColor: colors.background,
                           borderRadius: 10,
                           borderWidth: 1,
-                          borderColor: Color.light.tint,
+                          borderColor: colors.tint,
                           padding: 10,
                           alignItems: "center",
                           flexDirection: "row",
@@ -1336,13 +1635,13 @@ export default function mealsHome() {
                         <MaterialIcons
                           name="arrow-back"
                           size={18}
-                          color={Color.light.tint}
+                          color={colors.tint}
                           style={{ marginRight: 6 }}
                         />
                         <Text
                           style={{
                             fontWeight: "700",
-                            color: Color.light.tint,
+                            color: colors.tint,
                             fontSize: 14,
                           }}
                         >
@@ -1354,7 +1653,7 @@ export default function mealsHome() {
                         style={{
                           flex: 1,
                           marginLeft: 8,
-                          backgroundColor: Color.light.tint,
+                          backgroundColor: colors.tint,
                           borderRadius: 10,
                           padding: 10,
                           alignItems: "center",
@@ -1391,27 +1690,27 @@ export default function mealsHome() {
                   <View
                     style={{
                       flexDirection: "row",
-                      backgroundColor: Color.light.background,
+                      backgroundColor: colors.background,
                       borderRadius: 12,
                       paddingHorizontal: 12,
                       marginBottom: 16,
                       alignItems: "center",
                       borderWidth: 1,
-                      borderColor: Color.light.tint,
+                      borderColor: colors.tint,
                     }}
                   >
                     <MaterialIcons
                       name="search"
                       size={20}
-                      color={Color.light.tint}
+                      color={colors.tint}
                     />
                     <TextInput
                       placeholder="Search for food"
-                      placeholderTextColor={Color.light.tabIconDefault}
+                      placeholderTextColor={colors.tabIconDefault}
                       style={{
                         flex: 1,
                         padding: 12,
-                        color: Color.light.text,
+                        color: colors.text,
                         fontWeight: "500",
                         marginLeft: 8,
                       }}
@@ -1433,7 +1732,7 @@ export default function mealsHome() {
                     <Text
                       style={{
                         fontWeight: "700",
-                        color: Color.light.tint,
+                        color: colors.tint,
                         fontSize: 16,
                       }}
                     >
@@ -1445,7 +1744,7 @@ export default function mealsHome() {
                           style={{
                             flexDirection: "row",
                             alignItems: "center",
-                            backgroundColor: verifiedOnly ? Color.light.tint : Color.light.tintLighter,
+                            backgroundColor: verifiedOnly ? colors.background : colors.tintLighter,
                             paddingVertical: 6,
                             paddingHorizontal: 10,
                             borderRadius: 8,
@@ -1458,11 +1757,11 @@ export default function mealsHome() {
                           <MaterialIcons
                             name="verified"
                             size={16}
-                            color={verifiedOnly ? "#ffffff" : Color.light.tabIconDefault}
+                            color={verifiedOnly ? colors.green : colors.tabIconDefault}
                           />
                           <Text
                             style={{
-                              color: verifiedOnly ? "#ffffff" : Color.light.tabIconDefault,
+                              color: verifiedOnly ? colors.green : colors.tabIconDefault,
                               fontWeight: "600",
                               fontSize: 14,
                               marginLeft: 4,
@@ -1476,7 +1775,7 @@ export default function mealsHome() {
                           style={{
                             flexDirection: "row",
                             alignItems: "center",
-                            backgroundColor: mine ? Color.light.tint : Color.light.tintLighter,
+                            backgroundColor: mine ? colors.tint : colors.tintLighter,
                             paddingVertical: 6,
                             paddingHorizontal: 10,
                             borderRadius: 8,
@@ -1489,11 +1788,11 @@ export default function mealsHome() {
                           <MaterialIcons
                             name="person"
                             size={16}
-                            color={mine ? "#ffffff" : Color.light.tabIconDefault}
+                            color={mine ? "#ffffff" : colors.tabIconDefault}
                           />
                           <Text
                             style={{
-                              color: mine ? "#ffffff" : Color.light.tabIconDefault,
+                              color: mine ? "#ffffff" : colors.tabIconDefault,
                               fontWeight: "600",
                               fontSize: 14,
                               marginLeft: 4,
@@ -1507,17 +1806,17 @@ export default function mealsHome() {
                           style={{
                             flexDirection: "row",
                             alignItems: "center",
-                            backgroundColor: Color.light.tintLighter,
+                            backgroundColor: colors.tintLighter,
                             paddingVertical: 6,
                             paddingHorizontal: 10,
                             borderRadius: 8,
                           }}
                           onPress={() => setCustomFoodModalVisible(true)}
                         >
-                          <MaterialIcons name="add" size={16} color={Color.light.tint} />
+                          <MaterialIcons name="add" size={16} color={colors.tint} />
                           <Text
                             style={{
-                              color: Color.light.tint,
+                              color: colors.tint,
                               fontWeight: "600",
                               fontSize: 14,
                               marginLeft: 4,
@@ -1541,7 +1840,7 @@ export default function mealsHome() {
                     >
                       <View
                         style={{
-                          backgroundColor: Color.light.background,
+                          backgroundColor: colors.background,
                           borderRadius: 20,
                           padding: 20,
                           width: "90%",
@@ -1580,17 +1879,17 @@ export default function mealsHome() {
                       renderItem={({ item }) => (
                         <TouchableOpacity
                           style={{
-                            backgroundColor: Color.light.background,
+                            backgroundColor: colors.background,
                             paddingVertical: 10,
                             paddingHorizontal: 12,
                             borderRadius: 10,
                             elevation: 2,
-                            shadowColor: Color.light.tint,
+                            shadowColor: colors.tint,
                             shadowOffset: { width: 0, height: 1 },
                             shadowOpacity: 0.1,
                             shadowRadius: 2,
                             borderWidth: 0.5,
-                            borderColor: Color.light.tint,
+                            borderColor: colors.tint,
                           }}
                           onPress={() => {
                             toggleAdditionModal(item);
@@ -1609,7 +1908,7 @@ export default function mealsHome() {
                                 style={{
                                   fontWeight: "700",
                                   fontSize: 15,
-                                  color: Color.light.text,
+                                  color: colors.text,
                                 }}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
@@ -1721,7 +2020,7 @@ export default function mealsHome() {
                               style={{
                                 flexDirection: "row",
                                 justifyContent: "space-between",
-                                backgroundColor: Color.light.tintLighter,
+                                backgroundColor: colors.tintLighter,
                                 borderRadius: 8,
                                 padding: 6,
                                 marginTop: 8,
@@ -1743,14 +2042,14 @@ export default function mealsHome() {
                                 >
                                   <Text
                                     style={{
-                                      color: Color.light.text,
+                                      color: colors.text,
                                       fontSize: 12,
                                     }}
                                   >
                                     <Text
                                       style={{
                                         fontWeight: "700",
-                                        color: Color.light.tint,
+                                        color: colors.tint,
                                       }}
                                     >
                                       Protein:{" "}
@@ -1767,14 +2066,14 @@ export default function mealsHome() {
                                 >
                                   <Text
                                     style={{
-                                      color: Color.light.text,
+                                      color: colors.text,
                                       fontSize: 12,
                                     }}
                                   >
                                     <Text
                                       style={{
                                         fontWeight: "700",
-                                        color: Color.light.tint,
+                                        color: colors.tint,
                                       }}
                                     >
                                       Carbs:{" "}
@@ -1791,14 +2090,14 @@ export default function mealsHome() {
                                 >
                                   <Text
                                     style={{
-                                      color: Color.light.text,
+                                      color: colors.text,
                                       fontSize: 12,
                                     }}
                                   >
                                     <Text
                                       style={{
                                         fontWeight: "700",
-                                        color: Color.light.tint,
+                                        color: colors.tint,
                                       }}
                                     >
                                       Fat:{" "}
@@ -1815,14 +2114,14 @@ export default function mealsHome() {
                                 >
                                   <Text
                                     style={{
-                                      color: Color.light.text,
+                                      color: colors.text,
                                       fontSize: 12,
                                     }}
                                   >
                                     <Text
                                       style={{
                                         fontWeight: "700",
-                                        color: Color.light.tint,
+                                        color: colors.tint,
                                       }}
                                     >
                                       Cal:{" "}
@@ -1842,7 +2141,7 @@ export default function mealsHome() {
                             >
                               <View
                                 style={{
-                                  backgroundColor: Color.light.background,
+                                  backgroundColor: colors.background,
                                   borderRadius: 6,
                                   padding: 4,
                                   flexDirection: "row",
@@ -1850,18 +2149,18 @@ export default function mealsHome() {
                                   flex: 1,
                                   marginRight: 4,
                                   borderWidth: 0.5,
-                                  borderColor: Color.light.tint,
+                                  borderColor: colors.tint,
                                 }}
                               >
                                 <MaterialIcons
                                   name="person"
                                   size={14}
-                                  color={Color.light.tint}
+                                  color={colors.tint}
                                 />
                                 <Text
                                   style={{
                                     fontSize: 11,
-                                    color: Color.light.text,
+                                    color: colors.text,
                                     marginLeft: 4,
                                     fontStyle: "italic",
                                   }}
@@ -1874,7 +2173,7 @@ export default function mealsHome() {
 
                               <View
                                 style={{
-                                  backgroundColor: Color.light.background,
+                                  backgroundColor: colors.background,
                                   borderRadius: 6,
                                   padding: 4,
                                   flexDirection: "row",
@@ -1882,18 +2181,18 @@ export default function mealsHome() {
                                   flex: 1,
                                   marginLeft: 4,
                                   borderWidth: 0.5,
-                                  borderColor: Color.light.tint,
+                                  borderColor: colors.tint,
                                 }}
                               >
                                 <MaterialIcons
                                   name="business"
                                   size={14}
-                                  color={Color.light.tint}
+                                  color={colors.tint}
                                 />
                                 <Text
                                   style={{
                                     fontSize: 11,
-                                    color: Color.light.text,
+                                    color: colors.text,
                                     marginLeft: 4,
                                     fontStyle: "italic",
                                   }}
@@ -1920,7 +2219,7 @@ export default function mealsHome() {
                   >
                     <TouchableOpacity
                       style={{
-                        backgroundColor: Color.light.tint,
+                        backgroundColor: colors.tint,
                         padding: 12,
                         borderRadius: 10,
                         flex: 1,
@@ -1950,276 +2249,8 @@ export default function mealsHome() {
             </View>
           </View>
         </Modal>
-      </View>
+      </View >
 
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    shadowColor: Color.light.tint,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
-    borderBottomWidth: 1,
-    borderBottomColor: Color.light.tintLighter,
-    backgroundColor: Color.light.background,
-    justifyContent: "space-between",
-    alignContent: "center",
-    alignItems: "center",
-    height: "fit",
-    backgroundColor: Color.light.background,
-    padding: 20,
-  },
-  vitamine: {
-    backgroundColor: Color.light.tint,
-    padding: 5,
-    borderRadius: 5,
-    justifyContent: "center",
-    alignContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    padding: 10,
-    color: Color.light.tint,
-    backgroundColor: Color.light.background,
-    margin: "auto",
-    borderRadius: 10,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  modalBackground: {
-    flex: 1,
-    padding: (10, 30),
-  },
-  modeleContent: {
-    padding: 20,
-    backgroundColor: Color.light.background,
-    borderRadius: 20,
-  },
-  foodItem: {
-    padding: 15,
-    backgroundColor: "#f8f8f8",
-    margin: 5,
-    width: "95%",
-    borderRadius: 10,
-  },
-  selectedFood: {
-    backgroundColor: "#ffa726", // تغيير اللون عند التحديد
-  },
-  FoodInput: {
-    backgroundColor: Color.light.tint,
-    marginTop: 10,
-    borderRadius: 4,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-  },
-  foodVitamineInput: {
-    backgroundColor: Color.light.tint,
-    width: "23%",
-    marginTop: 10,
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-  },
-  car: {
-    fontSize: 12,
-    color: Color.dark,
-    textAlign: "center",
-    fontWeight: "700",
-  },
-  box: {
-    backgroundColor: Color.light.background,
-    margin: 2,
-    padding: 4,
-    borderRadius: 5,
-    fontWeight: "800",
-    width: 56,
-  },
-  addMealButton: {
-    backgroundColor: Color.light.background,
-    borderWidth: 1,
-    borderColor: Color.light.tint,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    transform: [{ scale: 1 }],
-  },
-
-  addMealButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-
-  addMealButtonIcon: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: Color.light.tint,
-    lineHeight: 20,
-  },
-
-  addMealButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.light.tint,
-    letterSpacing: 0.5,
-  },
-
-  // Header Styles
-  header: {
-    alignItems: 'flex-start',
-    backgroundColor: Color.light.background,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-
-  headerLeft: {
-    flex: 1,
-    paddingRight: 16,
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Color.light.text,
-    marginBottom: 4,
-    lineHeight: 24,
-  },
-
-  headerDate: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Color.light.text,
-    opacity: 0.7,
-  },
-
-  headerRight: {
-    alignItems: 'center',
-    minWidth: 160,
-  },
-
-  totalLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1,
-    color: Color.light.text,
-    opacity: 0.6,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-
-  nutritionSummary: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    justifyContent: 'center',
-  },
-
-  nutritionItem: {
-    minWidth: 70,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-
-  nutritionValue: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: 'white',
-    marginBottom: 2,
-    textAlign: 'center',
-  },
-
-  nutritionLabel: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: 'white',
-    opacity: 0.9,
-    textAlign: 'center',
-  },
-
-  // Alternative compact header style
-  headerCompact: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: Color.light.background,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-
-  // Alternative button style - filled
-  addMealButtonFilled: {
-    backgroundColor: Color.light.tint,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    shadowColor: Color.light.tint,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-
-  addMealButtonFilledText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.light.background,
-    textAlign: 'center',
-    letterSpacing: 0.5,
-  },
-
-  // Alternative button style - minimal
-  addMealButtonMinimal: {
-    backgroundColor: 'transparent',
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-
-  addMealButtonMinimalText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Color.light.tint,
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-});

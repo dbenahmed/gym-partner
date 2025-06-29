@@ -1,17 +1,69 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, Modal, TextInput, StyleSheet, FlatList, Alert } from 'react-native';
-import useAuth from '@/app/contex/authcontex';
+import useAuth from '@/context/authContext';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { validateName } from '@/utils/validation';
-import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises, fetchDeleteCollection } from '@/lib/api'; // Replace with real path
-
-
+import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises, fetchDeleteCollection } from '@/lib/api';
+import useThemeContext from '@/context/themeContext';
+import Button from '@/components/ui/Button';
+import ModalSlideUp from '@/components/ui/ModalSlideUp';
 import { fetchGetUserPlans, fetchCreatePlan } from '@/lib/api';
 
 
+
 const Plans = () => {
+
+  const { theme, colors } = useThemeContext();
+
+  const styles = useMemo(() => StyleSheet.create({
+    listContainer: {
+      flex: 1,
+    },
+    planItem: {
+      backgroundColor: colors.tintLighter,
+      borderRadius: 12,
+      padding: 20,
+      marginHorizontal: 16,
+      marginVertical: 10,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
+      borderWidth: 1,
+      borderColor: "rgba(0, 0, 0, 0.05)",
+    },
+    planTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      marginBottom: 10,
+      color: colors.text,
+      letterSpacing: 0.3,
+    },
+    buttonContainer: {
+      backgroundColor: colors.tint,
+      borderRadius: 8,
+      padding: 16,
+      marginHorizontal: 16,
+      marginTop: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: "#fff",
+    },
+  }), [theme]);
+
+
   const { authenticated } = useAuth();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -121,18 +173,20 @@ const Plans = () => {
               onPress={() => deleteCollection(collectionId)}
               style={{ padding: 10 }}
             >
-              <Text style={{ color: Colors.light.tint }}>Delete</Text>
+              <Text style={{ color: colors.tint }}>Delete</Text>
             </TouchableOpacity>
           ),
         }}
       />
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.tint} />
+        </View>
       ) : (
-        <View style={{ height: '100%', paddingVertical: 16, paddingHorizontal: 16 }}>
+        <View style={{ height: '100%', paddingBottom: 16, paddingHorizontal: 16, paddingTop: 16 }}>
 
           <View style={{ marginVertical: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.text }}>Description</Text>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Description</Text>
             <Text>{description}</Text>
           </View>
 
@@ -154,39 +208,70 @@ const Plans = () => {
             contentContainerStyle={{ paddingVertical: 10 }}
           />
 
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => setModalVisible(true)}>
-            <Text style={styles.buttonText}>Add New Plan</Text>
-          </TouchableOpacity>
-
+          <Button
+            text="Create New Plan"
+            onClick={() => {
+              setModalVisible(true)
+            }}
+            styles={{
+              marginHorizontal: 16,
+              marginTop: 16,
+            }}
+          />
           {/* Modal for creating a new plan */}
-          <Modal
-            visible={modalVisible}
-            animationType="slide"
-            onRequestClose={() => setModalVisible(false)}
+          <ModalSlideUp
+            isVisible={modalVisible}
+            onClose={() => {
+              setModalVisible(false)
+            }}
+            props={{ title: "Create New Plan" }}
           >
-            <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-              <Text style={{ fontSize: 20 }}>Create New Plan</Text>
+            <View style={{
+              flex: 1,
+              marginTop: 25,
+            }}>
+              <Text
+                style={{
+                  color: colors.text,
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 8,
+                }}
+              >
+                Title
+              </Text>
+
+
               <TextInput
                 value={addPlanTitle}
                 onChangeText={setAddPlanTitle}
                 placeholder="Enter plan title"
                 style={{
-                  height: 40,
-                  borderColor: '#ccc',
                   borderWidth: 1,
-                  borderRadius: 5,
-                  marginVertical: 10,
-                  paddingHorizontal: 10,
+                  borderColor: colors.tint,
+                  borderRadius: 8,
+                  padding: 12,
+                  marginBottom: 16,
+                  fontSize: 16,
+                  color: colors.text,
                 }}
               />
-              <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={handleCreatePlan}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Create Plan</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{ backgroundColor: Colors.light.tint, borderRadius: 8, padding: 16, marginHorizontal: 16, marginTop: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, }} onPress={() => setModalVisible(false)}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Cancel</Text>
-              </TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Button
+                  text="Create Plan"
+                  onClick={handleCreatePlan}
+                  styles={{
+                    height: 50,
+                  }}
+                />
+              </View>
             </View>
-          </Modal>
+          </ModalSlideUp>
         </View>
       )}
     </View>
@@ -195,47 +280,3 @@ const Plans = () => {
 
 export default Plans;
 
-
-const styles = StyleSheet.create({
-  listContainer: {
-    flex: 1,
-  },
-  planItem: {
-    backgroundColor: Colors.light.background,
-    borderRadius: 12,
-    padding: 20,
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  planTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: Colors.light.text,
-    letterSpacing: 0.3,
-  },
-  buttonContainer: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 8,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-});

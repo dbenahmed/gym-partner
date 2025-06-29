@@ -9,11 +9,37 @@ import {
 import Color from "@/constants/Colors.ts";
 import { useRouter } from "expo-router";
 import CheckBox from "react-native-check-box";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert } from "react-native";
 
 export default function Landing({ navigation }) {
   const router = useRouter();
+
+  const { colors } = useThemeContext();
+
+  const styles = useMemo(() => {
+    return StyleSheet.create({
+      botton: {
+        padding: 20,
+        backgroundColor: colors.tint,
+        marginTop: 20,
+        borderRadius: 50,
+      },
+      bottonText: {
+        textAlign: "center",
+        fontSize: 24,
+        color: colors.background,
+        fontWeight: 800,
+      },
+      backgroundLog: {
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        position: "relative",
+      },
+    });
+  }, [colors]);
+
 
   const [isChecked, setIsChecked] = useState(false);
 
@@ -21,10 +47,11 @@ export default function Landing({ navigation }) {
     <ImageBackground
       source={require("@/assets/images/manLog.jpg")}
       style={styles.backgroundLog}
+
     >
       <Text
         style={{
-          color: "#F0B294",
+          color: colors.tint,
           fontSize: 13,
           fontWeight: "700",
           fontSize: 32,
@@ -34,6 +61,12 @@ export default function Landing({ navigation }) {
           top: "35%",
           lineHeight: 40,
           textAlign: "center",
+          // drop shadow
+          textShadowColor: "#000",
+          textShadowOffset: { width: 0, height: 1 },
+          textShadowRadius: 10,
+          fontFamily: "outfitb",
+          textTransform: "uppercase",
         }}
       >
         TRACK YOUR MEALS IMPROVE YOUR WORKOUT
@@ -52,9 +85,9 @@ export default function Landing({ navigation }) {
           style={[
             styles.botton,
             {
-              backgroundColor: "#CF8765",
+              backgroundColor: colors.tint,
               borderWidth: 1,
-              borderColor: Color.light.tint,
+              borderColor: colors.tint,
               marginBottom: "8",
             },
           ]}
@@ -66,7 +99,7 @@ export default function Landing({ navigation }) {
             }
           }}
         >
-          <Text style={[styles.bottonText, { color: Color.light.background }]}>
+          <Text style={[styles.bottonText, { color: colors.background }]}>
             Get Started
           </Text>
         </TouchableOpacity>
@@ -80,30 +113,9 @@ export default function Landing({ navigation }) {
             </Text>
           }
           rightTextStyle={{ color: "#000" }}
-          checkBoxColor="#CF8765"
+          checkBoxColor={colors.tint}
         />
       </View>
     </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  botton: {
-    padding: 20,
-    backgroundColor: Color.light.tint,
-    marginTop: 20,
-    borderRadius: 50,
-  },
-  bottonText: {
-    textAlign: "center",
-    fontSize: 24,
-    color: Color.light.background,
-    fontWeight: 800,
-  },
-  backgroundLog: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-});

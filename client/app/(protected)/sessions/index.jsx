@@ -3,16 +3,23 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import useAuth from '@/app/contex/authcontex';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import useAuth from '@/context/authContext';
 import Colors from '@/constants/Colors';
 import { router, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { defaultUrl } from '@/constants/constants';
+import Button from '@/components/ui/Button.jsx';
 
 
+import useThemeContext from '@/context/themeContext';
 
 export default function Sessions() {
+
+
+    const { colors, theme } = useThemeContext();
+
+
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const { authenticated } = useAuth();
@@ -88,7 +95,7 @@ export default function Sessions() {
     const isToday = currentDate.getTime() === today.getTime();
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
             <View style={{ padding: 16 }}>
                 <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: 'center', marginBottom: 8 }}>
                     <TouchableOpacity
@@ -102,7 +109,7 @@ export default function Sessions() {
                         <MaterialCommunityIcons
                             name="chevron-left"
                             size={24}
-                            color={Colors.light.tint}
+                            color={colors.tint}
                             style={{
                                 shadowColor: "#000",
                                 shadowOffset: { width: 0, height: 1 },
@@ -114,7 +121,7 @@ export default function Sessions() {
                     </TouchableOpacity>
 
                     <View style={{ alignItems: 'center' }}>
-                        <Text style={{ fontSize: 18, fontWeight: 'bold', color: Colors.light.text }}>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>
                             {currentDate.toLocaleDateString('en-US', {
                                 weekday: 'short',
                                 month: 'short',
@@ -135,7 +142,7 @@ export default function Sessions() {
                             <MaterialCommunityIcons
                                 name="chevron-right"
                                 size={24}
-                                color={Colors.light.tint}
+                                color={colors.tint}
                                 style={{
                                     shadowColor: "#000",
                                     shadowOffset: { width: 0, height: 1 },
@@ -154,7 +161,7 @@ export default function Sessions() {
             </View>
 
             {loading ? (
-                <ActivityIndicator size="large" color={Colors.light.tint} />
+                <ActivityIndicator size="large" color={colors.tint} />
             ) : (
                 <FlatList
                     style={{ marginBottom: 20, flex: 1, paddingHorizontal: 20 }} // Added marginBottom to avoid overlap with button
@@ -165,7 +172,7 @@ export default function Sessions() {
                     renderItem={({ item }) => (
                         <TouchableOpacity
                             style={{
-                                backgroundColor: Colors.light.background,
+                                backgroundColor: colors.tintLighter,
                                 borderRadius: 8,
                                 padding: 16,
                                 marginBottom: 12,
@@ -175,7 +182,7 @@ export default function Sessions() {
                                 shadowRadius: 4,
                                 elevation: 2,
                                 borderLeftWidth: 4,
-                                borderLeftColor: Colors.light.tint,
+                                borderLeftColor: colors.tint,
                             }}
                             onPress={() => {
                                 // Navigate to session details
@@ -185,11 +192,11 @@ export default function Sessions() {
                                 });
                             }}
                         >
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: colors.text }}>
                                 {item.name}
                             </Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={{ fontSize: 14, color: '#666' }}>
+                                <Text style={{ fontSize: 14, color: colors.text }}>
                                     {item.note}
                                 </Text>
                             </View>
@@ -205,21 +212,9 @@ export default function Sessions() {
                 />
             )}
 
-            <TouchableOpacity
-                style={{
-                    backgroundColor: Colors.light.tint,
-                    borderRadius: 8,
-                    padding: 16,
-                    margin: 16,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 2,
-                }}
-                onPress={() => {
+            <Button
+                text="Start New Session"
+                onClick={() => {
                     router.push({
                         pathname: '/sessions/newSession',
                         params: {
@@ -227,11 +222,12 @@ export default function Sessions() {
                         }
                     });
                 }}
-            >
-                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>
-                    Start New Session
-                </Text>
-            </TouchableOpacity>
+                type="primary"
+                icon="plus"
+                styles={{
+                    margin: 16,
+                }}
+            />
         </View>
     );
 }

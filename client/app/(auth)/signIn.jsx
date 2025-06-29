@@ -8,25 +8,63 @@ import {
   Pressable,
   ImageBackground,
 } from "react-native";
-import { AuthContext } from "@/app/contex/authcontex";
 import { useRouter } from "expo-router";
-import Color from "@/constants/Colors.ts";
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo } from "react";
+import useAuth from "@/context/authContext";
 import SplashScreen from "@/components/SplashScreen";
 import { Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import useThemeContext from "@/context/themeContext";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 
 export default function TabTwoScreen() {
+
+
+
+
+  const { colors } = useThemeContext();
+
+
+  const styles = useMemo(() => StyleSheet.create({
+    textInput: {
+      borderWidth: 2,
+      width: "100%",
+      padding: 15,
+      borderRadius: 50,
+      fontSize: 16,
+      marginTop: 20,
+      borderColor: colors.tint,
+      color: colors.text,
+      paddingLeft: 60,
+    },
+    backgroundLog: {
+      width: "100%",
+      height: "100%",
+      position: "relative",
+      backgroundColor: "transparent",
+    },
+    inputContainer: {
+      width: "100%",
+      position: "relative",
+    },
+    icon: {
+      position: "absolute",
+      top: "50%",
+      left: "19",
+    },
+  }), [colors]);
+
   const router = useRouter();
   const [password, setPassword] = useState("password1");
-  const [username, setUsername] = useState("user1");
-  const { login, splashLoading, setSplashLoading } = useContext(AuthContext);
+  const [username, setUsername] = useState("djilaliben");
+  const { login, splashLoading, setSplashLoading } = useAuth();
 
   const handleLogin = async () => {
     setSplashLoading(true);
     const res = await login(username, password);
     if (res.success) {
-      router.push("/(protected)/mealsHome"); // should use REDIRECT
+      router.replace("/(protected)/mealsHome"); //todo :  should use REDIRECT
     } else {
       Alert.alert("Error", res.message);
     }
@@ -34,7 +72,9 @@ export default function TabTwoScreen() {
   };
 
   if (splashLoading) {
-    return <SplashScreen />;
+    return <View backgroundColor={colors.background} style={{ flex: 1 }}>
+      <SplashScreen />
+    </View>;
   }
 
   return (
@@ -43,25 +83,8 @@ export default function TabTwoScreen() {
       style={styles.backgroundLog}
     >
       <LinearGradient
-        colors={[
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgb(0, 0, 0)",
-          "rgba(93, 91, 91, 0.11)",
-          "rgba(98, 96, 96, 0)",
-        ]}
+        colors={["black", "transparent"]}
+        locations={[0, 1]}
         start={{ x: 0.5, y: 1 }}
         end={{ x: 0.5, y: 0 }}
         style={{
@@ -73,13 +96,16 @@ export default function TabTwoScreen() {
         }}
       >
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/people.png")}
+          <MaterialCommunityIcons
+            name="account"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
           />
           <TextInput
             placeholder="Name"
-            placeholderTextColor={"#fffaf0"}
+            placeholderTextColor={colors.text}
+
             value={username}
             style={styles.textInput}
             onChangeText={(text) => setUsername(text)}
@@ -87,14 +113,15 @@ export default function TabTwoScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image
-            source={require("@/assets/images/key.png")}
+          <MaterialCommunityIcons
+            name="key"
+            size={24}
+            color={colors.tint}
             style={styles.icon}
-            placeholderTextColor={"#fffaf0"}
           />
           <TextInput
             placeholder="password"
-            placeholderTextColor={"#fffaf0"}
+            placeholderTextColor={colors.text}
             value={password}
             secureTextEntry={true}
             style={styles.textInput}
@@ -105,7 +132,7 @@ export default function TabTwoScreen() {
         <TouchableOpacity
           style={{
             padding: 15,
-            backgroundColor: "#CF8765",
+            backgroundColor: colors.tint,
             width: "100%",
             marginTop: 20,
             borderRadius: 50,
@@ -136,7 +163,7 @@ export default function TabTwoScreen() {
         >
           <Text style={{ color: "#FFFFFF" }}>Don't have an account?</Text>
           <Pressable onPress={() => router.push("/(auth)/signUp")}>
-            <Text style={{ color: "#CF8765", fontFamily: "outfitb" }}>
+            <Text style={{ color: colors.tint, fontFamily: "outfitb" }}>
               sign Up Here
             </Text>
           </Pressable>
@@ -145,31 +172,3 @@ export default function TabTwoScreen() {
     </ImageBackground>
   );
 }
-const styles = StyleSheet.create({
-  textInput: {
-    borderWidth: 3,
-    width: "100%",
-    padding: 15,
-    borderRadius: 50,
-    fontSize: 16,
-    marginTop: 20,
-    borderColor: "#CF8765",
-    color: "#CF8765",
-    paddingLeft: 60,
-  },
-  backgroundLog: {
-    width: "100%",
-    height: "100%",
-    position: "relative",
-    backgroundColor: "transparent",
-  },
-  inputContainer: {
-    width: "100%",
-    position: "relative",
-  },
-  icon: {
-    position: "absolute",
-    top: "50%",
-    left: "19",
-  },
-});

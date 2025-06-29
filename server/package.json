@@ -6,7 +6,8 @@
   "scripts": {
     "test": "nodemon playground.js",
     "start": "node app.js",
-    "dev": "nodemon app.js  --local",
+    "dev": "nodemon app.js  --serveonet",
+    "local": "nodemon app.js --local",
     "prod": "nodemon app.js",
     "drizzle:dev:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
     "drizzle:dev:migrate": "drizzle-kit migrate --config=drizzle-dev.config.ts",

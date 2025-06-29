@@ -13,14 +13,363 @@ import {
 } from 'react-native';
 import Color from "@/constants/Colors.ts";
 import { defaultUrl } from "@/constants/constants.ts";
-import useAuth from "@/app/contex/authcontex";
+import useAuth from "@/context/authContext";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
-
+import useThemeContext from '@/context/themeContext';
+import { useMemo } from 'react';
+import Button from "@/components/ui/Button";
+import ModalSlideUp from "@/components/ui/ModalSlideUp";
 
 
 export default function Explore() {
+
+	const { colors } = useThemeContext();
+
+	const styles = useMemo(() => StyleSheet.create({
+		container: {
+			backgroundColor: colors.background,
+			paddingTop: 0,
+			padding: 16,
+			width: '100%',
+			flex: 1
+		},
+		header: {
+			fontSize: 28,
+			fontWeight: 'bold',
+			marginBottom: 20,
+			marginTop: 40,
+		},
+		loadingContainer: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
+		tabContainer: {
+			flexDirection: 'row',
+			marginBottom: 20,
+			borderWidth: 1,
+			borderColor: colors.tint,
+		},
+		tab: {
+			flex: 1,
+			paddingVertical: 12,
+			alignItems: 'center',
+			backgroundColor: 'transparent',
+		},
+		activeTab: {
+			backgroundColor: colors.tint,
+		},
+		tabText: {
+			fontWeight: '600',
+			color: colors.tint,
+		},
+		activeTabText: {
+			color: '#fff',
+		},
+		contentContainer: {
+			flex: 1,
+			flexDirection: 'row',
+			height: '100%',
+		},
+		tabContent: { // Each tab takes half of the contentContainer
+			width: '100%',
+			flex: 1
+		},
+		tabContentAbove: {
+			width: '100%',
+			flex: 1
+		},
+		searchContainer: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			width: '100%',
+			backgroundColor: '#f0f0f0',
+			borderRadius: 8,
+			paddingHorizontal: 16,
+			marginBottom: 10,
+		},
+		searchInput: {
+			flex: 1,
+			paddingVertical: 13,
+			fontSize: 16,
+
+		},
+		searchIcon: {
+			marginLeft: 8,
+		},
+		resultsContainer: {
+			flex: 1,
+		},
+		resultItem: {
+			backgroundColor: colors.tintLighter,
+			padding: 16,
+			borderRadius: 8,
+			marginBottom: 12,
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 1 },
+			shadowOpacity: 0.1,
+			shadowRadius: 2,
+			elevation: 2,
+		},
+		resultTitle: {
+			fontSize: 16,
+			fontWeight: 'bold',
+			color: colors.text,
+		},
+		resultSubtitle: {
+			fontSize: 14,
+			color: colors.text,
+			marginTop: 4,
+		},
+		noResultsText: {
+			textAlign: 'center',
+			color: '#666',
+			marginTop: 20,
+			fontSize: 16,
+
+		},
+		modalOverlay: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		},
+		modalContent: {
+			backgroundColor: colors.background,
+			padding: 20,
+			borderRadius: 10,
+			width: '90%',
+			maxHeight: '80%',
+		},
+		modalHeader: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginBottom: 20,
+		},
+		modalTitle: {
+			fontSize: 20,
+			color: colors.tint,
+			fontWeight: 'bold',
+		},
+		filterScrollView: {
+			maxHeight: 350,
+		},
+		filterSection: {
+			marginBottom: 16,
+		},
+		filterSectionTitle: {
+			fontSize: 16,
+			color: colors.text,
+			fontWeight: 'bold',
+			marginBottom: 8,
+		},
+		selectContainer: {
+			borderWidth: 1,
+			borderColor: '#ddd',
+			borderRadius: 8,
+			backgroundColor: '#f9f9f9',
+			overflow: 'hidden',
+		},
+		picker: {
+			width: '100%',
+			height: 40,
+			color: '#333',
+			fontSize: 14,
+		},
+		resetButton: {
+			backgroundColor: '#ccc',
+			padding: 12,
+			borderRadius: 8,
+			marginRight: 10,
+			marginBottom: 10,
+			alignItems: 'center',
+		},
+		resetButtonText: {
+			color: '#fff',
+			fontWeight: 'bold',
+			fontSize: 14,
+		},
+		applyButton: {
+			backgroundColor: colors.tint,
+			padding: 12,
+			borderRadius: 8,
+			marginBottom: 10,
+			alignItems: 'center',
+		},
+		applyButtonText: {
+			color: '#fff',
+			fontWeight: 'bold',
+			fontSize: 14,
+		},
+		modalFooter: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginTop: 20,
+			paddingTop: 10,
+			borderTopWidth: 1,
+			borderTopColor: '#eee',
+		},
+		filterButton: {
+			backgroundColor: colors.tint,
+			padding: 10,
+			borderRadius: 5,
+			marginBottom: 10,
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		filterButtonText: {
+			color: '#fff',
+			fontWeight: 'bold',
+			marginLeft: 5,
+		},
+
+		// Exercise card styles
+		exerciseCard: {
+			backgroundColor: '#fff',
+			borderRadius: 10,
+			padding: 15,
+			marginBottom: 15,
+			shadowColor: '#000',
+			shadowOffset: { width: 0, height: 2 },
+			shadowOpacity: 0.1,
+			shadowRadius: 4,
+			elevation: 3,
+		},
+		exerciseName: {
+			fontSize: 18,
+			fontWeight: 'bold',
+			marginBottom: 5,
+		},
+		exerciseDetails: {
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			marginBottom: 8,
+		},
+		exerciseDetail: {
+			backgroundColor: '#f0f0f0',
+			paddingHorizontal: 8,
+			paddingVertical: 4,
+			borderRadius: 4,
+			marginRight: 8,
+			marginBottom: 8,
+			fontSize: 12,
+		},
+		exerciseDescription: {
+			color: '#666',
+			marginBottom: 10,
+		},
+
+		// Food card styles
+		foodCard: {
+			backgroundColor: '#fff',
+			borderRadius: 10,
+			padding: 15,
+			marginBottom: 15,
+			shadowColor: '#000',
+			shadowOffset: { width: 0, height: 2 },
+			shadowOpacity: 0.1,
+			shadowRadius: 4,
+			elevation: 3,
+		},
+		foodName: {
+			fontSize: 18,
+			fontWeight: 'bold',
+			marginBottom: 5,
+		},
+		foodCalories: {
+			color: '#666',
+			fontSize: 14,
+		},
+
+		// Loading indicator styles
+		loadingContainer: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+			padding: 20,
+		},
+
+		// Empty state styles
+		emptyState: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+			padding: 20,
+		},
+		emptyStateText: {
+			fontSize: 16,
+			color: '#666',
+			textAlign: 'center',
+			marginTop: 10,
+		},
+
+		// Filter chips styles
+		filterChipsContainer: {
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			marginBottom: 10,
+			paddingHorizontal: 5,
+		},
+		filterChip: {
+			backgroundColor: colors.tint,
+			paddingHorizontal: 10,
+			paddingVertical: 6,
+			borderRadius: 20,
+			marginRight: 8,
+			marginBottom: 8,
+			flexDirection: 'row',
+			alignItems: 'center',
+		},
+		filterChipText: {
+			color: '#fff',
+			fontSize: 12,
+			marginRight: 5,
+		},
+		filterChipIcon: {
+			color: '#fff',
+		},
+		selectContainer: {
+			width: '100%',
+		},
+		buttonGroup: {
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			gap: 8,
+		},
+		button: {
+			paddingVertical: 8,
+			paddingHorizontal: 12,
+			borderRadius: 8,
+			borderWidth: 1,
+			marginRight: 8,
+			marginBottom: 8,
+		},
+		buttonSelected: {
+			backgroundColor: colors.tint, // Blue background for selected
+
+		},
+		buttonUnselected: {
+			backgroundColor: colors.text,
+		},
+		buttonText: {
+			fontSize: 14,
+		},
+		buttonTextSelected: {
+			color: colors.text, // White text for selected
+			fontWeight: 'bold',
+		},
+		buttonTextUnselected: {
+			color: "black",
+		},
+
+	}), [colors]);
+
+
+
 	const [loading, setLoading] = useState(false);
 	const { authenticated } = useAuth();
 
@@ -263,7 +612,7 @@ export default function Explore() {
 											<View style={styles.modalHeader}>
 												<Text style={styles.modalTitle}>Search Preferences</Text>
 												<TouchableOpacity onPress={() => setFilterModalVisible(false)}>
-													<MaterialIcons name="close" size={24} color="#333" />
+													<MaterialIcons name="close" size={24} color={colors.red} />
 												</TouchableOpacity>
 											</View>
 
@@ -433,28 +782,28 @@ export default function Explore() {
 											</ScrollView>
 
 											<View style={styles.modalFooter}>
-												<TouchableOpacity
-													style={styles.resetButton}
-													onPress={resetFilters}
-												>
-													<Text style={styles.resetButtonText}>Reset</Text>
-												</TouchableOpacity>
-												<TouchableOpacity
-													style={styles.applyButton}
-													onPress={() => {
+
+												<Button
+													text="Reset"
+													type="secondary"
+													onClick={() => resetFilters()}
+												/>
+												<Button
+													text="Apply"
+													type="primary"
+													onClick={() => {
 														applyFilters();
 														setFilterModalVisible(false);
 													}}
-												>
-													<Text style={styles.applyButtonText}>Apply</Text>
-												</TouchableOpacity>
+												/>
+
 											</View>
 										</View>
 									</View>
 								</Modal>
 								<ScrollView style={styles.resultsContainer}>
 									{exercisesLoading ? (
-										<ActivityIndicator size="small" color={Color.light.tint} />
+										<ActivityIndicator size="small" color={colors.tint} />
 									) : exercises.length > 0 ? (
 										exercises.map((item) => (
 											<TouchableOpacity
@@ -501,7 +850,7 @@ export default function Explore() {
 
 								<ScrollView style={styles.resultsContainer}>
 									{foodsLoading ? (
-										<ActivityIndicator size="small" color={Color.light.tint} />
+										<ActivityIndicator size="small" color={colors.tint} />
 									) : (
 										foods.length > 0 ? (
 											foods.map((food) => (
@@ -529,341 +878,3 @@ export default function Explore() {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		backgroundColor: Color.light.background,
-		padding: 16,
-		width: '100%',
-		flex: 1
-	},
-	header: {
-		fontSize: 28,
-		fontWeight: 'bold',
-		marginBottom: 20,
-		marginTop: 40,
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	tabContainer: {
-		flexDirection: 'row',
-		marginBottom: 20,
-		borderWidth: 1,
-		borderColor: Color.light.tint,
-	},
-	tab: {
-		flex: 1,
-		paddingVertical: 12,
-		alignItems: 'center',
-		backgroundColor: 'transparent',
-	},
-	activeTab: {
-		backgroundColor: Color.light.tint,
-	},
-	tabText: {
-		fontWeight: '600',
-		color: Color.light.tint,
-	},
-	activeTabText: {
-		color: '#fff',
-	},
-	contentContainer: {
-		flex: 1,
-		flexDirection: 'row',
-		height: '100%',
-	},
-	tabContent: { // Each tab takes half of the contentContainer
-		width: '100%',
-		flex: 1
-	},
-	tabContentAbove: {
-		width: '100%',
-		flex: 1
-	},
-	searchContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		width: '100%',
-		backgroundColor: '#f0f0f0',
-		borderRadius: 8,
-		paddingHorizontal: 16,
-		marginBottom: 10,
-	},
-	searchInput: {
-		flex: 1,
-		paddingVertical: 13,
-		fontSize: 16,
-	},
-	searchIcon: {
-		marginLeft: 8,
-	},
-	resultsContainer: {
-		flex: 1,
-	},
-	resultItem: {
-		backgroundColor: '#fff',
-		padding: 16,
-		borderRadius: 8,
-		marginBottom: 12,
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
-	},
-	resultTitle: {
-		fontSize: 16,
-		fontWeight: 'bold',
-	},
-	resultSubtitle: {
-		fontSize: 14,
-		color: '#666',
-		marginTop: 4,
-	},
-	noResultsText: {
-		textAlign: 'center',
-		color: '#666',
-		marginTop: 20,
-		fontSize: 16,
-
-	},
-	modalOverlay: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-	},
-	modalContent: {
-		backgroundColor: 'white',
-		padding: 20,
-		borderRadius: 10,
-		width: '90%',
-		maxHeight: '80%',
-	},
-	modalHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 20,
-	},
-	modalTitle: {
-		fontSize: 20,
-		fontWeight: 'bold',
-	},
-	filterScrollView: {
-		maxHeight: 350,
-	},
-	filterSection: {
-		marginBottom: 16,
-	},
-	filterSectionTitle: {
-		fontSize: 16,
-		fontWeight: 'bold',
-		marginBottom: 8,
-	},
-	selectContainer: {
-		borderWidth: 1,
-		borderColor: '#ddd',
-		borderRadius: 8,
-		backgroundColor: '#f9f9f9',
-		overflow: 'hidden',
-	},
-	picker: {
-		width: '100%',
-		height: 40,
-		color: '#333',
-		fontSize: 14,
-	},
-	resetButton: {
-		backgroundColor: '#ccc',
-		padding: 12,
-		borderRadius: 8,
-		marginRight: 10,
-		marginBottom: 10,
-		alignItems: 'center',
-	},
-	resetButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
-		fontSize: 14,
-	},
-	applyButton: {
-		backgroundColor: Color.light.tint,
-		padding: 12,
-		borderRadius: 8,
-		marginBottom: 10,
-		alignItems: 'center',
-	},
-	applyButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
-		fontSize: 14,
-	},
-	modalFooter: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginTop: 20,
-		paddingTop: 10,
-		borderTopWidth: 1,
-		borderTopColor: '#eee',
-	},
-	filterButton: {
-		backgroundColor: Color.light.tint,
-		padding: 10,
-		borderRadius: 5,
-		marginBottom: 10,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	filterButtonText: {
-		color: '#fff',
-		fontWeight: 'bold',
-		marginLeft: 5,
-	},
-
-	// Exercise card styles
-	exerciseCard: {
-		backgroundColor: '#fff',
-		borderRadius: 10,
-		padding: 15,
-		marginBottom: 15,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
-	},
-	exerciseName: {
-		fontSize: 18,
-		fontWeight: 'bold',
-		marginBottom: 5,
-	},
-	exerciseDetails: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		marginBottom: 8,
-	},
-	exerciseDetail: {
-		backgroundColor: '#f0f0f0',
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-		borderRadius: 4,
-		marginRight: 8,
-		marginBottom: 8,
-		fontSize: 12,
-	},
-	exerciseDescription: {
-		color: '#666',
-		marginBottom: 10,
-	},
-
-	// Food card styles
-	foodCard: {
-		backgroundColor: '#fff',
-		borderRadius: 10,
-		padding: 15,
-		marginBottom: 15,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
-	},
-	foodName: {
-		fontSize: 18,
-		fontWeight: 'bold',
-		marginBottom: 5,
-	},
-	foodCalories: {
-		color: '#666',
-		fontSize: 14,
-	},
-
-	// Loading indicator styles
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		padding: 20,
-	},
-
-	// Empty state styles
-	emptyState: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		padding: 20,
-	},
-	emptyStateText: {
-		fontSize: 16,
-		color: '#666',
-		textAlign: 'center',
-		marginTop: 10,
-	},
-
-	// Filter chips styles
-	filterChipsContainer: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		marginBottom: 10,
-		paddingHorizontal: 5,
-	},
-	filterChip: {
-		backgroundColor: Color.light.tint,
-		paddingHorizontal: 10,
-		paddingVertical: 6,
-		borderRadius: 20,
-		marginRight: 8,
-		marginBottom: 8,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	filterChipText: {
-		color: '#fff',
-		fontSize: 12,
-		marginRight: 5,
-	},
-	filterChipIcon: {
-		color: '#fff',
-	},
-	selectContainer: {
-		width: '100%',
-	},
-	buttonGroup: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: 8,
-	},
-	button: {
-		paddingVertical: 8,
-		paddingHorizontal: 12,
-		borderRadius: 8,
-		borderWidth: 1,
-		marginRight: 8,
-		marginBottom: 8,
-	},
-	buttonSelected: {
-		backgroundColor: '#007AFF', // Blue background for selected
-		borderColor: '#007AFF',
-	},
-	buttonUnselected: {
-		backgroundColor: '#FFFFFF',
-		borderColor: '#ccc',
-	},
-	buttonText: {
-		fontSize: 14,
-	},
-	buttonTextSelected: {
-		color: '#FFFFFF', // White text for selected
-		fontWeight: 'bold',
-	},
-	buttonTextUnselected: {
-		color: '#000000',
-	},
-
-});

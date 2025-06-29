@@ -3,11 +3,131 @@ import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert, Button } 
 import { router, useLocalSearchParams } from 'expo-router';
 import { defaultUrl } from '@/constants/constants';
 import Color from "@/constants/Colors.ts";
-import useAuth from '@/app/contex/authcontex';
+import useAuth from '@/context/authContext';
 import { Stack } from 'expo-router';
+import useThemeContext from "@/context/themeContext"; // Replace with real path
+import { useMemo } from 'react';
+
+
 
 
 export default function MealDetails() {
+
+
+
+
+    const { colors } = useThemeContext();
+
+
+    const styles = useMemo(() => StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.background,
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        errorContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        errorText: {
+            fontSize: 18,
+            color: 'red',
+        },
+        mainCard: {
+            backgroundColor: colors.background,
+            borderRadius: 10,
+            padding: 16,
+            margin: 10,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        headerSection: {
+            alignItems: 'center',
+            marginBottom: 16,
+        },
+        title: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            color: colors.text,
+            textAlign: 'center',
+        },
+        brand: {
+            fontSize: 16,
+            color: colors.text,
+            marginTop: 4,
+        },
+        descriptionCard: {
+            backgroundColor: colors.tintLighter,
+            borderRadius: 8,
+            padding: 12,
+            marginBottom: 16,
+        },
+        descriptionText: {
+            fontSize: 16,
+            lineHeight: 22,
+            color: colors.text,
+        },
+        nutritionHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 8,
+        },
+        sectionTitle: {
+            fontSize: 20,
+            color: colors.text,
+            fontWeight: 'bold',
+        },
+        perServing: {
+            fontSize: 14,
+            color: colors.text,
+        },
+        nutritionCard: {
+            backgroundColor: colors.tintLighter,
+            borderRadius: 8,
+            padding: 12,
+        },
+        nutritionRow: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingVertical: 8,
+        },
+        nutritionLabel: {
+            fontSize: 16,
+            fontWeight: '500',
+            color: colors.text,
+        },
+        nutritionLabelIndented: {
+            fontSize: 16,
+            marginLeft: 16,
+            color: colors.text,
+        },
+        nutritionValue: {
+            fontSize: 16,
+            fontWeight: '500',
+            color: colors.tint,
+        },
+        divider: {
+            height: 1,
+            backgroundColor: '#ddd',
+            marginVertical: 8,
+        },
+        detailedNutritionTitle: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            marginVertical: 8,
+            color: colors.text,
+        },
+    }), [colors]);
+
     const [meal, setMeal] = useState(null);
     const [loading, setLoading] = useState(true);
     const { authenticated } = useAuth();
@@ -48,7 +168,7 @@ export default function MealDetails() {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Color.light.tint} />
+                <ActivityIndicator size="large" color={colors.tint} />
             </View>
         );
     }
@@ -177,106 +297,3 @@ export default function MealDetails() {
 }
 
 
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Color.light.background,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        fontSize: 18,
-        color: 'red',
-    },
-    mainCard: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 16,
-        margin: 10,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    headerSection: {
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    brand: {
-        fontSize: 16,
-        color: '#666',
-        marginTop: 4,
-    },
-    descriptionCard: {
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 16,
-    },
-    descriptionText: {
-        fontSize: 16,
-        lineHeight: 22,
-        color: '#333',
-    },
-    nutritionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    perServing: {
-        fontSize: 14,
-        color: '#666',
-    },
-    nutritionCard: {
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-        padding: 12,
-    },
-    nutritionRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 8,
-    },
-    nutritionLabel: {
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    nutritionLabelIndented: {
-        fontSize: 16,
-        marginLeft: 16,
-    },
-    nutritionValue: {
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#ddd',
-        marginVertical: 8,
-    },
-    detailedNutritionTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginVertical: 8,
-    },
-});

@@ -17,13 +17,13 @@ import dashboardRouter from './routes/dashboardRoutes.js';
 import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
 import serveonet from 'serveonet';
-
+import OS from 'os';
 
 dotenv.config();
 
 
 const isLocal = process.argv.includes('--local');
-
+const isServeonet = process.argv.includes('--serveonet');
 
 const app = express()
 const port = process.env.PORT || 80
@@ -66,7 +66,7 @@ app.get('/', async (req, res) => {
     res.send('server is running')
 })
 
-if (isLocal) {
+if (isServeonet) {
     app.listen(port, async () => {
         console.log(`server started at http://localhost:${port}`);
         serveonet({
@@ -98,6 +98,12 @@ if (isLocal) {
                 event.onrestart = () => console.info("Restarted");
             });
     })
+} else if (isLocal) {
+    app.listen(port, async () => {
+        // get the local IP address
+        const localIp = OS.networkInterfaces()['Wi-Fi'][1].address;
+        console.log(`server started at http://${localIp}:${port}`);
+    });
 } else {
     app.listen(port, "0.0.0.0", async () => {
         console.log(`server started on port ${port}`);
