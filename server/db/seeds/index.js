@@ -10,7 +10,7 @@ const main = async () => {
         try {
             // filling the exercises db
             //console.log('here 1')
-            /* const exercisesMock = await Promise.all(
+            const exercisesMock = await Promise.all(
                 Array.from({ length: 10 }, async (_, index) => {
                     try {
                         return ({
@@ -31,7 +31,7 @@ const main = async () => {
                         console.error(e);
                     }
                 }))
-            const insertedExercises = await tx.insert(schema.exercises).values(exercisesMock).returning(); */
+            const insertedExercises = await tx.insert(schema.exercises).values(exercisesMock).returning();
             //console.log(insertedExercises)
 
             // filling the users
@@ -53,7 +53,7 @@ const main = async () => {
                 }
             }))
             const insertedUsers = await tx.insert(schema.users).values(usersMock).returning();
-            /* // filling the food db
+            // filling the food db
             const getRandomInt = (max) => {
                 return Math.floor(Math.random() * max);
             }
@@ -88,7 +88,7 @@ const main = async () => {
                     console.error(e);
                 }
             }))
-            const insertedFood = await tx.insert(schema.foods).values(foodMock).returning(); */
+            const insertedFood = await tx.insert(schema.foods).values(foodMock).returning();
             // creating the collections
             const collectionsMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
@@ -152,6 +152,7 @@ const main = async () => {
                         endtime: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString().slice(11, 19).toString(), // 1 hour later
                         note: `This is a note for session ${index + 1}`,
                         rating: Math.floor(Math.random() * 6), // Random rating between 0 and 5
+                        createdBy: userId,
                     };
                 } catch (e) {
                     console.error(e);
@@ -170,8 +171,8 @@ const main = async () => {
                             sessionId,
                             exerciseId,
                             order: index + 1, // Set the order
-                            weight: 20 + index * 5, // Example weight
-                            unit: index % 2 === 0 ? 'kg' : 'lbs', // Random unit (kg or lbs)
+                            weight: [10 + index % 5, 12 + index % 3, 8 + index % 4], // Example weight
+                            unit: ["kg", "kg", "lbs"], // Random unit (kg or lbs)
                             reps: [10 + index % 5, 12 + index % 3, 8 + index % 4], // Example array of reps
                             creationdate: new Date().toISOString(), // Creation date
                         };
