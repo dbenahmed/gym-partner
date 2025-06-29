@@ -1,13 +1,175 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, ScrollView, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
-import useAuth from '@/app/contex/authcontex';
+import useAuth from '@/context/authContext';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { fetchGetPlanExercises, fetchAddExerciseToPlan, fetchSearchExercises, fetchDeletePlan } from '@/lib/api'; // Replace with real path
 import Colors from '@/constants/Colors';
 import { Alert } from 'react-native';
+import useThemeContext from '@/context/themeContext'; // Replace with real path
+import Button from '@/components/ui/Button'; // Replace with real path
+import ModalSlideUp from '@/components/ui/ModalSlideUp';
+
 
 const Exercises = () => {
+
+  const defaultLimit = 10; // Default limit for search results
+  const { theme, colors } = useThemeContext();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    contentContainer: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingBottom: 16,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    exerciseCard: {
+      backgroundColor: colors.tintLighter,
+      borderRadius: 12,
+      padding: 20,
+      marginVertical: 8,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
+      borderWidth: 1,
+      borderColor: 'rgba(0, 0, 0, 0.05)',
+    },
+    exerciseTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text,
+      letterSpacing: 0.3,
+      marginBottom: 12,
+    },
+    muscleSection: {
+      marginVertical: 6,
+    },
+    muscleLabel: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    muscleText: {
+      fontSize: 15,
+      fontWeight: "400",
+      color: colors.text,
+      lineHeight: 20,
+    },
+    addButton: {
+      backgroundColor: colors.tint,
+      borderRadius: 12,
+      padding: 20,
+      marginVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    addButtonText: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: "#fff",
+      letterSpacing: 0.3,
+    },
+    modalContainer: {
+      margin: 0,
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      maxHeight: '85%',
+      minHeight: '75%',
+    },
+    modalHeader: {
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+      letterSpacing: 0.3,
+    },
+    searchInput: {
+      height: 50,
+      borderColor: 'rgba(0, 0, 0, 0.1)',
+      borderWidth: 1,
+      borderRadius: 12,
+      marginBottom: 16,
+      paddingHorizontal: 16,
+      fontSize: 16,
+      backgroundColor: '#f8f9fa',
+    },
+    countText: {
+      fontSize: 14,
+      color: '#666',
+      marginBottom: 12,
+      fontWeight: '500',
+    },
+    modalScrollView: {
+      flex: 1,
+    },
+    searchResultItem: {
+      padding: 16,
+      borderRadius: 8,
+      marginVertical: 4,
+      backgroundColor: colors.tintLighter,
+      borderWidth: 1,
+      borderColor: 'rgba(0, 0, 0, 0.05)',
+    },
+    searchResultText: {
+      fontSize: 16,
+      color: colors.text,
+      fontWeight: '500',
+    },
+    modalButton: {
+      backgroundColor: colors.tint,
+      borderRadius: 12,
+      padding: 16,
+      marginVertical: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    disabledButton: {
+      backgroundColor: '#ccc',
+      opacity: 0.6,
+    },
+    cancelButton: {
+      backgroundColor: '#6c757d',
+    },
+    modalButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: '#fff',
+      letterSpacing: 0.3,
+    },
+  }), [colors]);
+
   const { authenticated } = useAuth();
   const router = useRouter();
   const [exercises, setExercises] = useState([]);
@@ -17,7 +179,7 @@ const Exercises = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(defaultLimit);
   const [count, setCount] = useState(0);
 
   const handleSearchExercise = async (query) => {
@@ -143,14 +305,14 @@ const Exercises = () => {
           title: title === undefined ? 'Exercises' : `${title} Exercises`,
           headerRight: () => (
             <TouchableOpacity onPress={() => deletePlan()} style={{ padding: 10 }}>
-              <Text style={{ color: Colors.light.tint }}>Delete</Text>
+              <Text style={{ color: colors.tint }}>Delete</Text>
             </TouchableOpacity>
           ),
         }}
       />
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.light.tint} />
+          <ActivityIndicator size="large" color={colors.tint} />
         </View>
       ) : (
         <View style={styles.contentContainer}>
@@ -182,34 +344,52 @@ const Exercises = () => {
               </View>
             ))}
 
-            <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-              <Text style={styles.addButtonText}>Add New Exercise</Text>
-            </TouchableOpacity>
+            <Button
+              text="Add New Exercise"
+              onClick={() => {
+                setModalVisible(true);
+              }}
+              styles={{
+                marginHorizontal: 16,
+                marginBottom: 20,
+              }}
+            />
           </ScrollView>
 
           {/* Modal */}
-          <Modal
+          <ModalSlideUp
             isVisible={modalVisible}
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            swipeDirection="down"
-            onSwipeComplete={() => setModalVisible(false)}
-            style={styles.modalContainer}
+
+            onClose={() => {
+              setModalVisible(false)
+            }}
+            props={{ title: "Search Exercise" }}
+
           >
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Search Exercise</Text>
-              </View>
+            <View style={{
+              flex: 1,
+              marginTop: 25,
+            }}>
+
 
               <TextInput
                 value={searchQuery}
                 onChangeText={(text) => {
+                  setCount(0); // Reset count when searching
+                  setLimit(defaultLimit); // Reset limit when searching
                   setSearchQuery(text);
                   handleSearchExercise(text);
                 }}
                 placeholder="Search for exercises"
-                style={styles.searchInput}
-                placeholderTextColor="#999"
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.tint,
+                  borderRadius: 8,
+                  padding: 12,
+                  marginBottom: 16,
+                  fontSize: 16,
+                  color: colors.text,
+                }}
               />
 
               {count > 0 && (
@@ -227,181 +407,25 @@ const Exercises = () => {
                   </TouchableOpacity>
                 ))}
 
-                <TouchableOpacity
-                  style={[styles.modalButton, limit >= count && styles.disabledButton]}
-                  disabled={limit >= count}
-                  onPress={() => handleLimitChanged(limit + 5)}
-                >
-                  <Text style={styles.modalButtonText}>Load More</Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.cancelButton]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.modalButtonText}>Cancel</Text>
-                </TouchableOpacity>
+                <Button
+                  text="More Results"
+                  onClick={() => handleLimitChanged(limit + 10)}
+                  styles={{
+                    ...styles.modalButton,
+                    ...styles.cancelButton,
+                    marginBottom: 20,
+                  }}
+                  disabled={limit >= count}
+                />
               </ScrollView>
             </View>
-          </Modal>
+          </ModalSlideUp>
         </View>
       )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  exerciseCard: {
-    backgroundColor: Colors.light.background,
-    borderRadius: 12,
-    padding: 20,
-    marginVertical: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  exerciseTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: Colors.light.text,
-    letterSpacing: 0.3,
-    marginBottom: 12,
-  },
-  muscleSection: {
-    marginVertical: 6,
-  },
-  muscleLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.light.text,
-    marginBottom: 4,
-  },
-  muscleText: {
-    fontSize: 15,
-    fontWeight: "400",
-    color: '#666',
-    lineHeight: 20,
-  },
-  addButton: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 12,
-    padding: 20,
-    marginVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  addButtonText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.3,
-  },
-  modalContainer: {
-    margin: 0,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: Colors.light.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: '85%',
-    minHeight: '75%',
-  },
-  modalHeader: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Colors.light.text,
-    letterSpacing: 0.3,
-  },
-  searchInput: {
-    height: 50,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    borderWidth: 1,
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    backgroundColor: '#f8f9fa',
-  },
-  countText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    fontWeight: '500',
-  },
-  modalScrollView: {
-    flex: 1,
-  },
-  searchResultItem: {
-    padding: 16,
-    borderRadius: 8,
-    marginVertical: 4,
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  searchResultText: {
-    fontSize: 16,
-    color: Colors.light.text,
-    fontWeight: '500',
-  },
-  modalButton: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-    opacity: 0.6,
-  },
-  cancelButton: {
-    backgroundColor: '#6c757d',
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 0.3,
-  },
-});
 
 export default Exercises;

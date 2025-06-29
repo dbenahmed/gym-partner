@@ -20,14 +20,14 @@ const getUniqueIdentifier = () => {
 
 const getAppName = () => {
     if (IS_DEV) {
-        return 'StickerSmash (Dev)';
+        return 'Gym Partner (Dev)';
     }
 
     if (IS_PREVIEW) {
-        return 'StickerSmash (Preview)';
+        return 'Gym Partner (Preview)';
     }
 
-    return 'StickerSmash: Emoji Stickers';
+    return 'Gym Partner';
 };
 
 
@@ -37,7 +37,7 @@ export default {
         "slug": "gym-partner",
         "version": "1.0.0",
         "orientation": "portrait",
-        "icon": "./assets/images/icon.png",
+        "icon": "./assets/images/png.png",
         "scheme": "myapp",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
@@ -46,7 +46,7 @@ export default {
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/power.png",
+                "foregroundImage": "./assets/images/png.png",
                 "backgroundColor": "#ffffff"
             },
             "package": "com.dbenahmed.gympartner"
@@ -54,14 +54,14 @@ export default {
         "web": {
             "bundler": "metro",
             "output": "static",
-            "favicon": "./assets/images/favicon.png"
+            "favicon": "./assets/images/png.png"
         },
         "plugins": [
             "expo-router",
             [
                 "expo-splash-screen",
                 {
-                    "image": "./assets/images/power.png",
+                    "image": "./assets/images/png.png",
                     "imageWidth": 200,
                     "resizeMode": "contain",
                     "backgroundColor": "#ffffff"

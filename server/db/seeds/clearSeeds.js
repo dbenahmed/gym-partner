@@ -16,8 +16,13 @@ args.forEach(async (arg) => {
             await reset(db, devSchemas)
         } else if (value === 'main') {
             await reset(db, mainSchemas)
+
         }
     }
 });
+
+
+
+
 
 console.log("reset finished")

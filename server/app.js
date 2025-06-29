@@ -16,17 +16,17 @@ import exerciseDatabaseRouter from './routes/exerciseDatabaseRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
 import customFoodTrackingRouter from './routes/customFoodTrackingRoutes.js';
 import adminDashboardRouter from './routes/adminDashboardRoutes.js';
-
-
+import serveonet from 'serveonet';
+import OS from 'os';
 
 dotenv.config();
 
 
 const isLocal = process.argv.includes('--local');
-
+const isServeonet = process.argv.includes('--serveonet');
 
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 80
 
 // Middleware
 app.use(express.json())
@@ -66,13 +66,9 @@ app.get('/', async (req, res) => {
     res.send('server is running')
 })
 
-app.listen(port, async () => {
-    console.log(`server started at http://localhost:${port}`);
-
-
-    if (isLocal) {
-        const serveonet = require('serveonet');
-
+if (isServeonet) {
+    app.listen(port, async () => {
+        console.log(`server started at http://localhost:${port}`);
         serveonet({
             localHost: "localhost",
             localPort: port,
@@ -101,7 +97,18 @@ app.listen(port, async () => {
                 console.error("SSH exited with code " + event.code);
                 event.onrestart = () => console.info("Restarted");
             });
-    }
-})
+    })
+} else if (isLocal) {
+    app.listen(port, async () => {
+        // get the local IP address
+        const localIp = OS.networkInterfaces()['Wi-Fi'][1].address;
+        console.log(`server started at http://${localIp}:${port}`);
+    });
+} else {
+    app.listen(port, "0.0.0.0", async () => {
+        console.log(`server started on port ${port}`);
+    });
+
+}
 
 export default app;

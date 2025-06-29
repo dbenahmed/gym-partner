@@ -6,10 +6,12 @@ import { Alert, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '@/constants/Colors';
-
+import useThemeContext from '@/context/themeContext';
 
 
 export default function SessionsLayout() {
+
+    const { colors } = useThemeContext();
 
     const router = useRouter();
 
@@ -17,27 +19,15 @@ export default function SessionsLayout() {
         <Stack
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: Colors.light.background,
+                    backgroundColor: colors.background,
                 },
-                headerTintColor: Colors.light.tint,
+                headerTintColor: colors.tint,
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
                 contentStyle: {
-                    backgroundColor: Colors.light.background,
+                    backgroundColor: colors.background,
                 },
-                headerLeft: () => (
-                    <Pressable
-                        onPress={() =>
-                            Alert.alert('Confirm', 'Are you sure you want to go back? You will Lose All your Session Details!', [
-                                { text: 'Cancel', style: 'cancel' },
-                                { text: 'Yes', onPress: () => router.back() },
-                            ])
-                        }
-                    >
-                        <Ionicons name="arrow-back" size={24} color={Colors.light.tint} />
-                    </Pressable>
-                ),
             }}
         >
             <Stack.Screen
@@ -51,7 +41,18 @@ export default function SessionsLayout() {
                 options={{
                     title: "New Session",
                     presentation: "card",
-
+                    headerLeft: () => (
+                        <Pressable
+                            onPress={() =>
+                                Alert.alert('Confirm', 'Are you sure you want to go back? You will Lose All your Session Details!', [
+                                    { text: 'Cancel', style: 'cancel' },
+                                    { text: 'Yes', onPress: () => router.back() },
+                                ])
+                            }
+                        >
+                            <Ionicons name="arrow-back" size={24} color={colors.tint} />
+                        </Pressable>
+                    ),
                 }}
             />
         </Stack>

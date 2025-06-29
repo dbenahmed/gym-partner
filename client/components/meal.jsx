@@ -3,9 +3,392 @@ import React from "react";
 import Color from "@/constants/Colors.ts";
 import { router } from "expo-router";
 import { useState } from "react";
+import useAuth from "@/context/authContext";
+
+import useThemeContext from '@/context/themeContext';
+import { useMemo } from 'react';
+import Button from "@/components/ui/Button";
+import ModalSlideUp from "@/components/ui/ModalSlideUp";
+
 
 export default function Meal({ data, onDelete, onUpdate }) {
-  console.log(data);
+
+
+  // styles
+  const { theme, colors } = useThemeContext();
+  if (!colors) {
+    console.warn("Colors not defined in theme context. Using default colors.");
+    colors = Color[theme] || Color.light; // Fallback to light theme if colors are not defined
+  }
+  if (!theme) {
+    console.warn("Theme not defined in theme context. Defaulting to 'light'.");
+    theme = 'light'; // Default to light theme if not defined
+  }
+  const styles = useMemo(() => StyleSheet.create({
+    parent: {
+      backgroundColor: colors.tintLighter,
+      marginVertical: 8,
+      padding: 16,
+      borderRadius: 12,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      position: 'relative',
+    },
+
+    loadingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 80,
+    },
+
+    loadingText: {
+      marginLeft: 8,
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+
+    deleteButton: {
+      position: 'absolute',
+      top: 12,
+      right: 12,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: 'rgba(255, 0, 0, 0.1)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1,
+    },
+
+    deleteButtonText: {
+      color: '#FF4757',
+      fontSize: 18,
+      fontWeight: '600',
+      lineHeight: 18,
+    },
+
+    foodInfo: {
+      marginBottom: 16,
+      paddingRight: 32,
+    },
+
+    foodName: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      lineHeight: 24,
+    },
+
+    foodDescription: {
+      fontSize: 13,
+      color: colors.text,
+      opacity: 0.7,
+      marginBottom: 8,
+      lineHeight: 18,
+    },
+
+    servingSize: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.tint,
+      backgroundColor: colors.tintLighter || 'rgba(0, 0, 0, 0.05)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 6,
+      alignSelf: 'flex-start',
+    },
+
+    nutritionContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+      gap: 8,
+    },
+
+    nutritionCard: {
+      flex: 1,
+      borderRadius: 10,
+      padding: 12,
+      alignItems: 'center',
+      minHeight: 60,
+      justifyContent: 'center',
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+
+    nutritionLabel: {
+      color: 'white',
+      fontSize: 11,
+      fontWeight: '600',
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+
+    nutritionValue: {
+      color: 'white',
+      fontSize: 14,
+      fontWeight: '700',
+      textAlign: 'center',
+    },
+
+    nutritionUnit: {
+      fontSize: 10,
+      fontWeight: '500',
+    },
+
+    actionButtons: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+
+    actionButton: {
+      flex: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    detailButton: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: colors.tint,
+    },
+
+    updateMealButton: {
+      backgroundColor: colors.tint,
+    },
+
+    actionButtonText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.tint,
+    },
+    updateMealButtonText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.background,
+
+    },
+
+    // Modal Styles
+    modalBackground: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+
+    modalContent: {
+      width: '100%',
+      maxWidth: 400,
+      backgroundColor: colors.background,
+      borderRadius: 16,
+      padding: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 16,
+    },
+
+    modalTitleContainer: {
+      flex: 1,
+      paddingRight: 16,
+    },
+
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      lineHeight: 24,
+    },
+
+    modalSubtitle: {
+      fontSize: 14,
+      color: colors.text,
+      opacity: 0.7,
+      fontWeight: '500',
+    },
+
+    closeButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    closeButtonText: {
+      fontSize: 24,
+      color: colors.text,
+      fontWeight: '300',
+      lineHeight: 24,
+    },
+
+    descriptionContainer: {
+      backgroundColor: colors.tintLighter || 'rgba(0, 0, 0, 0.05)',
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 16,
+    },
+
+    descriptionText: {
+      fontSize: 12,
+      color: colors.text,
+      opacity: 0.8,
+      lineHeight: 16,
+    },
+
+    inputContainer: {
+      marginBottom: 20,
+    },
+
+    inputLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+    },
+
+    textInput: {
+      borderWidth: 1,
+      borderColor: colors.tint,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      color: colors.text,
+      backgroundColor: 'transparent',
+    },
+
+    nutritionPreviewContainer: {
+      marginBottom: 20,
+    },
+
+    nutritionPreviewTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+
+    nutritionTable: {
+      backgroundColor: colors.tintLighter,
+      borderRadius: 10,
+      padding: 16,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+
+    tableHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
+
+    tableHeaderText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.text,
+      flex: 1,
+      textAlign: 'left',
+    },
+
+    totalColumn: {
+      textAlign: 'right',
+      color: colors.tint,
+    },
+
+    tableDivider: {
+      height: 1,
+      backgroundColor: '#e0e0e0',
+      marginBottom: 8,
+    },
+
+    tableRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 6,
+    },
+
+    tableRowDivider: {
+      height: 0.5,
+      backgroundColor: colors.text,
+      opacity: 0.3,
+      marginVertical: 2,
+    },
+
+    tableCell: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.text,
+      flex: 1,
+    },
+
+    tableCellCenter: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.text,
+      flex: 1,
+      textAlign: 'center',
+    },
+
+    tableCellRight: {
+      fontSize: 12,
+      flex: 1,
+      textAlign: 'right',
+    },
+
+    totalValue: {
+      fontWeight: '700',
+      color: colors.tint,
+    },
+
+    updateButton: {
+      backgroundColor: colors.tint,
+      paddingVertical: 14,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    updateButtonDisabled: {
+      opacity: 0.7,
+    },
+
+    updateButtonText: {
+      color: colors.background,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  }), [colors, theme]);
+
+  const { userId } = useAuth();
+
 
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [updatedServingSize, setUpdatedServingSize] = useState(data.servingsizeG.toString());
@@ -63,7 +446,7 @@ export default function Meal({ data, onDelete, onUpdate }) {
   if (deleting) {
     return (
       <View style={[styles.parent, styles.loadingContainer]}>
-        <ActivityIndicator size="small" color={Color.light.tint} />
+        <ActivityIndicator size="small" color={colors.tint} />
         <Text style={styles.loadingText}>Deleting...</Text>
       </View>
     );
@@ -171,17 +554,12 @@ export default function Meal({ data, onDelete, onUpdate }) {
             </View>
 
             {/* Update Button */}
-            <TouchableOpacity
-              style={[styles.updateButton, updateLoading && styles.updateButtonDisabled]}
-              onPress={handleUpdateMeal}
+            <Button
+              text={updateLoading ? "Updating..." : "Update Meal"}
+              onClick={() => handleUpdateMeal()}
               disabled={updateLoading}
-            >
-              {updateLoading ? (
-                <ActivityIndicator size="small" color={Color.light.background} />
-              ) : (
-                <Text style={styles.updateButtonText}>Update Meal</Text>
-              )}
-            </TouchableOpacity>
+              styles={{ marginTop: 16 }}
+            />
           </View>
         </View>
       </Modal>
@@ -207,10 +585,18 @@ export default function Meal({ data, onDelete, onUpdate }) {
               {data.food.description}
             </Text>
           )}
-          <Text style={styles.servingSize}>
-            Serving: {data.servingsizeG}g
-          </Text>
+          <View>
+            <Text style={styles.servingSize}>
+              Serving: {data.servingsizeG}g
+            </Text>
+            {data.food.createBy === userId && (
+              <Text style={styles.servingSize}>
+                Serving: {data.servingsizeG}g
+              </Text>
+            )}
+          </View>
         </View>
+
 
         {/* Nutrition Cards */}
         <View style={styles.nutritionContainer}>
@@ -227,7 +613,7 @@ export default function Meal({ data, onDelete, onUpdate }) {
               unit: 'Cal',
               color: '#FF6B6B'
             },
-            
+
             {
               label: 'Carbs',
               value: `${calculateNutrient(data.food.carbohydratesper100g, data.servingsizeG)}`,
@@ -253,386 +639,23 @@ export default function Meal({ data, onDelete, onUpdate }) {
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.detailButton]}
-            onPress={() => {
-              router.push(`/Explore/`)
-              router.push(`/Explore/meals/${data.food.id}`)
-            }}
-          >
-            <Text style={styles.actionButtonText}>View Details</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.updateMealButton]}
-            onPress={() => setUpdateModalVisible(true)}
-          >
-            <Text style={styles.updateMealButtonText}>Update</Text>
-          </TouchableOpacity>
+          <Button
+            text="View Details"
+            type="outline"
+            onClick={() => {
+              router.push(`/Explore/meals/${data.food.id}`);
+            }}
+            styles={{ flex: 1 }}
+          />
+
+          <Button
+            text="Update"
+            onClick={() => setUpdateModalVisible(true)}
+            styles={{ flex: 1 }}
+          />
         </View>
       </View>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  parent: {
-    backgroundColor: Color.light.background,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    position: 'relative',
-  },
-
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 80,
-  },
-
-  loadingText: {
-    marginLeft: 8,
-    color: Color.light.text,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-
-  deleteButton: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 0, 0, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-
-  deleteButtonText: {
-    color: '#FF4757',
-    fontSize: 18,
-    fontWeight: '600',
-    lineHeight: 18,
-  },
-
-  foodInfo: {
-    marginBottom: 16,
-    paddingRight: 32,
-  },
-
-  foodName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Color.light.text,
-    marginBottom: 4,
-    lineHeight: 24,
-  },
-
-  foodDescription: {
-    fontSize: 13,
-    color: Color.light.text,
-    opacity: 0.7,
-    marginBottom: 8,
-    lineHeight: 18,
-  },
-
-  servingSize: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Color.light.tint,
-    backgroundColor: Color.light.tintLighter || 'rgba(0, 0, 0, 0.05)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-
-  nutritionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-    gap: 8,
-  },
-
-  nutritionCard: {
-    flex: 1,
-    borderRadius: 10,
-    padding: 12,
-    alignItems: 'center',
-    minHeight: 60,
-    justifyContent: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-
-  nutritionLabel: {
-    color: 'white',
-    fontSize: 11,
-    fontWeight: '600',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-
-  nutritionValue: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-
-  nutritionUnit: {
-    fontSize: 10,
-    fontWeight: '500',
-  },
-
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-
-  actionButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  detailButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Color.light.tint,
-  },
-
-  updateMealButton: {
-    backgroundColor: Color.light.tint,
-  },
-
-  actionButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Color.light.tint,
-  },
-  updateMealButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Color.light.background,
-
-  },
-
-  // Modal Styles
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-
-  modalContent: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: Color.light.background,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-
-  modalTitleContainer: {
-    flex: 1,
-    paddingRight: 16,
-  },
-
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Color.light.text,
-    marginBottom: 4,
-    lineHeight: 24,
-  },
-
-  modalSubtitle: {
-    fontSize: 14,
-    color: Color.light.text,
-    opacity: 0.7,
-    fontWeight: '500',
-  },
-
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  closeButtonText: {
-    fontSize: 24,
-    color: Color.light.text,
-    fontWeight: '300',
-    lineHeight: 24,
-  },
-
-  descriptionContainer: {
-    backgroundColor: Color.light.tintLighter || 'rgba(0, 0, 0, 0.05)',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-
-  descriptionText: {
-    fontSize: 12,
-    color: Color.light.text,
-    opacity: 0.8,
-    lineHeight: 16,
-  },
-
-  inputContainer: {
-    marginBottom: 20,
-  },
-
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Color.light.text,
-    marginBottom: 8,
-  },
-
-  textInput: {
-    borderWidth: 1,
-    borderColor: Color.light.tint,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: Color.light.text,
-    backgroundColor: 'transparent',
-  },
-
-  nutritionPreviewContainer: {
-    marginBottom: 20,
-  },
-
-  nutritionPreviewTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Color.light.text,
-    marginBottom: 12,
-  },
-
-  nutritionTable: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-
-  tableHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-
-  tableHeaderText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#666666',
-    flex: 1,
-    textAlign: 'left',
-  },
-
-  totalColumn: {
-    textAlign: 'right',
-    color: Color.light.tint,
-  },
-
-  tableDivider: {
-    height: 1,
-    backgroundColor: '#e0e0e0',
-    marginBottom: 8,
-  },
-
-  tableRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 6,
-  },
-
-  tableRowDivider: {
-    height: 1,
-    backgroundColor: '#f5f5f5',
-    marginVertical: 2,
-  },
-
-  tableCell: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: Color.light.text,
-    flex: 1,
-  },
-
-  tableCellCenter: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666666',
-    flex: 1,
-    textAlign: 'center',
-  },
-
-  tableCellRight: {
-    fontSize: 12,
-    flex: 1,
-    textAlign: 'right',
-  },
-
-  totalValue: {
-    fontWeight: '700',
-    color: Color.light.tint,
-  },
-
-  updateButton: {
-    backgroundColor: Color.light.tint,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  updateButtonDisabled: {
-    opacity: 0.7,
-  },
-
-  updateButtonText: {
-    color: Color.light.background,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

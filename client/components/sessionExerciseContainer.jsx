@@ -1,15 +1,68 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SetsContainer from './setsContainer';
+import Button from '@/components/ui/Button.jsx';
+import useThemeContext from '@/context/themeContext';
 
 export default function SessionExerciseContainer({ item, removeExercise, updateExerciseData }) {
+
+    const { colors, theme } = useThemeContext();
+
+    const styles = useMemo(() => StyleSheet.create({
+        exerciseCard: {
+            backgroundColor: colors.tintLighter,
+            borderRadius: 10,
+            padding: 15,
+            marginBottom: 15,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+        },
+        exerciseHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        exerciseName: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: colors.text,
+        },
+        exerciseCategory: {
+            fontSize: 14,
+            color: colors.text,
+        },
+        setsContainer: {
+            marginTop: 10,
+        },
+        setsHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        setsTitle: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: colors.text,
+        },
+        addSetButton: {
+            paddingHorizontal: 10,
+        },
+        noSetsText: {
+            color: colors.text,
+            marginTop: 10,
+        },
+    }), [colors, theme]);
+
+
     return (
         <View style={styles.exerciseCard}>
             <View style={styles.exerciseHeader}>
                 <Text style={styles.exerciseName}>{item.name}</Text>
                 <TouchableOpacity onPress={() => removeExercise(item.id)}>
-                    <MaterialCommunityIcons name="close" size={20} color="#ff6b6b" />
+                    <MaterialCommunityIcons name="close" size={20} color={colors.red} />
                 </TouchableOpacity>
             </View>
             <Text style={styles.exerciseCategory}>{item.category}</Text>
@@ -25,7 +78,7 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
                             updateExerciseData(item.id, 'sets', updatedSets);
                         }}
                     >
-                        <MaterialCommunityIcons name="plus" size={20} color="#4CAF50" />
+                        <MaterialCommunityIcons  name="plus" size={20} color="#4CAF50" />
                     </TouchableOpacity>
                 </View>
 
@@ -47,53 +100,4 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
     );
 }
 
-const styles = StyleSheet.create({
-    exerciseCard: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 16,
-        marginBottom: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    exerciseHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    exerciseName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    exerciseCategory: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 16,
-    },
-    setsContainer: {
-        marginTop: 8,
-    },
-    setsHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    setsTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    addSetButton: {
-        padding: 4,
-    },
-    noSetsText: {
-        color: '#888',
-        fontStyle: 'italic',
-        textAlign: 'center',
-        padding: 16,
-    }
-});
+

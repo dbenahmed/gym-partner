@@ -13,16 +13,28 @@ const Colors = {
     icon: "#687076",
     tabIconDefault: "#687076",
     tabIconSelected: "rgba(10, 126, 164, 1)",
+    proteinBg: "#4ECDC4",
+    caloriesBg: "#FF6B6B",
+    carbsBg: "#45B7D1",
+    fatBg: "#FFA07A",
+    green:"#4CAF50", // used for success messages
+    red: "#F44336", // used for error messages
   },
   dark: {
-    text: "#ECEDEE",
-    background: "#151718",
-    tint: "rgba(255, 255, 255, 1)",
-    tintLighter: "#E3F2FD",
-    tintLowOpacity: "rgba(255, 255, 255, 0.2)",
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: "rgba(255, 255, 255, 1)",
+    text: "#E6E8EB",
+    background: "#0D1117",
+    tint: "#5AC8FA", // softer than light tint
+    tintLighter: "#1E2A34",
+    tintLowOpacity: "rgba(90, 200, 250, 0.2)",
+    icon: "#9BA5B1",
+    tabIconDefault: "#9BA5B1",
+    tabIconSelected: "#5AC8FA",
+    proteinBg: "#3BB3AC",
+    caloriesBg: "#FF4C4C",
+    carbsBg: "#379EB5",
+    fatBg: "#FF8C66",
+    green: "#4CAF50", // used for success messages
+    red: "#F44336", // used for error messages
   },
 };
 
