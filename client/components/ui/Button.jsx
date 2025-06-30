@@ -5,7 +5,7 @@ import useThemeContext from "@/context/themeContext";
 
 
 
-export default function Button({ children = null, styles = {}, onClick, text, icon = undefined, type = 'primary', disabled = false }) {
+export default function Button({ children = null, styles = {}, onClick, text, icon = undefined, type = 'primary', disabled = false, iconSize = 20 }) {
 
     const { colors, theme } = useThemeContext();
 
@@ -20,7 +20,6 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
             return (
                 <TouchableOpacity
                     style={{
-                        ...styles,
                         backgroundColor: colors.tint,
                         flexDirection: 'row',
                         gap: 6,
@@ -32,22 +31,22 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.1,
                         shadowRadius: 4,
+                        ...styles,
                     }}
                     onPress={onClick}
                     disabled={disabled}
                 >
-                    {icon && <MaterialCommunityIcons name={icon} size={20} color="#fff" />}
-                    <Text style={{
+                    {icon && <MaterialCommunityIcons name={icon} size={iconSize} color="#fff" />}
+                    {text && <Text style={{
                         color: '#fff',
                         fontWeight: 'bold',
-                    }}>{text}</Text>
+                    }}>{text}</Text>}
                 </TouchableOpacity>
             );
         case 'secondary':
             return (
                 <TouchableOpacity
                     style={{
-                        ...styles,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -58,22 +57,22 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.1,
                         shadowRadius: 4,
+                        ...styles,
                     }}
                     onPress={onClick}
                     disabled={disabled}
                 >
-                    {icon && <MaterialCommunityIcons name={icon} size={20} color="#fff" />}
-                    <Text style={{
+                    {icon && <MaterialCommunityIcons name={icon} size={iconSize} color="#fff" />}
+                    {text && <Text style={{
                         color: '#fff',
                         fontWeight: 'bold',
-                    }}>{text}</Text>
+                    }}>{text}</Text>}
                 </TouchableOpacity>
             );
         case 'outline':
             return (
                 <TouchableOpacity
                     style={{
-                        ...styles,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -81,15 +80,16 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                         borderWidth: 1,
                         padding: 12,
                         borderRadius: 8,
+                        ...styles,
                     }}
                     onPress={onClick}
                     disabled={disabled}
                 >
-                    {icon && <MaterialCommunityIcons name={icon} size={20} color={colors.tint} />}
-                    <Text style={{
+                    {icon && <MaterialCommunityIcons name={icon} size={iconSize} color={colors.tint} />}
+                    {text && <Text style={{
                         color: colors.tint,
                         fontWeight: 'bold',
-                    }}>{text}</Text>
+                    }}>{text}</Text>}
                 </TouchableOpacity>
             );
         /* case 'tertiary':
@@ -108,7 +108,7 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                     onPress={onClick}
                     disabled={disabled}
                 >
-                    {icon && <MaterialCommunityIcons name={icon} size={20} color="#fff" />}
+                    {icon && <MaterialCommunityIcons name={icon} size={iconSize} color="#fff" />}
                     <Text style={[styles.buttonTertiaryText, { color: colors.text }]}>{text}</Text>
                 </TouchableOpacity>
             );
@@ -128,7 +128,7 @@ export default function Button({ children = null, styles = {}, onClick, text, ic
                     onPress={onClick}
                     disabled={true}
                 >
-                    {icon && <MaterialCommunityIcons name={icon} size={20} color="#ccc" />}
+                    {icon && <MaterialCommunityIcons name={icon} size={iconSize} color="#ccc" />}
                     <Text style={[styles.buttonDisabledText, { color: colors.text }]}>{text}</Text>
                 </TouchableOpacity>
             ); */

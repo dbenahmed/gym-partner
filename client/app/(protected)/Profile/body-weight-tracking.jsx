@@ -12,6 +12,8 @@ export default function BodyWeightTrackingScreen() {
     const { colors, theme } = useThemeContext();
     const { authenticated } = useAuth();
 
+    const [UpdateWeightModalVisible, setUpdateWeightModalVisible] = useState(false);
+    const [selectedWeight, setSelectedWeight] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
     const [weights, setWeights] = useState([]);
     const [unit, setUnit] = useState("kg");
@@ -45,7 +47,32 @@ export default function BodyWeightTrackingScreen() {
         fetchWeights();
     }, []);
 
-
+    const updateWeight = async (id) => {
+        try {
+            const response = await fetch(`${defaultUrl}/weight/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authenticated}`
+                },
+                body: JSON.stringify({ weight, unit })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update weight');
+            }
+            const { success, message } = await response.json();
+            if (!success) {
+                throw new Error(message);
+            }
+            Alert.alert('Success', 'Weight updated successfully');
+            fetchWeights();
+            setUpdateWeightModalVisible(false);
+            setWeight(null);
+            setSelectedWeight(null);
+        } catch (error) {
+            console.error('Error updating weight:', error);
+        }
+    }
     const deleteWeight = async (id) => {
         try {
             console.log(id)
@@ -60,6 +87,7 @@ export default function BodyWeightTrackingScreen() {
                 throw new Error('Failed to delete weight');
             }
             const { success, message } = await response.json();
+            console.log("message", message)
             if (!success) {
                 throw new Error(message);
             }
@@ -72,21 +100,33 @@ export default function BodyWeightTrackingScreen() {
     }
 
     const renderItem = ({ item }) => (
-        <View style={[styles.listItem, { backgroundColor: colors.tintLighter, flexDirection: 'row', justifyContent: 'space-between' }]}>
-            <Text style={[styles.listItemText, { color: colors.text }]}>
-                Weight: {item.weight} {item.unit}
-            </Text>
-            <Button
-                onPress={() => {
-                    console.log(item)
-                    // todo : delete weight update weight
-                    deleteWeight(item.id)
-                }}
-                icon="delete"
-                text=""
-                styles={{ width: 40, padding: 0, margin: 0, height: 40, borderRadius: 50 }}
+        <View style={[styles.listItem, { backgroundColor: colors.tintLighter, alignItems: "center", flexDirection: 'row', justifyContent: 'space-between' }]}>
+            <View className="flex-col gap-1">
+                <Text style={[styles.listItemText, { color: colors.text }]}>
+                    Date: {item.creationdate.split(' ')[0]}
+                </Text>
+                <Text style={[styles.listItemText, { color: colors.text }]}>
+                    Weight: {item.weight} {item.unit}
+                </Text>
+            </View>
+            <View className="flex-row gap-2">
+                <Button
+                    onClick={() => {
+                        setUpdateWeightModalVisible(true)
+                        setSelectedWeight(item);
+                    }}
+                    icon="pencil"
+                    styles={{ width: 30, height: 30, padding: 0, margin: 0 }}
 
-            />
+                />
+                <Button
+                    onClick={() => {
+                        deleteWeight(item.id)
+                    }}
+                    icon="delete"
+                    styles={{ width: 30, height: 30, padding: 0, margin: 0 }}
+                />
+            </View>
         </View>
     );
 
@@ -173,11 +213,41 @@ export default function BodyWeightTrackingScreen() {
                 </View>
 
             </ModalSlideUp>
+            <ModalSlideUp isVisible={UpdateWeightModalVisible} onClose={() => {
+                setWeight(null); setSelectedWeight(null); setUpdateWeightModalVisible(false)
+            }} props={{ title: "Update Weight" }} className="pr-8 pl-8 pt-4 pb-4">
+                <View style={styles.inputContainer}>
+                    <Text style={{
+                        fontSize: 14,
+                        fontWeight: '600',
+                        color: colors.text,
+                        marginBottom: 8,
+                    }}>Weight:</Text>
+                    <TextInput
+                        style={{
+                            borderWidth: 1,
+                            borderColor: colors.tint,
+                            borderRadius: 8,
+                            padding: 12,
+                            fontSize: 16,
+                            color: colors.text,
+                            backgroundColor: 'transparent',
+                            marginBottom: 16,
+                        }}
+                        placeholder="Enter weight"
+                        keyboardType="numeric"
+                        value={weight}
+                        onChangeText={setWeight}
+                        selectTextOnFocus
+                    />
+                </View>
+                <Button text="Update Weight" onClick={() => updateWeight(selectedWeight.id)} />
+            </ModalSlideUp>
             <View style={{ flex: 1 }}>
                 <FlatList
                     data={weights}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.id.toString()}
                     onEndReachedThreshold={0.5}
                 /* onEndReached={() => {
                     // fetch another new data
