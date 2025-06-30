@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import db from "../db/index.js";
-import { foods } from "../db/schemas/dev/schema.js";
+import { foods } from "../db/schemas/schema.js";
 // Create a new custom meal
 export const createCustomMeal = async (req, res) => {
     try {

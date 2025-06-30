@@ -1,11 +1,8 @@
 // POSTGRESQL CONNECTION
 import { drizzle } from 'drizzle-orm/node-postgres';
-import dotenv from 'dotenv';
-import * as devSchema from "./schemas/dev/schema.js"
-import * as devRelations from "./schemas/dev/relations.js"
-dotenv.config();
+import { config } from "../config/env.js"
+import * as schema from "../db/schemas/schema.js"
 
-
-const db = drizzle(process.env.SUPABASE_DATABASE_URL, { schema: { ...devSchema, ...devRelations }, logger: true })
+const db = drizzle(config.databaseUrl, { schema, logger: true })
 
 export default db

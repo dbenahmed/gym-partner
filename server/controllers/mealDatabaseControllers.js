@@ -1,6 +1,6 @@
 import { ilike, or, and } from "drizzle-orm";
 import db from "../db/index.js";
-import { foods } from "../db/schemas/dev/schema.js";
+import { foods } from "../db/schemas/schema.js";
 import { eq } from "drizzle-orm";
 // Get a list of all available meals
 export const getAllMeals = async (req, res) => {

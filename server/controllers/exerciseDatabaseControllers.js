@@ -1,5 +1,5 @@
 import db from "../db/index.js";
-import { collections, exercises, plans, users } from "../db/schemas/dev/schema.js";
+import { collections, exercises, plans, users } from "../db/schemas/schema.js";
 import { and, eq, ilike, like, inArray, sql } from "drizzle-orm";
 
 
