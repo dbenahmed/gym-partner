@@ -164,10 +164,9 @@ export const exercises = pgTable("exercises", {
 export const sessions = pgTable("sessions", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id"),
-	duedate: date().notNull(),
 	name: varchar({ length: 100 }).notNull(),
-	starttime: time(),
-	endtime: time(),
+	starttime: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+	endtime: timestamp({ withTimezone: true, mode: 'string' }),
 	note: text(),
 	rating: integer(),
 	createdBy: integer("created_by").notNull(),
