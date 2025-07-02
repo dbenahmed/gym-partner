@@ -1,10 +1,9 @@
 import { pgTable, pgSchema, unique, check, serial, varchar, timestamp, foreignKey, integer, text, boolean, time, date } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-export const schema = pgSchema("dev");
 
 
-export const users = schema.table("users", {
+export const users = pgTable("users", {
 	id: serial().primaryKey().notNull(),
 	username: varchar({ length: 50 }).notNull(),
 	password: varchar({ length: 72 }).notNull(),
@@ -24,7 +23,7 @@ export const users = schema.table("users", {
 	check("users_username_check", sql`(length((username)::text) > 3) AND ((username)::text ~ '^[a-zA-Z0-9_]+$'::text)`),
 ]);
 
-export const collections = schema.table("collections", {
+export const collections = pgTable("collections", {
 	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
@@ -40,7 +39,7 @@ export const collections = schema.table("collections", {
 	check("collections_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const foods = schema.table("foods", {
+export const foods = pgTable("foods", {
 	id: serial().primaryKey().notNull(),
 	foodname: varchar({ length: 255 }).notNull(),
 	description: text().default(''),
@@ -82,7 +81,7 @@ export const foods = schema.table("foods", {
 	check("foods_status_check", sql`(status)::text = ANY (ARRAY[('pending'::character varying)::text, ('verified'::character varying)::text, ('refused'::character varying)::text])`)
 ]);
 
-export const foodsLogs = schema.table("foods_logs", {
+export const foodsLogs = pgTable("foods_logs", {
 	id: serial().primaryKey().notNull(),
 	foodId: integer("food_id").notNull(),
 	userId: integer("user_id").notNull(),
@@ -105,7 +104,7 @@ export const foodsLogs = schema.table("foods_logs", {
 	check("foods_logs_servingsize_g_check", sql`servingsize_g >= 0`),
 ]);
 
-export const plans = schema.table("plans", {
+export const plans = pgTable("plans", {
 	id: serial().primaryKey().notNull(),
 	collectionId: integer("collection_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
@@ -120,7 +119,7 @@ export const plans = schema.table("plans", {
 	check("plans_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const plansExercises = schema.table("plans_exercises", {
+export const plansExercises = pgTable("plans_exercises", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
@@ -140,7 +139,7 @@ export const plansExercises = schema.table("plans_exercises", {
 	}).onDelete("cascade"),
 ]);
 
-export const exercises = schema.table("exercises", {
+export const exercises = pgTable("exercises", {
 	id: serial().primaryKey().notNull(),
 	name: varchar({ length: 100 }).notNull(),
 	force: varchar({ length: 10 }).default(sql`NULL`),
@@ -162,7 +161,7 @@ export const exercises = schema.table("exercises", {
 	check("exercises_mechanic_check", sql`(mechanic)::text = ANY (ARRAY[('isolation'::character varying)::text, ('compound'::character varying)::text])`),
 ]);
 
-export const sessions = schema.table("sessions", {
+export const sessions = pgTable("sessions", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id"),
 	duedate: date().notNull(),
@@ -187,7 +186,7 @@ export const sessions = schema.table("sessions", {
 	check("sessions_rating_check", sql`(rating >= 0) AND (rating <= 5)`),
 ]);
 
-export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises", {
+export const setsOfSessionsExercises = pgTable("sets_of_sessions_exercises", {
 	id: serial().primaryKey().notNull(),
 	sessionId: integer("session_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
@@ -209,7 +208,7 @@ export const setsOfSessionsExercises = schema.table("sets_of_sessions_exercises"
 	}).onDelete("cascade"),
 ]);
 
-export const templatesExercises = schema.table("templates_exercises", {
+export const templatesExercises = pgTable("templates_exercises", {
 	id: serial().primaryKey().notNull(),
 	templateId: integer("template_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
@@ -229,7 +228,7 @@ export const templatesExercises = schema.table("templates_exercises", {
 	}).onDelete("cascade"),
 ]);
 
-export const templates = schema.table("templates", {
+export const templates = pgTable("templates", {
 	id: serial().primaryKey().notNull(),
 	title: varchar({ length: 100 }).notNull(),
 	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -238,7 +237,7 @@ export const templates = schema.table("templates", {
 	check("templates_title_check", sql`length((title)::text) >= 1`),
 ]);
 
-export const weightsLogs = schema.table("weights_logs", {
+export const weightsLogs = pgTable("weights_logs", {
 	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	weight: integer(),

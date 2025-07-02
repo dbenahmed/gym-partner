@@ -1,22 +1,9 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import db from "../index.js";
-import * as devSchemas from "../schemas/dev/schema.js";
-import * as mainSchemas from "../schemas/main/schema.js";
+import * as schema from "../schemas/schema.js";
+import { config } from "../../config/env.js"
 
-dotenv.config();
-
-let schema;
-const args = process.argv.slice(2); // Get CLI arguments
-args.forEach(async (arg) => {
-    const [key, value] = arg.split('=');
-    if (key === "--schema")
-        if (value === 'dev') {
-            schema = devSchemas
-        } else if (value === 'main') {
-            schema = mainSchemas
-        }
-});
 
 const main = async () => {
     await db.transaction(async (tx) => {
@@ -50,7 +37,7 @@ const main = async () => {
             // filling the users
             const usersMock = await Promise.all(Array.from({ length: 10 }, async (_, index) => {
                 try {
-                    const password = await bcrypt.hash(`password${index + 1}`, parseInt(process.env.BCRYPT_SALT_ROUNDS))
+                    const password = await bcrypt.hash(`password${index + 1}`, parseInt(config.BCRYPT_SALT_ROUNDS))
                     return ({
                         username: `user${index + 1}`,
                         password, // Mock password (store hashed in production)
@@ -165,6 +152,7 @@ const main = async () => {
                         endtime: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString().slice(11, 19).toString(), // 1 hour later
                         note: `This is a note for session ${index + 1}`,
                         rating: Math.floor(Math.random() * 6), // Random rating between 0 and 5
+                        createdBy: userId,
                     };
                 } catch (e) {
                     console.error(e);
@@ -183,8 +171,8 @@ const main = async () => {
                             sessionId,
                             exerciseId,
                             order: index + 1, // Set the order
-                            weight: 20 + index * 5, // Example weight
-                            unit: index % 2 === 0 ? 'kg' : 'lbs', // Random unit (kg or lbs)
+                            weight: [10 + index % 5, 12 + index % 3, 8 + index % 4], // Example weight
+                            unit: ["kg", "kg", "lbs"], // Random unit (kg or lbs)
                             reps: [10 + index % 5, 12 + index % 3, 8 + index % 4], // Example array of reps
                             creationdate: new Date().toISOString(), // Creation date
                         };

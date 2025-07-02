@@ -1,27 +1,21 @@
 {
   "name": "gym-partner",
   "version": "1.0.0",
-  "main": "app.js",
   "type": "module",
   "scripts": {
     "test": "nodemon playground.js",
-    "start": "node app.js",
-    "dev": "nodemon app.js  --serveonet",
-    "local": "nodemon app.js --local",
-    "prod": "nodemon app.js",
-    "drizzle:dev:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
-    "drizzle:dev:migrate": "drizzle-kit migrate --config=drizzle-dev.config.ts",
-    "drizzle:dev:seed": "node db/seeds/index.js --schema=dev",
-    "drizzle:dev:seed:mock": "node db/seeds/seedMockData.js --schema=dev",
-    "drizzle:dev:clearseed": "node ./db/seeds/clearSeeds.js --schema=dev",
-    "drizzle:main:generate": "drizzle-kit generate --config=drizzle-main.config.ts",
-    "drizzle:main:migrate": "drizzle-kit migrate --config=drizzle-main.config.ts",
-    "drizzle:main:seed": "node db/seeds/index.js --schema=main",
-    "drizzle:main:seed:mock": "node db/seeds/seedMockData.js --schema=main",
-    "drizzle:main:clearseed": "node ./db/seeds/clearSeeds.js --schema=main",
-    "drizzle:main:studio": "npx drizzle-kit studio --port 3000 --verbose --config=drizzle-main.config.ts",
-    "drizzle:dev:studio": "npx drizzle-kit studio --port 3020 --verbose --config=drizzle-dev.config.ts",
-    "drizzle:dev:push": "npx drizzle-kit push --config=drizzle-dev.config.ts --strict --verbose"
+    "build": "tsc",
+    "start": "node --env-file .env.local --loader ts-node/esm app.ts",
+    "dev": "cross-env NODE_ENV=development npx nodemon",
+    "prod": "cross-env NODE_ENV=production npx nodemon",
+    "drizzle:generate": "drizzle-kit generate ",
+    "drizzle:migrate": "drizzle-kit migrate ",
+    "drizzle:push": "drizzle-kit push ",
+    "drizzle:pull": "drizzle-kit pull ",
+    "drizzle:seed": "node db/seeds/index.js",
+    "drizzle:seed:mock": "node db/seeds/seedMockData.js",
+    "drizzle:clearseed": "node ./db/seeds/clearSeeds.js",
+    "drizzle:studio": "NODE_ENV=production npx drizzle-kit studio --port 3000 --verbose "
   },
   "author": "",
   "license": "ISC",
@@ -31,7 +25,7 @@
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "drizzle-orm": "^0.41.0",
     "drizzle-seed": "^0.3.1",
     "express": "^4.21.2",
@@ -40,9 +34,15 @@
     "serveonet": "^0.0.2"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.7",
     "drizzle-kit": "^0.30.4",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.2"
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3"
   }
 }

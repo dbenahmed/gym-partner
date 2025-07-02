@@ -6,7 +6,7 @@ import {
   plansExercises,
   sessions,
   setsOfSessionsExercises,
-} from "../db/schemas/dev/schema.js";
+} from "../db/schemas/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 
