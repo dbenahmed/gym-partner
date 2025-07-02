@@ -15,7 +15,7 @@
     "drizzle:seed": "node db/seeds/index.js",
     "drizzle:seed:mock": "node db/seeds/seedMockData.js",
     "drizzle:clearseed": "node ./db/seeds/clearSeeds.js",
-    "drizzle:studio": "NODE_ENV=production npx drizzle-kit studio --port 3000 --verbose "
+    "drizzle:studio": "npx drizzle-kit studio --port 3000 --verbose"
   },
   "author": "",
   "license": "ISC",
