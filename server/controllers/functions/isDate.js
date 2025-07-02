@@ -1,4 +1,4 @@
-export function isYYYYMMDD(time) {
+export function isYYYYMMDD(date) {
     const isoRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
     const isISO8601 = isoRegex.test(date)
     if (!isISO8601) {

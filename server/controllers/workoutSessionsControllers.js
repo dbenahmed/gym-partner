@@ -28,7 +28,7 @@ export const createWorkoutSession = async (req, res) => {
 
 
     // verify if rating is given
-    if (rating || rating > 5 || rating < 0) {
+    if (!rating || rating > 5 || rating < 0) {
       return res.status(401).json({
         success: false,
         message: "Rating must be between 1 and 5",
@@ -96,6 +96,8 @@ export const createWorkoutSession = async (req, res) => {
       //   });
       // } */
     }
+
+    console.log('date', startTime.toISOString().split('T')[0])
     // verify sessions not already exist ( name not used )
     const nameExists = await db.query.sessions.findFirst({
       where: and(
@@ -271,18 +273,32 @@ export const getWorkoutSessions = async (req, res) => {
   try {
     const userId = req.user;
     const { date } = req.query;
-    const isYYYYMMDDFormat = isYYYYMMDD(date);
-    if (!isYYYYMMDDFormat.success) {
+
+
+    /*
+      // const isYYYYMMDDFormat = isYYYYMMDD(date);
+      // if (!isYYYYMMDDFormat.success) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "Date does not follow the format YYYY-MM-DD",
+      //   });
+      // } 
+    */
+    const startTime = new Date(date);
+    if (!startTime) {
       return res.status(401).json({
         success: false,
         message: "Date does not follow the format YYYY-MM-DD",
       });
     }
-
     const foundedSessions = await db
       .select()
       .from(sessions)
-      .where(and(eq(sessions.createdBy, userId), eq(sessions.duedate, date)));
+      .where(
+        and(
+          eq(sessions.createdBy, userId),
+          sql`DATE(${sessions.starttime}) = ${startTime.toISOString().split('T')[0]}`,
+        ));
     if (!foundedSessions) {
       return res.status().jsom({
         message: "there is no session created by this user ",
