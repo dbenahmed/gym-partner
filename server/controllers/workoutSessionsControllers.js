@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import db from "../db/index.js";
 
 import {
@@ -10,28 +10,24 @@ import {
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 
-// Start a new workout session
-// In this route I did not add the exercises to the sessionsExercises table,
-// I only created the session and send the exercise of the selected planId
-// to the client's frontend
-// todo : negotiate about this features with team later
+// add a new workout session with its details
 export const createWorkoutSession = async (req, res) => {
   try {
     const userId = req.user;
     const userData = req.userData;
     const {
       planId,
-      dueDate,
       name,
-      startTime,
-      endTime,
       note,
       rating,
       exercisesArray,
     } = req.body;
-    console.log("backend");
+    const startTime = new Date(req.body.startTime);
+    const endTime = new Date(req.body.endTime);
     console.log(req.body);
 
+
+    // verify if rating is given
     if (rating || rating > 5 || rating < 0) {
       return res.status(401).json({
         success: false,
@@ -39,50 +35,76 @@ export const createWorkoutSession = async (req, res) => {
       });
     }
 
-    console.log("rating", rating);
-    if (!dueDate || !name) {
+
+
+    // verify if name is givem
+    if (!name) {
       return res.status(401).json({
         success: false,
-        message: "Due Date / name / startTime not Included",
-      });
+        message: "Name not Included",
+      })
     }
-    // verify format of the dueDate
-    const isYYYYMMDDFormat = isYYYYMMDD(dueDate);
-    if (!isYYYYMMDDFormat.success) {
-      return res.status(401).json({
-        success: false,
-        message: "Due Date does not follow the format YYYY-MM-DD",
-      });
-    }
-    console.log("dueDate", dueDate);
+
+    /* CANCELLED DUE DATE
+    // if (!dueDate || !name) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Due Date / name / startTime not Included",
+    //   });
+    // }
+    
+      // verify format of the dueDate
+      // const isYYYYMMDDFormat = isYYYYMMDD(dueDate);
+      // if (!isYYYYMMDDFormat.success) {
+      //  return res.status(401).json({
+      //   success: false,
+      //   message: "Due Date does not follow the format YYYY-MM-DD",
+      // });
+      //}
+      // console.log("dueDate", dueDate); 
+    */
     // verify format of the startDate
-    if (startTime) {
-      const startTimeIsHHMMSSFormat = isHHMMSS(startTime);
-      if (!startTimeIsHHMMSSFormat.success) {
-        return res.status(401).json({
-          success: false,
-          message: "Start Time does not follow the format HH-MM-SS",
-        });
-      }
+
+
+    if (!startTime) {
+      return res.status(401).json({
+        success: false,
+        message: "Start Time not Included",
+      })
+      // cancelled starttime of format HHMMSS it is now a timestamp
+      /*  const startTimeIsHHMMSSFormat = isHHMMSS(startTime);
+       // if (!startTimeIsHHMMSSFormat.success) {
+       //   return res.status(401).json({
+       //     success: false,
+       //     message: "Start Time does not follow the format HH-MM-SS",
+       //   });
+       // } 
+      */
     }
-    if (endTime) {
-      const endTimeIsHHMMSSFormat = isHHMMSS(endTime);
-      if (!endTimeIsHHMMSSFormat.success) {
-        return res.status(401).json({
-          success: false,
-          message: "End Time does not follow the format HH-MM-SS",
-        });
-      }
+    if (!endTime) {
+      return res.status(401).json({
+        success: false,
+        message: "End Time not Included",
+      })
+      // cancelled endtime of format HHMMSS it is now a timestamp
+      /*
+      // const endTimeIsHHMMSSFormat = isHHMMSS(endTime);
+      // if (!endTimeIsHHMMSSFormat.success) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "End Time does not follow the format HH-MM-SS",
+      //   });
+      // } */
     }
     // verify sessions not already exist ( name not used )
     const nameExists = await db.query.sessions.findFirst({
       where: and(
         eq(sessions.createdBy, userId),
         eq(sessions.name, name),
-        eq(sessions.duedate, dueDate)
+        sql`DATE(${sessions.starttime}) = ${startTime.toISOString().split('T')[0]}`
       ),
     });
-    console.log("nameExists", nameExists);
+
     if (nameExists) {
       return res.status(201).json({
         success: false,
@@ -100,9 +122,6 @@ export const createWorkoutSession = async (req, res) => {
         });
       }
     }
-    console.log("authorized", planId);
-
-    console.log("exercisesArray", exercisesArray);
 
     // verify the exercisesArray is array
     if (
@@ -118,7 +137,6 @@ export const createWorkoutSession = async (req, res) => {
     }
 
     const finished = await db.transaction(async (tx) => {
-      console.log("tx", tx);
 
       // create the session
       const createdSessions = await tx
@@ -126,8 +144,7 @@ export const createWorkoutSession = async (req, res) => {
         .values({
           planId: planId ? planId : null,
           name: name,
-          duedate: dueDate,
-          starttime: startTime ? startTime : null,
+          starttime: startTime,
           endtime: endTime ? endTime : null,
           note: note ? note : null,
           rating: rating ? rating : null,
