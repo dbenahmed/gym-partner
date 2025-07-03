@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import useThemeContext from '@/context/themeContext';
@@ -8,7 +8,6 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
 
 
     const { theme, colors } = useThemeContext();
-
 
     const styles = useMemo(() => StyleSheet.create({
         setRow: {
@@ -28,12 +27,21 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
         },
 
         input: {
-            backgroundColor: colors.text,
-            color: colors.backgroundColor,
+            backgroundColor: "transparent",
+            color: colors.text,
+            borderWidth: 0.2,
             borderRadius: 4,
             padding: 6,
             fontSize: 14,
             height: 34,
+            // drop shadow
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
         },
         setNumber: {
             width: 20,
@@ -65,16 +73,13 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: colors.tabIconSelected,
+            backgroundColor: colors.background,
             borderRadius: 4,
             padding: 6,
             fontSize: 14,
             height: 34,
         },
-        previousRepText: {
-            fontSize: 11,
-            color: colors.backgroundColor,
-        },
+
         previousSetInfo: {
             flexDirection: 'row',
             alignItems: 'center',
@@ -93,10 +98,18 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
         },
         previousRepsText: {
             fontSize: 12,
-            color: colors.backgroundColor,
+            color: colors.tint,
+            fontWeight: "500",
             textAlign: 'center',
         }
     }), [colors, theme]);
+
+
+    useEffect(() => {
+        console.log('itemoooo', item);
+        console.log("stats", item.statistics)
+
+    }, [item]);
 
     return (
         <View key={index} style={styles.setRow}>
@@ -105,9 +118,9 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
                 {index === 0 && <Text style={styles.inputLabel}>Previous Reps</Text>}
                 <View style={styles.previousRepsViewStyles}>
                     <Text style={styles.previousRepsText}>
-                        {[10, 20, 18].map((rep, idx) => (
-                            idx === 0 ? `${rep}` : `, ${rep}`
-                        )).join('')}
+                        {item.statistics[index] &&
+                            item.statistics[index].reps[index] ? `${item.statistics[index].weight[index]} ${item.statistics[index].unit[index]} ${item.statistics[index].reps[index]} Reps` : 'NO DATA'
+                        }
                     </Text>
                 </View>
             </View>
@@ -115,6 +128,7 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
             <View style={[styles.rowContainer, styles.width50]}>
                 {index === 0 && <Text style={styles.inputLabel}>Reps</Text>}
                 <TextInput
+                    autoFocus={true}
                     style={styles.input}
                     value={item.sets && item.sets[index] && item.sets[index].reps ? item.sets[index].reps.toString() : ''}
                     onChangeText={(value) => {
@@ -144,7 +158,7 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
             <View style={[styles.rowContainer, styles.width50]}>
                 {index === 0 && <Text style={styles.inputLabel}>Unit</Text>}
                 <TouchableOpacity
-                    style={[styles.input]}
+                    style={[styles.input, { backgroundColor: colors.background }]}
                     onPress={() => {
                         const updatedSets = [...item.sets];
                         const currentUnit = updatedSets[index].unit || 'kg';
@@ -152,7 +166,7 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
                         updateExerciseData(item.id, 'sets', updatedSets);
                     }}
                 >
-                    <Text style={{ fontSize: 14, color: colors.backgroundColor }}>
+                    <Text style={{ fontSize: 14, color: colors.text }}>
                         {item.sets && item.sets[index] && item.sets[index].unit ? item.sets[index].unit : 'kg'}
                     </Text>
                 </TouchableOpacity>
