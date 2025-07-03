@@ -9,6 +9,8 @@ import { Alert } from 'react-native';
 import useThemeContext from '@/context/themeContext'; // Replace with real path
 import Button from '@/components/ui/Button'; // Replace with real path
 import ModalSlideUp from '@/components/ui/ModalSlideUp';
+import Sortable from 'react-native-sortables';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 const Exercises = () => {
@@ -182,6 +184,55 @@ const Exercises = () => {
   const [limit, setLimit] = useState(defaultLimit);
   const [count, setCount] = useState(0);
 
+
+  const handleDragEnd = (params) => {
+    const {
+      key,           // The key of the dragged item
+      fromIndex,     // Original position
+      toIndex,       // New position
+      indexToKey,    // Array of keys in new order
+      keyToIndex,    // Object mapping keys to new indices
+      data           // Reordered data array
+    } = params;
+    const newExercises = [...data]
+    setExercises(newExercises)
+
+    
+
+  }
+
+  const renderItem = ({ item }) => {
+    console.log(item.exercises.id)
+    return (
+      <View key={item.exercises.id} style={styles.exerciseCard}>
+        <Text style={styles.exerciseTitle}>{item.exercises.name}</Text>
+
+        {item.exercises.primarymuscles?.length > 0 && (
+          <View style={styles.muscleSection}>
+            <Text style={styles.muscleLabel}>Primary Muscles:</Text>
+            <Text style={styles.muscleText}>{item.exercises.primarymuscles.join(", ")}</Text>
+          </View>
+        )}
+
+        {item.exercises.secondarymuscles?.length > 0 && (
+          <View style={styles.muscleSection}>
+            <Text style={styles.muscleLabel}>Secondary Muscles:</Text>
+            <Text style={styles.muscleText}>{item.exercises.secondarymuscles.join(", ")}</Text>
+          </View>
+        )}
+
+        {item.exercises.equipment && (
+          <View style={styles.muscleSection}>
+            <Text style={styles.muscleLabel}>Equipment:</Text>
+            <Text style={styles.muscleText}>{item.exercises.equipment}</Text>
+          </View>
+        )}
+      </View>
+
+    )
+  }
+
+
   const handleSearchExercise = async (query) => {
     if (query.length === 0) {
       setSearchResults([]);
@@ -317,41 +368,23 @@ const Exercises = () => {
       ) : (
         <View style={styles.contentContainer}>
           <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-            {exercises.map((ex) => (
-              <View key={ex.plans_exercises.id} style={styles.exerciseCard}>
-                <Text style={styles.exerciseTitle}>{ex.exercises.name}</Text>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <Sortable.Grid
+                onDragEnd={handleDragEnd}
+                columns={1} // Single column = full width items
+                columnGap={0}
+                data={exercises}
+                keyExtractor={(item) => String(item.exercises.id)}
+                renderItem={renderItem}
+                rowGap={15} // Space between items
+              />
+            </GestureHandlerRootView>
 
-                {ex.exercises.primarymuscles?.length > 0 && (
-                  <View style={styles.muscleSection}>
-                    <Text style={styles.muscleLabel}>Primary Muscles:</Text>
-                    <Text style={styles.muscleText}>{ex.exercises.primarymuscles.join(", ")}</Text>
-                  </View>
-                )}
-
-                {ex.exercises.secondarymuscles?.length > 0 && (
-                  <View style={styles.muscleSection}>
-                    <Text style={styles.muscleLabel}>Secondary Muscles:</Text>
-                    <Text style={styles.muscleText}>{ex.exercises.secondarymuscles.join(", ")}</Text>
-                  </View>
-                )}
-
-                {ex.exercises.equipment && (
-                  <View style={styles.muscleSection}>
-                    <Text style={styles.muscleLabel}>Equipment:</Text>
-                    <Text style={styles.muscleText}>{ex.exercises.equipment}</Text>
-                  </View>
-                )}
-              </View>
-            ))}
 
             <Button
               text="Add New Exercise"
               onClick={() => {
                 setModalVisible(true);
-              }}
-              styles={{
-                marginHorizontal: 16,
-                marginBottom: 20,
               }}
             />
           </ScrollView>
@@ -407,17 +440,21 @@ const Exercises = () => {
                   </TouchableOpacity>
                 ))}
 
-
-                <Button
-                  text="More Results"
-                  onClick={() => handleLimitChanged(limit + 10)}
-                  styles={{
-                    ...styles.modalButton,
-                    ...styles.cancelButton,
-                    marginBottom: 20,
-                  }}
-                  disabled={limit >= count}
-                />
+                {searchResults.length === 0 && (
+                  <Text style={styles.noResultsText}>No results found</Text>
+                )}
+                {searchResults.length > 0 && limit < count && (
+                  <Button
+                    text="Load More"
+                    onClick={() => handleLimitChanged(limit + 10)}
+                    styles={{
+                      ...styles.modalButton,
+                      ...styles.cancelButton,
+                      marginBottom: 20,
+                    }}
+                    disabled={limit >= count}
+                  />
+                )}
               </ScrollView>
             </View>
           </ModalSlideUp>
