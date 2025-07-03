@@ -1,6 +1,6 @@
 import db from "../db/index.js";
-import { collections, exercises, plans, users } from "../db/schemas/schema.js";
-import { and, eq, ilike, like, inArray, sql } from "drizzle-orm";
+import { collections, exercises, plans, sessions, setsOfSessionsExercises, users } from "../db/schemas/schema.js";
+import { and, eq, ilike, like, inArray, sql, desc } from "drizzle-orm";
 
 
 // Get a list of all available exercises
@@ -154,3 +154,44 @@ export const deleteExercise = (req, res) => {
     res.status(500).json({ message: 'Error deleting exercise', error: error.message });
   }
 };
+
+
+export const getLatestExerciseStats = async (req, res) => {
+  const userId = req.user;
+  const {
+    exerciseId,
+  } = req.query
+
+  // fetch the table setsOfSessionsExercises for this exercise and load latest statistics, sort them by date from latest to oldest
+  const foundStats = await db.query.setsOfSessionsExercises.findMany({
+    where: and(
+      eq(setsOfSessionsExercises.exerciseId, 914),
+    ),
+    with: {
+      sessions: {
+        where: eq(sessions.createdBy, 51)
+      }
+    },
+    orderBy: desc(setsOfSessionsExercises.creationdate)
+  })
+
+  if (!foundStats) {
+    return res.status(500).json({
+      success: false,
+      message: 'ERROR: error retreiving latest exercise stats'
+    });
+  }
+
+  if (foundStats.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: 'ERROR: no stats found for this exercise'
+    });
+  }
+
+  res.status(200).json({
+    message: 'Latest Exercise Stats',
+    success: true,
+    data: foundStats
+  });
+}

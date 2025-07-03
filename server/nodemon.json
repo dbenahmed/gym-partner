@@ -8,5 +8,5 @@
     "*.log",
     "C:\\DumpStack.log.tmp"
   ],
-  "exec": "tsx app.ts"
+  "exec": "tsx"
 }

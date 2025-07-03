@@ -650,25 +650,76 @@ export default function StartSession() {
         setExercises([...exercises, ...filteredExercises]);
     };
 
-    const addExerciseToSession = (exercise) => {
-        // Check if the exercise already exists in the session
-        const exerciseExists = exercises.some(existingExercise => existingExercise.id === exercise.id);
+    const addExerciseToSession = async (exercise) => {
+        try {
 
-        if (exerciseExists) {
-            Alert.alert(
-                "Exercise Already Added",
-                "This exercise is already in your session.",
-                [{ text: "OK" }]
-            );
-            return;
+            // Check if the exercise already exists in the session
+            const exerciseExists = exercises.some(existingExercise => existingExercise.id === exercise.id);
+
+            if (exerciseExists) {
+                Alert.alert(
+                    "Exercise Already Added",
+                    "This exercise is already in your session.",
+                    [{ text: "OK" }]
+                );
+                return;
+            }
+
+
+            const response = await fetch(`${defaultUrl}/exercise/statistics/${exercise.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authenticated}`
+                }
+            })
+            if (!response.ok) {
+                throw new Error('Failed to fetch exercise statistics');
+            }
+            const { success, message, data } = await response.json();
+            if (!success) {
+                throw new Error(message);
+            }
+
+            console.log('latest data ', data)
+            // now data contains all the previous sets of this exercise
+            // we need to filter the latest session only
+            let filtered;
+            if (Array.isArray(data) & data.length > 0) {
+
+                console.log('entered')
+
+                filtered = data.sort((a, b) => new Date(b.creationdate) - new Date(a.creationdate))
+                const latest = data[0]
+                console.log("latest", latest)
+                filtered = filtered.filter(item => {
+                    const ses = latest.sessionId;
+                    return item.sessionId === ses
+                }).sort((a, b) => (a.order - b.order))
+            } else {
+                filtered = []
+            }
+
+            console.log("filtered", filtered)
+
+            const exerciseDetails = {
+                id: exercise.id,
+                name: exercise.name,
+                category: exercise.category,
+                sets: [],
+                "statistics": filtered
+            }
+
+            console.log('detaile', exerciseDetails)
+
+            console.log("settings exercise")
+            setExercises(prev => {
+                return [...prev, exerciseDetails]
+            });
+            setModalVisible(false);
+        } catch (error) {
+            console.error('Error fetching exercise statistics:', error);
+            Alert.alert('Error', error.message);
         }
-        setExercises([...exercises, {
-            id: exercise.id,
-            name: exercise.name,
-            category: exercise.category,
-            sets: []
-        }]);
-        setModalVisible(false);
     };
 
 
@@ -756,6 +807,7 @@ export default function StartSession() {
                     Alert.alert('Error', message);
                     return;
                 }
+                await AsyncStorage.removeItem(`session-data-${userId}`);
                 console.log('Session saved successfully');
                 console.log("data", data);
             } else {
@@ -771,11 +823,17 @@ export default function StartSession() {
     }
 
     const updateExerciseData = (id, field, value) => {
-        const updatedExercises = exercises.map(exercise =>
-            exercise.id === id ? { ...exercise, [field]: value } : exercise
-        );
-        console.log('UPDATED EXOS', updatedExercises)
-        setExercises(updatedExercises);
+        console.log("exos", exercises)
+        console.log(id)
+        console.log(value, field)
+        setExercises(prev => {
+            console.log('previous exercises', prev)
+            const updatedExercises = prev.map(exercise =>
+                exercise.id === id ? { ...exercise, [field]: value } : exercise
+            );
+            console.log('UPDATED EXOS', updatedExercises)
+            return updatedExercises;
+        });
     };
 
     const removeExercise = (id) => {
@@ -790,7 +848,7 @@ export default function StartSession() {
             return;
         }
         setIsLoadingSearchExercises(true);
-        const res = await fetch(`${defaultUrl}/explore/exercises?name=${query}`, {
+        const res = await fetch(`${defaultUrl}/explore/exercises?name=${query}&sets=true`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authenticated}`

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "nodemon playground.js",
+    "test": "npx nodemon playground.js",
     "build": "tsc",
     "start": "node --env-file .env.local --loader ts-node/esm app.ts",
     "dev": "cross-env NODE_ENV=development npx nodemon",

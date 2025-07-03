@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddlewares.js';
 const router = express.Router();
-import { createNewExercise, deleteExercise, getAllExercises, getExerciseDetails, updateExercise } from '../controllers/exerciseDatabaseControllers.js';
+import { createNewExercise, deleteExercise, getAllExercises, getExerciseDetails, updateExercise, getLatestExerciseStats } from '../controllers/exerciseDatabaseControllers.js';
 
 
 //* done
@@ -20,5 +20,8 @@ router.put('/explore/exercises/:exerciseId', authMiddleware, updateExercise);
 
 // Delete an exercise
 router.delete('/explore/exercises/:exerciseId', authMiddleware, deleteExercise);
+
+// Get latest data of an exercise ( latest reps sets weights sessions ...)
+router.get('/exercise/statistics/:exerciseId', authMiddleware, getLatestExerciseStats);
 
 export default router; 
