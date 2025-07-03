@@ -293,7 +293,7 @@ export default function SessionDetails() {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
-              }`}
+                }`}
             </Text>
             {session.note && (
               <Text style={styles.sessionNote}>Note: {session.note}</Text>

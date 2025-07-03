@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert, Touchable } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -16,8 +16,8 @@ import Spinner from '@/components/Spinner';
 import useThemeContext from '@/context/themeContext';
 import { useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
+import Sortable from 'react-native-sortables';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function StartSession() {
 
@@ -364,6 +364,32 @@ export default function StartSession() {
 
 
 
+    const handleDragEnd = (params) => {
+        const {
+            key,           // The key of the dragged item
+            fromIndex,     // Original position
+            toIndex,       // New position
+            indexToKey,    // Array of keys in new order
+            keyToIndex,    // Object mapping keys to new indices
+            data           // Reordered data array
+        } = params;
+        const newExercises = [...data]
+        setExercises(newExercises)
+    }
+
+    const renderItem = useCallback(
+        ({ item }) => (
+            <SessionExerciseContainer
+                key={String(item.id)}
+                item={item}
+                removeExercise={removeExercise}
+                updateExerciseData={updateExerciseData}
+            />
+        ),
+        []
+    );
+
+
     // GATHER THE DRAFT SESSION DATA FROM ASYNC STORAGE
     useEffect(() => {
         const run = async () => {
@@ -389,6 +415,8 @@ export default function StartSession() {
                                     startTime.current = new Date(extractedData.startTime)
                                     setRating(extractedData.rating)
                                     setExercises(extractedData.exercises)
+                                    console.log("imported Exercises", extractedData.exercises)
+                                    console.log("----------------------------")
                                     const newDuration = new Date() - new Date(extractedData.startTime)
                                     console.log("new duration imported", newDuration)
                                     setDuration(newDuration)
@@ -881,11 +909,18 @@ export default function StartSession() {
                             onClick={() => setModalVisible(true)}
                         />
                         <Button
+                            text="debug"
+                            icon="folder-download"
+                            type="primary"
+                            onClick={() => { console.log(exercises) }}
+                        />
+                        <Button
                             text="Import Collection"
                             icon="folder-download"
                             type="primary"
                             onClick={() => importCollectionsButtonPressed()}
                         />
+
                     </ScrollView>
                 </View>
 
@@ -896,24 +931,32 @@ export default function StartSession() {
                         </Text>
                     </View>
                 ) : (
-                    exercises.map((exercise, index) => (
-                        <SessionExerciseContainer
-                            key={exercise.id || index}
-                            item={exercise}
-                            removeExercise={removeExercise}
-                            updateExerciseData={updateExerciseData}
+
+
+                    // Draggable list of exercises 
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <Sortable.Grid
+                            onDragEnd={handleDragEnd}
+                            columns={1} // Single column = full width items
+                            columnGap={0}
+                            data={exercises}
+                            keyExtractor={(item) => String(item.id)}
+                            renderItem={renderItem}
+                            rowGap={15} // Space between items
                         />
-                    ))
+                    </GestureHandlerRootView>
                 )}
 
                 {exercises.length > 0 && (
                     <Button
                         text="Save Session"
                         onClick={() => saveSession()}
+                        styles={{ marginTop: 20 }}
                         type="primary"
                         disabled={exercises.length === 0}
                     />
                 )}
+
 
 
             </ScrollView>
