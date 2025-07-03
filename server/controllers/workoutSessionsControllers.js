@@ -13,6 +13,7 @@ import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 // add a new workout session with its details
 export const createWorkoutSession = async (req, res) => {
   try {
+    console.log("received")
     const userId = req.user;
     const userData = req.userData;
     const {
@@ -25,21 +26,23 @@ export const createWorkoutSession = async (req, res) => {
     const startTime = new Date(req.body.startTime);
     const endTime = new Date(req.body.endTime);
     console.log(req.body);
-
-
+    console.log(typeof rating)
     // verify if rating is given
-    if (!rating || rating > 5 || rating < 0) {
-      return res.status(401).json({
+    if (rating === null || rating === undefined || rating > 5 || rating < 0) {
+      console.log("lol")
+      res.status(400).json({
         success: false,
         message: "Rating must be between 1 and 5",
       });
+      return
     }
 
+    console.log('good')
 
 
     // verify if name is givem
     if (!name) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Name not Included",
       })
@@ -65,9 +68,8 @@ export const createWorkoutSession = async (req, res) => {
     */
     // verify format of the startDate
 
-
     if (!startTime) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Start Time not Included",
       })
@@ -82,7 +84,7 @@ export const createWorkoutSession = async (req, res) => {
       */
     }
     if (!endTime) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "End Time not Included",
       })
@@ -185,7 +187,7 @@ export const createWorkoutSession = async (req, res) => {
           ) {
             return {
               success: false,
-              statusCode: 401,
+              statusCode: 400,
               message: "The number of weights, units and reps are not the same",
             };
           }
@@ -286,7 +288,7 @@ export const getWorkoutSessions = async (req, res) => {
     */
     const startTime = new Date(date);
     if (!startTime) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Date does not follow the format YYYY-MM-DD",
       });

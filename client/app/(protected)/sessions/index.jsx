@@ -217,9 +217,6 @@ export default function Sessions() {
                 onClick={() => {
                     router.push({
                         pathname: '/sessions/newSession',
-                        params: {
-                            date: currentDate.toISOString().split('T')[0]
-                        }
                     });
                 }}
                 type="primary"
