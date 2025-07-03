@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert, Touchable } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -7,16 +7,17 @@ import SessionExerciseContainer from '@/components/sessionExerciseContainer';
 import { defaultUrl } from '@/constants/constants';
 import useAuth from '@/context/authContext';
 import { ActivityIndicator } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
-import { validateName, validateNumber } from '@/utils/validation';
+import { validateName, validateString, validateNumber } from '@/utils/validation';
 import Button from '@/components/ui/Button';
 import ModalSlideUp from '@/components/ui/ModalSlideUp';
-
+import { Stack } from "expo-router";
+import Spinner from '@/components/Spinner';
 import useThemeContext from '@/context/themeContext';
-
-
-
+import { useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Sortable from 'react-native-sortables';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function StartSession() {
 
@@ -349,28 +350,146 @@ export default function StartSession() {
         },
     }), [colors]);
 
-    const [exercises, setExercises] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // SESSION DATA STATES 
     const [sessionName, setSessionName] = useState('');
     const [sessionNotes, setSessionNotes] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const startTime = useRef(new Date())
+    const [rating, setRating] = useState(1);
+    const [duration, setDuration] = useState(null) // Duration as a date;
+    const [exercises, setExercises] = useState([]);
+
+
+
+    const handleDragEnd = (params) => {
+        const {
+            key,           // The key of the dragged item
+            fromIndex,     // Original position
+            toIndex,       // New position
+            indexToKey,    // Array of keys in new order
+            keyToIndex,    // Object mapping keys to new indices
+            data           // Reordered data array
+        } = params;
+        const newExercises = [...data]
+        setExercises(newExercises)
+    }
+
+    const renderItem = useCallback(
+        ({ item }) => (
+            <SessionExerciseContainer
+                key={String(item.id)}
+                item={item}
+                removeExercise={removeExercise}
+                updateExerciseData={updateExerciseData}
+            />
+        ),
+        []
+    );
+
+
+    // GATHER THE DRAFT SESSION DATA FROM ASYNC STORAGE
+    useEffect(() => {
+        const run = async () => {
+            try {
+                const draftSessionData = await AsyncStorage.getItem(`session-data-${userId}`);
+                if (draftSessionData) {
+                    const extractedData = JSON.parse(draftSessionData)
+                    if (extractedData.exercises.length === 0) return
+                    Alert.alert(
+                        'Draft session found',
+                        'Would you like to import your previous unsaved session?',
+                        [
+                            {
+                                text: 'Cancel',
+                                style: 'cancel',
+                            },
+                            {
+                                text: 'Yes',
+                                onPress: () => {
+                                    // Draft session data exists => fill the items
+                                    setSessionName(extractedData.sessionName)
+                                    setSessionNotes(extractedData.sessionNotes)
+                                    startTime.current = new Date(extractedData.startTime)
+                                    setRating(extractedData.rating)
+                                    setExercises(extractedData.exercises)
+                                    console.log("imported Exercises", extractedData.exercises)
+                                    console.log("----------------------------")
+                                    const newDuration = new Date() - new Date(extractedData.startTime)
+                                    console.log("new duration imported", newDuration)
+                                    setDuration(newDuration)
+                                }
+                            }
+                        ]
+                    )
+
+                }
+            } catch (error) {
+                console.error('Error retrieving draft session data:', error);
+            }
+        }
+        run();
+    }, []);
+
+
+    const didMount = useRef(false);
+    // AUTO SAVING FUNCTIONALITY 
+    useEffect(() => {
+        const run = async () => {
+            try {
+                setAutoSaveLoading(true)
+                sessionData.current = {
+                    sessionName: sessionName,
+                    sessionNotes: sessionNotes,
+                    startTime: startTime.current.toISOString(),
+                    rating: rating,
+                    exercises: exercises,
+                }
+                setTimeout(() => setAutoSaveLoading(false), 1000);
+                await AsyncStorage.setItem(`session-data-${userId}`, JSON.stringify(sessionData.current));
+                console.log('Session data saved.');
+            } catch (error) {
+                console.error('Error saving session data:', error);
+            }
+        }
+        if (didMount.current) {
+            run();
+        } else {
+            didMount.current = true
+        }
+    }, [sessionName, sessionNotes, startTime, rating, exercises])
+
+
+    // TIMER FUNCTIONALITY FEATURE
+    useEffect(() => {
+        // THE DURATION INTERVAL
+        setInterval(() => {
+            const newDuration = new Date() - startTime.current;
+            setDuration(newDuration);
+        }, 1000);
+    }, [])
+
+    // The current session data
+    const sessionData = useRef(null)
+    // For display the auto save session data every interval loading state
+    const [autoSaveLoading, setAutoSaveLoading] = useState(false)
+
+
 
 
     const [importFromCollectionModalVisible, setImportFromCollectionModalVisible] = useState(false);
 
     const [isLoadingSearchExercises, setIsLoadingSearchExercises] = useState(false);
 
-    const { date } = useLocalSearchParams();
 
     const [filteredExercises, setFilteredExercises] = useState([]);
 
 
-    const { authenticated } = useAuth();
+    const { authenticated, userId } = useAuth();
 
     // Mock exercise data for search results
-
-
     const [planExercises, setPlanExercises] = useState([]);
     const [isLoadingPlanExercises, setIsLoadingPlanExercises] = useState(false)
 
@@ -443,6 +562,7 @@ export default function StartSession() {
     const handlePlanSelect = async (plan) => {
         if (plan.id === selectedPlan?.id) {
             // If the same plan is selected, reset the state
+            // WHICH MEANS UNSELECT THAT PLAN
             console.log('S[PPPPPP', selectedPlan)
             setSelectedPlan(null)
             return;
@@ -554,26 +674,21 @@ export default function StartSession() {
 
     const saveSession = async () => {
         const io = async () => {
+
             setLoading(true);
+            // verify session name available
             if (validateName(sessionName).success === false) {
                 console.log('session name not valid')
                 Alert.alert('Error', validateName(sessionName).message);
                 return;
             }
-            console.log('save session')
-            if (validateName(sessionNotes).success === false) {
+            // verify session Note available
+            if (validateString(sessionNotes).success === false) {
                 console.log('session notes not valid')
                 Alert.alert('Error', validateName(sessionNotes).message);
                 return;
             }
-            console.log('llll')
-            // verify session name and date are available
-            if (!sessionName || !date) {
-                console.log('sesions name or date not included')
-                Alert.alert('Error', 'Please enter a session name and date');
-                return;
-            }
-            console.log('Save Session exercises');
+
 
             // verify exercises infos are available
             if (exercises.length === 0) {
@@ -615,8 +730,9 @@ export default function StartSession() {
                 ...exercise,
                 order: index
             }));
-            console.log('exercisesArray', exercisesArray);
-            console.log(date)
+            const endTime = new Date();
+            console.log('fetching session')
+            console.log("def", defaultUrl)
             const res = await fetch(`${defaultUrl}/workout/sessions`, {
                 method: 'POST',
                 headers: {
@@ -625,29 +741,28 @@ export default function StartSession() {
                 },
                 body: JSON.stringify({
                     planId: null,
-                    dueDate: date,
                     name: sessionName,
-                    startTime: null,
-                    endTime: null,
+                    startTime: startTime.current.toISOString(),
+                    endTime: endTime.toISOString(),
                     note: sessionNotes,
-                    rating: null,
+                    rating: rating ? rating : null,
                     exercisesArray: exercisesArray
                 })
             });
-            console.log('res', res)
-            if (!res.ok) {
-                console.log('Error saving session');
-                Alert.alert('Error', 'Failed to save session');
-                return;
-            }
             const { success, message, data } = await res.json();
-            if (!success) {
-                console.log('error', message)
-                Alert.alert('Error', message);
-                return;
+            if (success !== undefined && success !== null) {
+                if (!success) {
+                    console.log('error', message)
+                    Alert.alert('Error', message);
+                    return;
+                }
+                console.log('Session saved successfully');
+                console.log("data", data);
+            } else {
+                if (!res.ok) {
+                    Alert.alert("error", "server error")
+                }
             }
-            console.log('Session saved successfully');
-            console.log(data);
             router.back()
         }
         io().finally(() => {
@@ -711,6 +826,13 @@ export default function StartSession() {
     return (
         <View style={{ flex: 1 }}>
 
+            <Stack.Screen
+                options={{
+                    headerRight: () => (
+                        <Spinner size={"small"} visible={autoSaveLoading} />
+                    )
+                }}
+            />
             <ScrollView contentContainerStyle={styles.container}>
                 {/* Session Name Input */}
 
@@ -735,6 +857,37 @@ export default function StartSession() {
                         multiline={true}
                         numberOfLines={3}
                     />
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Duration</Text>
+                    <Text style={[styles.textInput, styles.inputLabel, { paddingVertical: 10, fontSize: 18, fontWeight: "bold", marginBottom: 10, borderColor: colors.tintLighter, textAlign: "center" }]}>
+                        {`${Math.floor(duration / 3600000)
+                            .toString()
+                            .padStart(2, '0')}:${Math.floor((duration / 60000) % 60)
+                                .toString()
+                                .padStart(2, '0')}:${Math.floor((duration / 1000) % 60)
+                                    .toString()
+                                    .padStart(2, '0')}`}
+                    </Text>
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Rating</Text>
+                    <View className="flex-row gap-2 align-center justify-center mb-4">
+                        {
+                            [1, 2, 3, 4, 5].map((star) => (
+                                <TouchableOpacity
+                                    key={star}
+                                    onPress={() => setRating(star)}
+                                >
+                                    <MaterialCommunityIcons
+                                        name={star <= rating ? "star" : "star-outline"}
+                                        size={24}
+                                        color={star <= rating ? colors.tint : colors.tintLighter}
+                                    />
+                                </TouchableOpacity>
+                            ))
+                        }
+                    </View>
                 </View>
                 <View style={{
                     height: 40,
@@ -761,6 +914,7 @@ export default function StartSession() {
                             type="primary"
                             onClick={() => importCollectionsButtonPressed()}
                         />
+
                     </ScrollView>
                 </View>
 
@@ -771,26 +925,32 @@ export default function StartSession() {
                         </Text>
                     </View>
                 ) : (
-                    exercises.map((exercise, index) => (
-                        <SessionExerciseContainer
-                            key={exercise.id || index}
-                            item={exercise}
-                            removeExercise={removeExercise}
-                            updateExerciseData={updateExerciseData}
+
+
+                    // Draggable list of exercises 
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <Sortable.Grid
+                            onDragEnd={handleDragEnd}
+                            columns={1} // Single column = full width items
+                            columnGap={0}
+                            data={exercises}
+                            keyExtractor={(item) => String(item.id)}
+                            renderItem={renderItem}
+                            rowGap={15} // Space between items
                         />
-                    ))
+                    </GestureHandlerRootView>
                 )}
 
                 {exercises.length > 0 && (
-                    <TouchableOpacity style={styles.saveButton}
-                        onPress={() => {
-                            saveSession();
-                        }}
+                    <Button
+                        text="Save Session"
+                        onClick={() => saveSession()}
+                        styles={{ marginTop: 20 }}
+                        type="primary"
                         disabled={exercises.length === 0}
-                    >
-                        <Text style={styles.saveButtonText}>Save Session</Text>
-                    </TouchableOpacity>
+                    />
                 )}
+
 
 
             </ScrollView>

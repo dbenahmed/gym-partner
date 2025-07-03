@@ -103,7 +103,7 @@ export default function BodyWeightTrackingScreen() {
         <View style={[styles.listItem, { backgroundColor: colors.tintLighter, alignItems: "center", flexDirection: 'row', justifyContent: 'space-between' }]}>
             <View className="flex-col gap-1">
                 <Text style={[styles.listItemText, { color: colors.text }]}>
-                    Date: {item.creationdate.split(' ')[0]}
+                    Date: {new Date(item.creationdate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                 </Text>
                 <Text style={[styles.listItemText, { color: colors.text }]}>
                     Weight: {item.weight} {item.unit}

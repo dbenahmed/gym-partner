@@ -14,7 +14,7 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
             backgroundColor: colors.tintLighter,
             borderRadius: 10,
             padding: 15,
-            marginBottom: 15,
+            width: "100%",
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -78,7 +78,7 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
                             updateExerciseData(item.id, 'sets', updatedSets);
                         }}
                     >
-                        <MaterialCommunityIcons  name="plus" size={20} color="#4CAF50" />
+                        <MaterialCommunityIcons name="plus" size={20} color="#4CAF50" />
                     </TouchableOpacity>
                 </View>
 

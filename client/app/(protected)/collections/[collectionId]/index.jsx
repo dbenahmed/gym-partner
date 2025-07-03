@@ -25,7 +25,6 @@ const Plans = () => {
       backgroundColor: colors.tintLighter,
       borderRadius: 12,
       padding: 20,
-      marginHorizontal: 16,
       marginVertical: 10,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
@@ -214,7 +213,6 @@ const Plans = () => {
               setModalVisible(true)
             }}
             styles={{
-              marginHorizontal: 16,
               marginTop: 16,
             }}
           />

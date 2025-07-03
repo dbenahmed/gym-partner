@@ -8,6 +8,13 @@
       "when": 1751218612136,
       "tag": "0000_stiff_nuke",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751453450575,
+      "tag": "0001_giant_sunfire",
+      "breakpoints": true
     }
   ]
 }

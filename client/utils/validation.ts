@@ -56,6 +56,23 @@ export const validateName = (name: string): ValidationResult => {
   return { success: true, message: "Valid name" };
 };
 
+export const validateString = (str: string): ValidationResult => {
+  if (str.length < 1)
+    return { success: false, message: "Name must be at least 2 characters" };
+  if (!/^[a-zA-Z\s]+$/.test(str))
+    return {
+      success: false,
+      message: "Name can only contain letters and spaces",
+    };
+  if (str.length > 30) {
+    return {
+      success: false,
+      message: "Name must be at most 30 characters",
+    };
+  }
+  return { success: true, message: "Valid name" };
+};
+
 export const validateNameWithNumbers = (name: string): ValidationResult => {
   if (name.length < 2)
     return { success: false, message: "Name must be at least 2 characters" };

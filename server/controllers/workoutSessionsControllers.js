@@ -1,88 +1,113 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import db from "../db/index.js";
 
 import {
   exercises,
-  plansExercises,
   sessions,
   setsOfSessionsExercises,
 } from "../db/schemas/schema.js";
 import verifyPlanCreatedByUser from "./functions/verifyPlanWasCreatedByUser.js";
 import { isHHMMSS, isYYYYMMDD } from "./functions/isDate.js";
 
-// Start a new workout session
-// In this route I did not add the exercises to the sessionsExercises table,
-// I only created the session and send the exercise of the selected planId
-// to the client's frontend
-// todo : negotiate about this features with team later
+// add a new workout session with its details
 export const createWorkoutSession = async (req, res) => {
   try {
+    console.log("received")
     const userId = req.user;
     const userData = req.userData;
     const {
       planId,
-      dueDate,
       name,
-      startTime,
-      endTime,
       note,
       rating,
       exercisesArray,
     } = req.body;
-    console.log("backend");
+    const startTime = new Date(req.body.startTime);
+    const endTime = new Date(req.body.endTime);
     console.log(req.body);
-
-    if (rating || rating > 5 || rating < 0) {
-      return res.status(401).json({
+    console.log(typeof rating)
+    // verify if rating is given
+    if (rating === null || rating === undefined || rating > 5 || rating < 0) {
+      console.log("lol")
+      res.status(400).json({
         success: false,
         message: "Rating must be between 1 and 5",
       });
+      return
     }
 
-    console.log("rating", rating);
-    if (!dueDate || !name) {
-      return res.status(401).json({
+    console.log('good')
+
+
+    // verify if name is givem
+    if (!name) {
+      return res.status(400).json({
         success: false,
-        message: "Due Date / name / startTime not Included",
-      });
+        message: "Name not Included",
+      })
     }
-    // verify format of the dueDate
-    const isYYYYMMDDFormat = isYYYYMMDD(dueDate);
-    if (!isYYYYMMDDFormat.success) {
-      return res.status(401).json({
-        success: false,
-        message: "Due Date does not follow the format YYYY-MM-DD",
-      });
-    }
-    console.log("dueDate", dueDate);
+
+    /* CANCELLED DUE DATE
+    // if (!dueDate || !name) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Due Date / name / startTime not Included",
+    //   });
+    // }
+    
+      // verify format of the dueDate
+      // const isYYYYMMDDFormat = isYYYYMMDD(dueDate);
+      // if (!isYYYYMMDDFormat.success) {
+      //  return res.status(401).json({
+      //   success: false,
+      //   message: "Due Date does not follow the format YYYY-MM-DD",
+      // });
+      //}
+      // console.log("dueDate", dueDate); 
+    */
     // verify format of the startDate
-    if (startTime) {
-      const startTimeIsHHMMSSFormat = isHHMMSS(startTime);
-      if (!startTimeIsHHMMSSFormat.success) {
-        return res.status(401).json({
-          success: false,
-          message: "Start Time does not follow the format HH-MM-SS",
-        });
-      }
+
+    if (!startTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Start Time not Included",
+      })
+      // cancelled starttime of format HHMMSS it is now a timestamp
+      /*  const startTimeIsHHMMSSFormat = isHHMMSS(startTime);
+       // if (!startTimeIsHHMMSSFormat.success) {
+       //   return res.status(401).json({
+       //     success: false,
+       //     message: "Start Time does not follow the format HH-MM-SS",
+       //   });
+       // } 
+      */
     }
-    if (endTime) {
-      const endTimeIsHHMMSSFormat = isHHMMSS(endTime);
-      if (!endTimeIsHHMMSSFormat.success) {
-        return res.status(401).json({
-          success: false,
-          message: "End Time does not follow the format HH-MM-SS",
-        });
-      }
+    if (!endTime) {
+      return res.status(400).json({
+        success: false,
+        message: "End Time not Included",
+      })
+      // cancelled endtime of format HHMMSS it is now a timestamp
+      /*
+      // const endTimeIsHHMMSSFormat = isHHMMSS(endTime);
+      // if (!endTimeIsHHMMSSFormat.success) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "End Time does not follow the format HH-MM-SS",
+      //   });
+      // } */
     }
+
+    console.log('date', startTime.toISOString().split('T')[0])
     // verify sessions not already exist ( name not used )
     const nameExists = await db.query.sessions.findFirst({
       where: and(
         eq(sessions.createdBy, userId),
         eq(sessions.name, name),
-        eq(sessions.duedate, dueDate)
+        sql`DATE(${sessions.starttime}) = ${startTime.toISOString().split('T')[0]}`
       ),
     });
-    console.log("nameExists", nameExists);
+
     if (nameExists) {
       return res.status(201).json({
         success: false,
@@ -100,9 +125,6 @@ export const createWorkoutSession = async (req, res) => {
         });
       }
     }
-    console.log("authorized", planId);
-
-    console.log("exercisesArray", exercisesArray);
 
     // verify the exercisesArray is array
     if (
@@ -118,7 +140,6 @@ export const createWorkoutSession = async (req, res) => {
     }
 
     const finished = await db.transaction(async (tx) => {
-      console.log("tx", tx);
 
       // create the session
       const createdSessions = await tx
@@ -126,8 +147,7 @@ export const createWorkoutSession = async (req, res) => {
         .values({
           planId: planId ? planId : null,
           name: name,
-          duedate: dueDate,
-          starttime: startTime ? startTime : null,
+          starttime: startTime,
           endtime: endTime ? endTime : null,
           note: note ? note : null,
           rating: rating ? rating : null,
@@ -166,7 +186,7 @@ export const createWorkoutSession = async (req, res) => {
           ) {
             return {
               success: false,
-              statusCode: 401,
+              statusCode: 400,
               message: "The number of weights, units and reps are not the same",
             };
           }
@@ -254,21 +274,36 @@ export const getWorkoutSessions = async (req, res) => {
   try {
     const userId = req.user;
     const { date } = req.query;
-    const isYYYYMMDDFormat = isYYYYMMDD(date);
-    if (!isYYYYMMDDFormat.success) {
-      return res.status(401).json({
+
+
+    /*
+      // const isYYYYMMDDFormat = isYYYYMMDD(date);
+      // if (!isYYYYMMDDFormat.success) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "Date does not follow the format YYYY-MM-DD",
+      //   });
+      // } 
+    */
+    const startTime = new Date(date);
+    if (!startTime) {
+      return res.status(400).json({
         success: false,
         message: "Date does not follow the format YYYY-MM-DD",
       });
     }
-
+    console.log(userId, "sesion id ", date)
     const foundedSessions = await db
       .select()
       .from(sessions)
-      .where(and(eq(sessions.createdBy, userId), eq(sessions.duedate, date)));
+      .where(
+        and(
+          eq(sessions.createdBy, userId),
+          sql`DATE(${sessions.starttime}) = ${startTime.toISOString().split('T')[0]}`,
+        ));
     if (!foundedSessions) {
-      return res.status().jsom({
-        message: "there is no session created by this user ",
+      return res.status(500).jsom({
+        message: "ERROR: SERVER ERROR WHILE GETTING WORKOUT SESSIONS",
       });
     } else {
       return res.status(200).json({
@@ -288,11 +323,11 @@ export const getWorkoutSessions = async (req, res) => {
 export const getWorkoutSessionDetails = async (req, res) => {
   try {
     const userId = req.user;
-    console.log("uuid", userId);
+
     const foundSession = await db.query.sessions.findFirst({
       where: and(
         eq(sessions.createdBy, userId),
-        eq(sessions.id, req.params.sessionId)
+        eq(sessions.id, parseInt(req.params.sessionId))
       ),
       with: {
         setsOfSessionsExercises: {
@@ -301,7 +336,7 @@ export const getWorkoutSessionDetails = async (req, res) => {
           },
         },
       },
-    });
+    })
 
     if (!foundSession) {
       return res.status(404).json({
@@ -310,27 +345,26 @@ export const getWorkoutSessionDetails = async (req, res) => {
       });
     }
 
+
     const responseSessions = {
       id: foundSession.id,
       name: foundSession.name,
-      startTtime: foundSession.starttime,
-      endtime: foundSession.endtime,
+      starttime: foundSession.starttime.toISOString(),
+      endtime: foundSession.endtime.toISOString(),
       note: foundSession.note,
       rating: foundSession.rating,
       createdBy: foundSession.createdBy,
-      duedate: foundSession.duedate,
     };
     const responseExercises = foundSession.setsOfSessionsExercises.map(
       (exercise) => ({
         id: exercise.id,
         exerciseId: exercise.exerciseId,
         sessionsId: exercise.sessionId,
-        creationDate: exercise.creationdate,
+        creationDate: exercise.creationdate.toISOString(),
         order: exercise.order,
         weight: exercise.weight,
         unit: exercise.unit,
         reps: exercise.reps,
-        creationdate: exercise.creationdate,
         exercise: exercise.exercises,
       })
     );
