@@ -3,7 +3,6 @@ import db from "../db/index.js";
 
 import {
   exercises,
-  plansExercises,
   sessions,
   setsOfSessionsExercises,
 } from "../db/schemas/schema.js";
@@ -293,6 +292,7 @@ export const getWorkoutSessions = async (req, res) => {
         message: "Date does not follow the format YYYY-MM-DD",
       });
     }
+    console.log(userId, "sesion id ", date)
     const foundedSessions = await db
       .select()
       .from(sessions)
@@ -302,8 +302,8 @@ export const getWorkoutSessions = async (req, res) => {
           sql`DATE(${sessions.starttime}) = ${startTime.toISOString().split('T')[0]}`,
         ));
     if (!foundedSessions) {
-      return res.status().jsom({
-        message: "there is no session created by this user ",
+      return res.status(500).jsom({
+        message: "ERROR: SERVER ERROR WHILE GETTING WORKOUT SESSIONS",
       });
     } else {
       return res.status(200).json({
@@ -323,11 +323,11 @@ export const getWorkoutSessions = async (req, res) => {
 export const getWorkoutSessionDetails = async (req, res) => {
   try {
     const userId = req.user;
-    console.log("uuid", userId);
+
     const foundSession = await db.query.sessions.findFirst({
       where: and(
         eq(sessions.createdBy, userId),
-        eq(sessions.id, req.params.sessionId)
+        eq(sessions.id, parseInt(req.params.sessionId))
       ),
       with: {
         setsOfSessionsExercises: {
@@ -336,7 +336,7 @@ export const getWorkoutSessionDetails = async (req, res) => {
           },
         },
       },
-    });
+    })
 
     if (!foundSession) {
       return res.status(404).json({
@@ -345,27 +345,26 @@ export const getWorkoutSessionDetails = async (req, res) => {
       });
     }
 
+
     const responseSessions = {
       id: foundSession.id,
       name: foundSession.name,
-      startTtime: foundSession.starttime,
-      endtime: foundSession.endtime,
+      starttime: foundSession.starttime.toISOString(),
+      endtime: foundSession.endtime.toISOString(),
       note: foundSession.note,
       rating: foundSession.rating,
       createdBy: foundSession.createdBy,
-      duedate: foundSession.duedate,
     };
     const responseExercises = foundSession.setsOfSessionsExercises.map(
       (exercise) => ({
         id: exercise.id,
         exerciseId: exercise.exerciseId,
         sessionsId: exercise.sessionId,
-        creationDate: exercise.creationdate,
+        creationDate: exercise.creationdate.toISOString(),
         order: exercise.order,
         weight: exercise.weight,
         unit: exercise.unit,
         reps: exercise.reps,
-        creationdate: exercise.creationdate,
         exercise: exercise.exercises,
       })
     );
