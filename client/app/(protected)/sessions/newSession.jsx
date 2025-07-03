@@ -909,12 +909,6 @@ export default function StartSession() {
                             onClick={() => setModalVisible(true)}
                         />
                         <Button
-                            text="debug"
-                            icon="folder-download"
-                            type="primary"
-                            onClick={() => { console.log(exercises) }}
-                        />
-                        <Button
                             text="Import Collection"
                             icon="folder-download"
                             type="primary"
