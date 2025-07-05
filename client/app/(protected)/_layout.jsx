@@ -66,7 +66,7 @@ export default function Layout() {
         }}
       >
 
-        <Tabs.Screen name="home/index" options={{
+        <Tabs.Screen name="home" options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home-outline" color={color} size={size} />
           ),
