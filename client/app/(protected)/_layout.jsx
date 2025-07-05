@@ -66,13 +66,15 @@ export default function Layout() {
         }}
       >
 
-        {/* <Tabs.Screen name="home" options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="home" color={color} size={size} />
-                    ),
-                    tabBarLabel: 'Home',
-                    
-                }} /> */}
+        <Tabs.Screen name="home/index" options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home-outline" color={color} size={size} />
+          ),
+          tabBarLabel: "Home",
+
+        }} />
+
+
         <Tabs.Screen
           name="mealsHome"
           options={{
@@ -88,34 +90,6 @@ export default function Layout() {
         />
 
 
-        {/*  <Tabs.Screen
-          name="sessions"
-          options={{
-
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="history"
-                color={color}
-                size={size}
-              />
-            ),
-            tabBarLabel: "Sessions",
-          }}
-        />
- */}
-        {/* <Tabs.Screen
-          name="collections"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="clipboard-list"
-                color={color}
-                size={size}
-              />
-            ),
-            tabBarLabel: "Collections",
-          }}
-        /> */}
 
 
         <Tabs.Screen
