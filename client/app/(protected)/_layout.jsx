@@ -9,7 +9,7 @@ import useThemeContext from "@/context/themeContext";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback } from "react";
 import { BlurView } from 'expo-blur';
-
+import routesLinks from "@/constants/routes";
 
 
 export default function Layout() {
@@ -88,7 +88,7 @@ export default function Layout() {
         />
 
 
-        <Tabs.Screen
+        {/*  <Tabs.Screen
           name="sessions"
           options={{
 
@@ -102,8 +102,8 @@ export default function Layout() {
             tabBarLabel: "Sessions",
           }}
         />
-
-        <Tabs.Screen
+ */}
+        {/* <Tabs.Screen
           name="collections"
           options={{
             tabBarIcon: ({ color, size }) => (
@@ -114,6 +114,21 @@ export default function Layout() {
               />
             ),
             tabBarLabel: "Collections",
+          }}
+        /> */}
+
+
+        <Tabs.Screen
+          name="training"
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="dumbbell"
+                color={color}
+                size={size}
+              />
+            ),
+            tabBarLabel: "Training",
           }}
         />
 
@@ -146,6 +161,6 @@ export default function Layout() {
       </Tabs>
     );
   } else {
-    return <Redirect href="/(auth)/landing" />;
+    return <Redirect href={routesLinks.LANDING} />;
   }
 }

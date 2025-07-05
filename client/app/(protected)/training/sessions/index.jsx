@@ -10,7 +10,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { defaultUrl } from '@/constants/constants';
 import Button from '@/components/ui/Button.jsx';
-
+import routesLink from '@/constants/routes';
 
 import useThemeContext from '@/context/themeContext';
 
@@ -188,7 +188,7 @@ export default function Sessions() {
                                 // Navigate to session details
                                 console.log('Navigate to session', item.id);
                                 router.push({
-                                    pathname: `/sessions/${item.id}`,
+                                    pathname: `${String(routesLink.PROTECTED_SESSION_DETAILS).replace(':sessionId', item.id)}`,
                                 });
                             }}
                         >
@@ -216,7 +216,7 @@ export default function Sessions() {
                 text="Start New Session"
                 onClick={() => {
                     router.push({
-                        pathname: '/sessions/newSession',
+                        pathname: `${routesLink.PROTECTED_NEW_SESSION}`,
                     });
                 }}
                 type="primary"

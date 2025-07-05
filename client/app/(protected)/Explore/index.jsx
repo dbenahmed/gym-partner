@@ -11,6 +11,7 @@ import {
 	Modal,
 	Alert
 } from 'react-native';
+import routerLinks from "@/constants/routes.ts";
 import Color from "@/constants/Colors.ts";
 import { defaultUrl } from "@/constants/constants.ts";
 import useAuth from "@/context/authContext";
@@ -809,7 +810,7 @@ export default function Explore() {
 											<TouchableOpacity
 												key={item.id}
 												style={styles.resultItem}
-												onPress={() => router.push(`/Explore/exercise/${item.id}`)}
+												onPress={() => router.push(`${routerLinks.PROTECTED_EXERCISE_DETAILS}/${item.id}`)}
 											>
 												<Text style={styles.resultTitle}>{item.name}</Text>
 												<Text style={styles.resultSubtitle}>{item.primarymuscles.map((muscle) => muscle).join(', ')}</Text>
@@ -857,7 +858,7 @@ export default function Explore() {
 												<TouchableOpacity
 													key={food.id}
 													style={styles.resultItem}
-													onPress={() => router.push(`/Explore/meals/${food.id}`)}
+													onPress={() => router.push(`${routerLinks.PROTECTED_FOOD_DETAILS}/${food.id}`)}
 												>
 													<Text style={styles.resultTitle}>{food.foodname}</Text>
 													<Text style={styles.resultSubtitle}>{food.calories} kcal</Text>
