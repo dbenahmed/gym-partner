@@ -127,9 +127,8 @@ const Collections = () => {
   const navigation = useNavigation();
 
   const renderUserCollections = async () => {
-    const { success, collections, message } = await fetchGetUserCollections(
-      authenticated
-    );
+    const { success, collections, message } =
+      await fetchGetUserCollections(authenticated);
     if (success) {
       setCollections(collections);
     } else {

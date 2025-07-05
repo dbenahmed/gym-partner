@@ -8,12 +8,13 @@ import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import useThemeContext from '@/context/themeContext';
 
+export default function Layout() {
 
-export default function SessionsLayout() {
 
     const { colors } = useThemeContext();
 
     const router = useRouter();
+
 
     return (
         <Stack
@@ -30,14 +31,35 @@ export default function SessionsLayout() {
                 },
             }}
         >
+            {/* ROOT SCREEN */}
+            <Stack.Screen name="index"
+                options={{
+                    title: "Gym Tracking",
+                }} />
+            {/* Collections SCREEN */}
+            <Stack.Screen name="collections/index"
+                options={{
+                    title: "My Collections",
+                }} />
+            {/* Collections SCREEN */}
+            <Stack.Screen name="collections/[collectionId]/index"
+                options={{
+                    title: "Collection",
+                }} />
+            {/* Collections SCREEN */}
+            <Stack.Screen name="collections/[collectionId]/[planId]/index"
+                options={{
+                    title: "Plan",
+                }} />
+            {/* Sessions SCREEN */}
             <Stack.Screen
-                name="index"
+                name="sessions/index"
                 options={{
                     title: "Sessions",
-                }}
-            />
+                }} />
+
             <Stack.Screen
-                name="newSession"
+                name="sessions/newSession"
                 options={{
                     title: "New Session",
                     presentation: "card",
@@ -55,7 +77,7 @@ export default function SessionsLayout() {
                     ),
                 }}
             />
+
         </Stack>
     );
-
 }

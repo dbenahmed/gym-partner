@@ -66,10 +66,12 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
         <View style={styles.exerciseCard}>
             <View style={styles.exerciseHeader}>
                 <Text style={styles.exerciseName}>{item.name}</Text>
-                <TouchableOpacity onPress={() => {
-                    console.log("removing")
-                    removeExercise(item.id)
-                }}>
+                <TouchableOpacity
+                    hitSlop={20}
+                    onPress={() => {
+                        console.log("removing")
+                        removeExercise(item.id)
+                    }}>
                     <MaterialCommunityIcons name="close" size={20} color={colors.red} />
                 </TouchableOpacity>
             </View>
@@ -80,6 +82,7 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
                     <Text style={styles.setsTitle}>Sets</Text>
                     <TouchableOpacity
                         style={styles.addSetButton}
+                        hitSlop={15}
                         onPress={() => {
                             console.log("item", item)
                             const updatedSets = Array.isArray(item.sets) ? [...item.sets] : [];

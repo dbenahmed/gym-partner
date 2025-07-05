@@ -5,6 +5,7 @@ import useAuth from "@/context/authContext";
 import SplashScreen from "@/components/SplashScreen";
 import useTheme from "@/context/themeContext";
 import { StyleSheet, Text, View } from "react-native";
+import routes from "@/constants/routes";
 
 export default function Index() {
 
@@ -22,10 +23,10 @@ export default function Index() {
   }
 
   if (authenticated) { // logged in 
-    return <Redirect href="/(protected)/mealsHome" />;
+    return <Redirect href={routes.PROTECTED_HOME} />;
   }
 
-  return <Redirect href="/(auth)/landing" />;
+  return <Redirect href={routes.LANDING} />;
 }
 
 

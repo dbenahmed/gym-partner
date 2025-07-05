@@ -9,7 +9,7 @@ import useThemeContext from "@/context/themeContext";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback } from "react";
 import { BlurView } from 'expo-blur';
-
+import routesLinks from "@/constants/routes";
 
 
 export default function Layout() {
@@ -66,13 +66,15 @@ export default function Layout() {
         }}
       >
 
-        {/* <Tabs.Screen name="home" options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="home" color={color} size={size} />
-                    ),
-                    tabBarLabel: 'Home',
-                    
-                }} /> */}
+        <Tabs.Screen name="home/index" options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home-outline" color={color} size={size} />
+          ),
+          tabBarLabel: "Home",
+
+        }} />
+
+
         <Tabs.Screen
           name="mealsHome"
           options={{
@@ -88,32 +90,19 @@ export default function Layout() {
         />
 
 
-        <Tabs.Screen
-          name="sessions"
-          options={{
 
+
+        <Tabs.Screen
+          name="training"
+          options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
-                name="history"
+                name="dumbbell"
                 color={color}
                 size={size}
               />
             ),
-            tabBarLabel: "Sessions",
-          }}
-        />
-
-        <Tabs.Screen
-          name="collections"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="clipboard-list"
-                color={color}
-                size={size}
-              />
-            ),
-            tabBarLabel: "Collections",
+            tabBarLabel: "Training",
           }}
         />
 
@@ -146,6 +135,6 @@ export default function Layout() {
       </Tabs>
     );
   } else {
-    return <Redirect href="/(auth)/landing" />;
+    return <Redirect href={routesLinks.LANDING} />;
   }
 }
