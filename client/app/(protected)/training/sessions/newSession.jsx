@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert, Touchable } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, TextInput, /* Modal,  */StyleSheet, ScrollView, Alert, Touchable, Platform } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -18,6 +18,8 @@ import { useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Sortable from 'react-native-sortables';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardAvoidingView } from 'react-native';
+
 
 export default function StartSession() {
 
@@ -837,7 +839,13 @@ export default function StartSession() {
     };
 
     const removeExercise = (id) => {
-        setExercises(exercises.filter(exercise => exercise.id !== id));
+        console.log('removing exercise')
+        setExercises(prev => {
+            console.log('previous exercises', prev)
+            const newExercises = prev.filter(exercise => exercise.id !== id);
+            console.log('newExercises', newExercises)
+            return newExercises;
+        });
     };
 
     const searchExercises = async (query) => {
@@ -883,7 +891,6 @@ export default function StartSession() {
 
     return (
         <View style={{ flex: 1 }}>
-
             <Stack.Screen
                 options={{
                     headerRight: () => (
@@ -891,279 +898,284 @@ export default function StartSession() {
                     )
                 }}
             />
-            <ScrollView contentContainerStyle={styles.container}>
-                {/* Session Name Input */}
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
 
-                <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>Session Name</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Enter session name"
-                        value={sessionName}
-                        onChangeText={setSessionName}
-                    />
-                </View>
 
-                {/* Session Notes Input */}
-                <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>Notes (optional)</Text>
-                    <TextInput
-                        style={[styles.textInput]}
-                        placeholder="Add notes about this session"
-                        value={sessionNotes}
-                        onChangeText={setSessionNotes}
-                        multiline={true}
-                        numberOfLines={3}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>Duration</Text>
-                    <Text style={[styles.textInput, styles.inputLabel, { paddingVertical: 10, fontSize: 18, fontWeight: "bold", marginBottom: 10, borderColor: colors.tintLighter, textAlign: "center" }]}>
-                        {`${Math.floor(duration / 3600000)
-                            .toString()
-                            .padStart(2, '0')}:${Math.floor((duration / 60000) % 60)
-                                .toString()
-                                .padStart(2, '0')}:${Math.floor((duration / 1000) % 60)
-                                    .toString()
-                                    .padStart(2, '0')}`}
-                    </Text>
-                </View>
-                <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>Rating</Text>
-                    <View className="flex-row gap-2 align-center justify-center mb-4">
-                        {
-                            [1, 2, 3, 4, 5].map((star) => (
-                                <TouchableOpacity
-                                    key={star}
-                                    onPress={() => setRating(star)}
-                                >
-                                    <MaterialCommunityIcons
-                                        name={star <= rating ? "star" : "star-outline"}
-                                        size={24}
-                                        color={star <= rating ? colors.tint : colors.tintLighter}
-                                    />
-                                </TouchableOpacity>
-                            ))
-                        }
+                <ScrollView contentContainerStyle={styles.container}>
+                    {/* Session Name Input */}
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Session Name</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Enter session name"
+                            value={sessionName}
+                            onChangeText={setSessionName}
+                        />
                     </View>
-                </View>
-                <View style={{
-                    height: 40,
-                    marginBottom: 16,
-                }}>
 
-                    <ScrollView
-                        contentContainerStyle={styles.buttonsScrollStyles}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        styles={{
-                            height: "100%"
-                        }}
-                    >
-                        <Button
-                            text="Add Exercises"
-                            icon="magnify"
-                            type="primary"
-                            onClick={() => setModalVisible(true)}
+                    {/* Session Notes Input */}
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Notes (optional)</Text>
+                        <TextInput
+                            style={[styles.textInput]}
+                            placeholder="Add notes about this session"
+                            value={sessionNotes}
+                            onChangeText={setSessionNotes}
+                            multiline={true}
+                            numberOfLines={3}
                         />
-                        <Button
-                            text="Import Collection"
-                            icon="folder-download"
-                            type="primary"
-                            onClick={() => importCollectionsButtonPressed()}
-                        />
-
-                    </ScrollView>
-                </View>
-
-                {exercises.length === 0 ? (
-                    <View style={styles.emptyState}>
-                        <Text style={styles.emptyStateText}>
-                            No exercises added yet. Search and add exercises to your session.
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Duration</Text>
+                        <Text style={[styles.textInput, styles.inputLabel, { paddingVertical: 10, fontSize: 18, fontWeight: "bold", marginBottom: 10, borderColor: colors.tintLighter, textAlign: "center" }]}>
+                            {`${Math.floor(duration / 3600000)
+                                .toString()
+                                .padStart(2, '0')}:${Math.floor((duration / 60000) % 60)
+                                    .toString()
+                                    .padStart(2, '0')}:${Math.floor((duration / 1000) % 60)
+                                        .toString()
+                                        .padStart(2, '0')}`}
                         </Text>
                     </View>
-                ) : (
-
-
-                    // Draggable list of exercises 
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                        <Sortable.Grid
-                            onDragEnd={handleDragEnd}
-                            columns={1} // Single column = full width items
-                            columnGap={0}
-                            data={exercises}
-                            keyExtractor={(item) => String(item.id)}
-                            renderItem={renderItem}
-                            rowGap={15} // Space between items
-                        />
-                    </GestureHandlerRootView>
-                )}
-
-                {exercises.length > 0 && (
-                    <Button
-                        text="Save Session"
-                        onClick={() => saveSession()}
-                        styles={{ marginTop: 20 }}
-                        type="primary"
-                        disabled={exercises.length === 0}
-                    />
-                )}
-
-
-
-            </ScrollView>
-            {/* Exercise Search Modal */}
-            <ModalSlideUp
-                isVisible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                props={{
-                    title: 'Add Exercises',
-                }}
-                styles={{
-                    backgroundColor: colors.background,
-                }}
-            >
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search exercises..."
-                    value={searchQuery}
-                    onChangeText={searchExercises}
-                />
-
-                {isLoadingSearchExercises ? (
-                    <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="large" color={colors.tint} />
-                        <Text style={styles.loadingText}>Loading exercises...</Text>
-                    </View>
-                ) : (
-                    <FlatList
-                        data={filteredExercises}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={styles.searchResultItem}
-                                onPress={() => addExerciseToSession(item)}
-                            >
-                                <Text style={styles.searchResultName}>{item.name}</Text>
-                                <Text style={styles.searchResultCategory}>{item.category}</Text>
-                            </TouchableOpacity>
-                        )}
-                        ListEmptyComponent={
-                            <Text style={styles.emptySearchText}>No exercises found</Text>
-                        }
-                    />
-                )}
-
-            </ModalSlideUp>
-
-
-            {/* Modal for Importing from Collection */}
-            <ModalSlideUp
-                isVisible={importFromCollectionModalVisible}
-                onClose={() => setImportFromCollectionModalVisible(false)}
-                props={{
-                    title: 'Import from Collection',
-                }}
-            >
-                <View style={{ padding: 16 }}>
-                    <View >
-                        <Text style={styles.inputLabel}>Collections</Text>
-                        {isLoadingCollections ? (
-                            <ActivityIndicator size="large" color={colors.tint} />
-                        ) : (
-                            <FlatList
-                                data={collections}
-                                keyExtractor={(item) => item.collectionId}
-                                renderItem={({ item }) => (
-
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Rating</Text>
+                        <View className="flex-row gap-2 align-center justify-center mb-4">
+                            {
+                                [1, 2, 3, 4, 5].map((star) => (
                                     <TouchableOpacity
-                                        style={item.collectionId === selectedCollection?.collectionId ? { ...styles.searchResultItemSelected, ...styles.searchResultItem } : styles.searchResultItem}
-                                        onPress={() => handleCollectionSelect(item)}
+                                        key={star}
+                                        hitSlop={10}
+                                        onPress={() => setRating(star)}
                                     >
-                                        <Text style={styles.searchResultName}>{item.title}</Text>
+                                        <MaterialCommunityIcons
+                                            name={star <= rating ? "star" : "star-outline"}
+                                            size={24}
+                                            color={star <= rating ? colors.tint : colors.tintLighter}
+                                        />
                                     </TouchableOpacity>
-                                )}
-                                ListEmptyComponent={
-                                    <Text style={styles.emptySearchText}>No collections found</Text>
-                                }
-                            />
-                        )}
-
-                        {selectedCollection && (
-                            <View>
-                                <Text style={[styles.inputLabel, { marginTop: 20 }]}>Plans</Text>
-
-                                {isLoadingPlans ? (
-                                    <ActivityIndicator size="large" color={colors.tint} />
-                                ) : (
-                                    <FlatList
-                                        data={plans}
-                                        keyExtractor={(item) => item.id}
-                                        renderItem={({ item }) => (
-                                            <TouchableOpacity
-                                                style={item.id === selectedPlan?.id ? { ...styles.searchResultItemSelected, ...styles.searchResultItem } : styles.searchResultItem}
-                                                onPress={() => handlePlanSelect(item)}
-                                            >
-                                                <Text style={styles.searchResultName}>{item.title}</Text>
-
-                                            </TouchableOpacity>
-                                        )}
-                                        ListEmptyComponent={
-                                            <Text style={styles.emptySearchText}>No plans found</Text>
-                                        }
-                                    />
-                                )}
-                            </View>
-                        )}
-
-                        {selectedPlan && (
-                            <View>
-                                <Text style={[styles.inputLabel, { marginTop: 20 }]}>Exercises Preview</Text>
-                                {isLoadingPlanExercises ? (
-                                    <ActivityIndicator size="large" color={colors.tint} />
-                                ) : (
-                                    <FlatList
-                                        data={planExercises}
-                                        keyExtractor={(item) => item.exercises.id}
-                                        renderItem={({ item }) => (
-                                            <TouchableOpacity
-                                                style={styles.searchResultItem}
-                                                onPress={() => { }}
-                                            >
-                                                {console.log('item', item)}
-                                                <Text style={styles.searchResultName}>{item.exercises.name}</Text>
-
-                                            </TouchableOpacity>
-                                        )}
-                                        ListEmptyComponent={
-                                            <Text style={styles.emptySearchText}>No Exercises found</Text>
-                                        }
-                                    />
-                                )}
-                            </View>
-                        )}
+                                ))
+                            }
+                        </View>
                     </View>
-                    {
-                        selectedPlan && planExercises.length > 0 && (
-                            <TouchableOpacity
-                                style={styles.saveButton}
-                                onPress={() => {
-                                    addManyExercisesToSession(planExercises);
-                                    setSelectedPlan(null);
-                                    setSelectedCollection(null);
-                                    setPlans([]);
-                                    setPlanExercises([]);
-                                    setImportFromCollectionModalVisible(false);
-                                }}
-                            >
-                                <Text style={styles.saveButtonText}>Add Exercises</Text>
-                            </TouchableOpacity>
-                        )
-                    }
+                    <View style={{
+                        height: 40,
+                        marginBottom: 16,
+                    }}>
 
-                </View>
-            </ModalSlideUp>
+                        <ScrollView
+                            contentContainerStyle={styles.buttonsScrollStyles}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            styles={{
+                                height: "100%"
+                            }}
+                        >
+                            <Button
+                                text="Add Exercises"
+                                icon="magnify"
+                                type="primary"
+                                onClick={() => setModalVisible(true)}
+                            />
+                            <Button
+                                text="Import Collection"
+                                icon="folder-download"
+                                type="primary"
+                                onClick={() => importCollectionsButtonPressed()}
+                            />
 
+                        </ScrollView>
+                    </View>
+
+                    {exercises.length === 0 ? (
+                        <View style={styles.emptyState}>
+                            <Text style={styles.emptyStateText}>
+                                No exercises added yet. Search and add exercises to your session.
+                            </Text>
+                        </View>
+                    ) : (
+
+
+                        // Draggable list of exercises 
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                            <Sortable.Grid
+                                onDragEnd={handleDragEnd}
+                                columns={1} // Single column = full width items
+                                columnGap={0}
+                                data={exercises}
+                                keyExtractor={(item) => String(item.id)}
+                                renderItem={renderItem}
+                                rowGap={15} // Space between items
+                            />
+                        </GestureHandlerRootView>
+                    )}
+
+                    {exercises.length > 0 && (
+                        <Button
+                            text="Save Session"
+                            onClick={() => saveSession()}
+                            styles={{ marginTop: 20 }}
+                            type="primary"
+                            disabled={exercises.length === 0}
+                        />
+                    )}
+
+
+
+                </ScrollView>
+                {/* Exercise Search Modal */}
+                <ModalSlideUp
+                    isVisible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    props={{
+                        title: 'Add Exercises',
+                    }}
+                    styles={{
+                        backgroundColor: colors.background,
+                    }}
+                >
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search exercises..."
+                        value={searchQuery}
+                        onChangeText={searchExercises}
+                    />
+
+                    {isLoadingSearchExercises ? (
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="large" color={colors.tint} />
+                            <Text style={styles.loadingText}>Loading exercises...</Text>
+                        </View>
+                    ) : (
+                        <FlatList
+                            data={filteredExercises}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.searchResultItem}
+                                    onPress={() => addExerciseToSession(item)}
+                                >
+                                    <Text style={styles.searchResultName}>{item.name}</Text>
+                                    <Text style={styles.searchResultCategory}>{item.category}</Text>
+                                </TouchableOpacity>
+                            )}
+                            ListEmptyComponent={
+                                <Text style={styles.emptySearchText}>No exercises found</Text>
+                            }
+                        />
+                    )}
+
+                </ModalSlideUp>
+
+
+                {/* Modal for Importing from Collection */}
+                <ModalSlideUp
+                    isVisible={importFromCollectionModalVisible}
+                    onClose={() => setImportFromCollectionModalVisible(false)}
+                    props={{
+                        title: 'Import from Collection',
+                    }}
+                >
+                    <View style={{ padding: 16 }}>
+                        <View >
+                            <Text style={styles.inputLabel}>Collections</Text>
+                            {isLoadingCollections ? (
+                                <ActivityIndicator size="large" color={colors.tint} />
+                            ) : (
+                                <FlatList
+                                    data={collections}
+                                    keyExtractor={(item) => item.collectionId}
+                                    renderItem={({ item }) => (
+
+                                        <TouchableOpacity
+                                            style={item.collectionId === selectedCollection?.collectionId ? { ...styles.searchResultItemSelected, ...styles.searchResultItem } : styles.searchResultItem}
+                                            onPress={() => handleCollectionSelect(item)}
+                                        >
+                                            <Text style={styles.searchResultName}>{item.title}</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    ListEmptyComponent={
+                                        <Text style={styles.emptySearchText}>No collections found</Text>
+                                    }
+                                />
+                            )}
+
+                            {selectedCollection && (
+                                <View>
+                                    <Text style={[styles.inputLabel, { marginTop: 20 }]}>Plans</Text>
+
+                                    {isLoadingPlans ? (
+                                        <ActivityIndicator size="large" color={colors.tint} />
+                                    ) : (
+                                        <FlatList
+                                            data={plans}
+                                            keyExtractor={(item) => item.id}
+                                            renderItem={({ item }) => (
+                                                <TouchableOpacity
+                                                    style={item.id === selectedPlan?.id ? { ...styles.searchResultItemSelected, ...styles.searchResultItem } : styles.searchResultItem}
+                                                    onPress={() => handlePlanSelect(item)}
+                                                >
+                                                    <Text style={styles.searchResultName}>{item.title}</Text>
+
+                                                </TouchableOpacity>
+                                            )}
+                                            ListEmptyComponent={
+                                                <Text style={styles.emptySearchText}>No plans found</Text>
+                                            }
+                                        />
+                                    )}
+                                </View>
+                            )}
+
+                            {selectedPlan && (
+                                <View>
+                                    <Text style={[styles.inputLabel, { marginTop: 20 }]}>Exercises Preview</Text>
+                                    {isLoadingPlanExercises ? (
+                                        <ActivityIndicator size="large" color={colors.tint} />
+                                    ) : (
+                                        <FlatList
+                                            data={planExercises}
+                                            keyExtractor={(item) => item.exercises.id}
+                                            renderItem={({ item }) => (
+                                                <TouchableOpacity
+                                                    style={styles.searchResultItem}
+                                                    onPress={() => { }}
+                                                >
+                                                    {console.log('item', item)}
+                                                    <Text style={styles.searchResultName}>{item.exercises.name}</Text>
+
+                                                </TouchableOpacity>
+                                            )}
+                                            ListEmptyComponent={
+                                                <Text style={styles.emptySearchText}>No Exercises found</Text>
+                                            }
+                                        />
+                                    )}
+                                </View>
+                            )}
+                        </View>
+                        {
+                            selectedPlan && planExercises.length > 0 && (
+                                <TouchableOpacity
+                                    style={styles.saveButton}
+                                    onPress={() => {
+                                        addManyExercisesToSession(planExercises);
+                                        setSelectedPlan(null);
+                                        setSelectedCollection(null);
+                                        setPlans([]);
+                                        setPlanExercises([]);
+                                        setImportFromCollectionModalVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.saveButtonText}>Add Exercises</Text>
+                                </TouchableOpacity>
+                            )
+                        }
+
+                    </View>
+                </ModalSlideUp>
+
+            </KeyboardAvoidingView>
         </View >
     );
 }

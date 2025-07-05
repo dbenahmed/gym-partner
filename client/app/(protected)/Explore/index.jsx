@@ -50,10 +50,12 @@ export default function Explore() {
 			flexDirection: 'row',
 			marginBottom: 20,
 			borderWidth: 1,
+			borderRadius: 10,
 			borderColor: colors.tint,
 		},
 		tab: {
 			flex: 1,
+			borderRadius: 9,
 			paddingVertical: 12,
 			alignItems: 'center',
 			backgroundColor: 'transparent',
@@ -179,39 +181,14 @@ export default function Explore() {
 			color: '#333',
 			fontSize: 14,
 		},
-		resetButton: {
-			backgroundColor: '#ccc',
-			padding: 12,
-			borderRadius: 8,
-			marginRight: 10,
-			marginBottom: 10,
-			alignItems: 'center',
-		},
-		resetButtonText: {
-			color: '#fff',
-			fontWeight: 'bold',
-			fontSize: 14,
-		},
-		applyButton: {
-			backgroundColor: colors.tint,
-			padding: 12,
-			borderRadius: 8,
-			marginBottom: 10,
-			alignItems: 'center',
-		},
-		applyButtonText: {
-			color: '#fff',
-			fontWeight: 'bold',
-			fontSize: 14,
-		},
 		modalFooter: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			marginTop: 20,
+			marginTop: 0,
 			paddingTop: 10,
 			borderTopWidth: 1,
-			borderTopColor: '#eee',
+			borderTopColor: colors.tintLighter,
 		},
 		filterButton: {
 			backgroundColor: colors.tint,
@@ -223,7 +200,7 @@ export default function Explore() {
 			justifyContent: 'center',
 		},
 		filterButtonText: {
-			color: '#fff',
+			color: colors.tint,
 			fontWeight: 'bold',
 			marginLeft: 5,
 		},
@@ -354,7 +331,7 @@ export default function Explore() {
 
 		},
 		buttonUnselected: {
-			backgroundColor: colors.text,
+			backgroundColor: colors.tintLighter,
 		},
 		buttonText: {
 			fontSize: 14,
@@ -364,7 +341,7 @@ export default function Explore() {
 			fontWeight: 'bold',
 		},
 		buttonTextUnselected: {
-			color: "black",
+			color: colors.text,
 		},
 
 	}), [colors]);

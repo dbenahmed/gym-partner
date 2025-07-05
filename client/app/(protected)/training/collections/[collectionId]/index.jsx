@@ -186,7 +186,7 @@ const Plans = () => {
 
           <View style={{ marginVertical: 10 }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Description</Text>
-            <Text>{description}</Text>
+            <Text style={{ color: colors.text }}>{description}</Text>
           </View>
 
           {/* <Text style={{ marginVertical: 10, fontSize: 18, fontWeight: 'bold' }}>Plans:</Text> */}
