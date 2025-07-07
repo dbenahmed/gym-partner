@@ -87,7 +87,7 @@ export default function Profile() {
       },
       container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: "transparent",
       },
       header: {
         flexDirection: 'row',
