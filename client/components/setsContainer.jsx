@@ -106,8 +106,7 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
 
 
     useEffect(() => {
-        console.log('itemoooo', item);
-        console.log("stats", item.statistics)
+        console.log("index", index)
 
     }, [item]);
 
@@ -118,8 +117,8 @@ export default function SetsContainer({ item, index, updateExerciseData }) {
                 {index === 0 && <Text style={styles.inputLabel}>Previous Reps</Text>}
                 <View style={styles.previousRepsViewStyles}>
                     <Text style={styles.previousRepsText}>
-                        {item.statistics && item.statistics[index] &&
-                            item.statistics[index].reps[index] ? `${item.statistics[index].weight[index]} ${item.statistics[index].unit[index]} ${item.statistics[index].reps[index]} Reps` : 'NO DATA'
+                        {item.statistics && item.statistics[0] &&
+                            item.statistics[0].reps[index] ? `${item.statistics[0].weight[index]} ${item.statistics[0].unit[index]} ${item.statistics[0].reps[index]} Reps` : 'NO DATA'
                         }
                     </Text>
                 </View>

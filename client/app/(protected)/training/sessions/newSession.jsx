@@ -682,7 +682,7 @@ export default function StartSession() {
             }
          })
          if (!response.ok) {
-            throw new Error('Failed to fetch exercise statistics');
+            throw new Error((await response.json()).message || 'Failed to fetch exercise statistics');
          }
          const { success, message, data } = await response.json();
          if (!success) {
