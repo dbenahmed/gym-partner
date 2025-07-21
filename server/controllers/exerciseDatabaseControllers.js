@@ -160,16 +160,19 @@ export const getLatestExerciseStats = async (req, res) => {
   const userId = req.user;
   const {
     exerciseId,
-  } = req.query
+  } = req.params
+
+
+  console.log("GETTING STATISTICS FOR EXERCISE: ", exerciseId, "USER ID: ", userId)
 
   // fetch the table setsOfSessionsExercises for this exercise and load latest statistics, sort them by date from latest to oldest
   const foundStats = await db.query.setsOfSessionsExercises.findMany({
     where: and(
-      eq(setsOfSessionsExercises.exerciseId, 914),
+      eq(setsOfSessionsExercises.exerciseId, exerciseId),
     ),
     with: {
       sessions: {
-        where: eq(sessions.createdBy, 51)
+        where: eq(sessions.createdBy, userId)
       }
     },
     orderBy: desc(setsOfSessionsExercises.creationdate)
@@ -182,12 +185,6 @@ export const getLatestExerciseStats = async (req, res) => {
     });
   }
 
-  if (foundStats.length === 0) {
-    return res.status(404).json({
-      success: false,
-      message: 'ERROR: no stats found for this exercise'
-    });
-  }
 
   res.status(200).json({
     message: 'Latest Exercise Stats',
