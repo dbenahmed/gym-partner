@@ -10,9 +10,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback } from "react";
 import { BlurView } from 'expo-blur';
 import routesLinks from "@/constants/routes";
+import { useSharedValue } from "react-native-reanimated";
+import { useAnimatedStyle } from "react-native-reanimated";
 
 
 export default function Layout() {
+
 
   const { authenticated, theme } = useAuth();
 
@@ -35,29 +38,25 @@ export default function Layout() {
           tabBarActiveTintColor: colors.tint,
           headerShown: false,
           animation: "shift",
-          tabBarBackground: () => (
-            <LinearGradient
-              colors={[colors.background, darkenHex(colors.tint, 0.2), colors.background]} // dark blue → dark gray
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              locations={[0, 0.5, 1]}
-              style={{ flex: 1 }}
-            />
-          ),
+          tabBarBackground: () => {
+            return (
+              <View style={{ backgroundColor: "transparent" }} />
+            )
+          },
           tabBarStyle: Platform.select({
             ios: {
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
               borderTopWidth: 0,
-              backgroundColor: colors.background,
+              backgroundColor: "transparent",
             },
             android: {
               // Use a solid background on Android
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
-              backgroundColor: colors.background, // solid white
+              backgroundColor: "transparent", // solid white
               borderTopColor: "transparent", // remove border
               borderTopWidth: 0,
             },
@@ -71,7 +70,6 @@ export default function Layout() {
             <MaterialCommunityIcons name="home-outline" color={color} size={size} />
           ),
           tabBarLabel: "Home",
-
         }} />
 
 
