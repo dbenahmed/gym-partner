@@ -3,10 +3,7 @@ import WeightLogsServices from "../services/weightLogsServices.js";
 export default class WeightController {
   weightLogsServices;
   constructor() {
-    console.log("WeightController constructor called");
     this.weightLogsServices = new WeightLogsServices();
-    console.log("WeightLogsServices instantiated:", this.weightLogsServices);
-    console.log("hi property:", this.weightLogsServices.hi);
   }
 
   // Get a history of the user's weight logs

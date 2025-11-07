@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import CheckBox from "react-native-check-box";
 import { useMemo, useState } from "react";
 import { Alert } from "react-native";
+import useThemeContext from "@/context/themeContext";
 
 export default function Landing({ navigation }) {
   const router = useRouter();

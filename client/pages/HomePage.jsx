@@ -5,7 +5,7 @@ import useThemeContext from "@/context/themeContext";
 export default function HomePage() {
 
     const { colors } = useThemeContext();
-
+    console.log("homepage")
     return (
         <View style={{ flex: 1 }}>
             {/* horizontal view with two cards horizontally */}

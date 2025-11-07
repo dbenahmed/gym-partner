@@ -18,6 +18,7 @@ export default function Index() {
     return <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background }}>
       <SplashScreen hideLogo={false}>
         <Text style={[styles.title, { color: colors.text }]}>Gym Partner</Text>
+        <Text style={[styles.description, { color: colors.text }]}>Loading... Please wait</Text>
       </SplashScreen>
     </View>
   }
@@ -34,6 +35,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
+  },
+  description: {
+    fontSize: 13,
+    fontWeight: "300",
     marginBottom: 20,
   },
 });
