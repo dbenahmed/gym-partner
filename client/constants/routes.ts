@@ -22,7 +22,7 @@ export default {
   PROTECTED_FOOD_DETAILS: "/(protected)/Explore/meals",
 
   // MISC
-  PROTECTED_HOME: "/(protected)/Profile", //"/(protected)/home",
+  PROTECTED_HOME: "/(protected)/home", //"/(protected)/home",
   PROTECTED_PROFILE: "/(protected)/Profile",
   PROTECTED_PROFILE_BODY_WEIGHT_TRACKING:
     "/(protected)/Profile/body-weight-tracking",

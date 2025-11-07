@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, between, eq, sql } from "drizzle-orm";
 import db from "../db/index.js";
 
 import {
@@ -292,27 +292,31 @@ export const getWorkoutSessions = async (req, res) => {
         message: "Date does not follow the format YYYY-MM-DD",
       });
     }
-    console.log(userId, "sesion id ", date)
-    const foundedSessions = await db
+
+    const dateStringDayStart = startTime.setHours(0, 0, 0, 0);
+    const dateStringDayEnd = startTime.setHours(23, 59, 59, 999);
+    const foundSessions = await db
       .select()
       .from(sessions)
       .where(
         and(
           eq(sessions.createdBy, userId),
-          sql`DATE(${sessions.starttime}) = ${startTime.toISOString().split('T')[0]}`,
-        ));
-    if (!foundedSessions) {
-      return res.status(500).jsom({
+          between(sessions.starttime, new Date(dateStringDayStart), new Date(dateStringDayEnd))
+        )
+      );
+    if (!foundSessions) {
+      return res.status(500).json({
         message: "ERROR: SERVER ERROR WHILE GETTING WORKOUT SESSIONS",
       });
     } else {
       return res.status(200).json({
         success: true,
-        userSessions: foundedSessions,
+        userSessions: foundSessions,
       });
     }
   } catch (error) {
-    res.status(500).json({
+    console.log(error)
+    return res.status(500).json({
       message: "Error retrieving workout sessions",
       error: error.message,
     });

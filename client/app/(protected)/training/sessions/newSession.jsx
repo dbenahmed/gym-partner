@@ -944,7 +944,7 @@ export default function StartSession() {
                {/*// display two of this input container in a row each one takes 50% of thw screen
                  */}
 
-               <View style={styles.inputContainer}>
+               {/* <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Session Date</Text>
                   <Button
                      text={`${selected.toDateString()}`}
@@ -977,7 +977,7 @@ export default function StartSession() {
                         }}
                      />
                   )}
-               </View>
+               </View> */}
                <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Duration</Text>
                   <Text style={[styles.textInput, styles.inputLabel, {

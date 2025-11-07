@@ -3,11 +3,10 @@ import { Redirect } from "expo-router";
 import useAuth from "@/context/authContext";
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Colors from "@/constants/Colors.ts";
 import { Platform, View } from "react-native";
 import useThemeContext from "@/context/themeContext";
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { BlurView } from 'expo-blur';
 import routesLinks from "@/constants/routes";
 import { useSharedValue } from "react-native-reanimated";
@@ -19,15 +18,8 @@ export default function Layout() {
 
   const { authenticated, theme } = useAuth();
 
-  const darkenHex = useCallback((hexColor, factor) => {
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-    return `#${((r * factor) | 0).toString(16)}${((g * factor) | 0).toString(16)}${((b * factor) | 0).toString(16)}`;
-  }, []);
 
   const { colors } = useThemeContext();
-
   if (authenticated) {
     // logged in
     return (
@@ -37,19 +29,26 @@ export default function Layout() {
           lazy: false, // Load all tabs at once when the app starts instead of on first access
           tabBarActiveTintColor: colors.tint,
           headerShown: false,
-          animation: "shift",
-          tabBarBackground: () => {
+          // this animation makes a bug in the the tabs navigation
+          //animation: "shift", 
+          /* tabBarBackground: () => {
             return (
-              <View style={{ backgroundColor: "transparent" }} />
+              <View style={{ backgroundColor: "red" }} />
             )
-          },
+          }, */
+
+
+
           tabBarStyle: Platform.select({
             ios: {
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
               borderTopWidth: 0,
-              backgroundColor: "transparent",
+              marginLeft: 20,
+              marginRight: 20,
+              backgroundColor: colors.tintLighter,
+              borderRadius: 20,
             },
             android: {
               // Use a solid background on Android
@@ -67,7 +66,7 @@ export default function Layout() {
 
         <Tabs.Screen name="home" options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home-outline" color={color} size={size} />
+            <MaterialCommunityIcons name="home-outline" color={colors.icon} size={size} />
           ),
           tabBarLabel: "Home",
         }} />
@@ -79,7 +78,7 @@ export default function Layout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="food-apple"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),
@@ -96,7 +95,7 @@ export default function Layout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="dumbbell"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),
@@ -110,7 +109,7 @@ export default function Layout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="magnify"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),
@@ -123,7 +122,7 @@ export default function Layout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="account-circle"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),

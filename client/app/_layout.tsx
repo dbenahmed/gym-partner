@@ -40,7 +40,7 @@ function InnerLayout() {
           barStyle={theme === "light" ? "dark-content" : "light-content"}
         />
         <AuthProvider>
-          <LinearGradient
+          {/* <LinearGradient
             colors={[colors.background, colors.tintLighter]} // Dark background → Light glow at bottom
             start={{ x: 0, y: 0 }} // Start from top (dark)
             end={{ x: 0, y: 1 }} // End at bottom (light glow)
@@ -54,7 +54,7 @@ function InnerLayout() {
               top: 0,
               bottom: 0,
             }}
-          />
+          /> */}
 
           <Slot />
         </AuthProvider>

@@ -1,11 +1,11 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import useAuth from '@/context/authContext';
 import Colors from '@/constants/Colors';
-import {router, useFocusEffect} from 'expo-router';
-import {MaterialCommunityIcons} from '@expo/vector-icons';
-import {defaultUrl} from '@/constants/constants';
+import { router, useFocusEffect } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { defaultUrl } from '@/constants/constants';
 import Button from '@/components/ui/Button.jsx';
 import routesLink from '@/constants/routes';
 
@@ -14,57 +14,58 @@ import useThemeContext from '@/context/themeContext';
 export default function Sessions() {
 
 
-   const {colors, theme} = useThemeContext();
+   const { colors, theme } = useThemeContext();
 
 
    const [sessions, setSessions] = useState([]);
    const [loading, setLoading] = useState(true);
-   const {authenticated} = useAuth();
+   const { authenticated } = useAuth();
    const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
 
 
    useFocusEffect(
-       useCallback(() => {
-          // Fetch sessions data
-          const fetchSessions = async () => {
-             setLoading(true);
-             console.log('Fetching sessions for date:', currentDate.toISOString().split('T')[0]);
-             try {
-                // Replace with actual API call when available
-                // Example: const response = await fetchGetUserSessions(authenticated);
+      useCallback(() => {
+         // Fetch sessions data
+         const fetchSessions = async () => {
+            setLoading(true);
+            console.log('Fetching sessions for date:', currentDate.toISOString().split('T')[0]);
+            try {
+               // Replace with actual API call when available
+               // Example: const response = await fetchGetUserSessions(authenticated);
 
-                const res = await fetch(`${defaultUrl}/workout/sessions?date=${currentDate.toISOString().split('T')[0]}`, {
-                   method: 'GET',
-                   headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${authenticated}`
-                   }
-                })
-                if (!res.ok) {
-                   Alert.alert('Error', 'Failed to load workout sessions');
-                   setLoading(false);
-                   return;
-                }
+               const res = await fetch(`${defaultUrl}/workout/sessions?date=${currentDate.toISOString().split('T')[0]}`, {
+                  method: 'GET',
+                  headers: {
+                     'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${authenticated}`
+                  }
+               })
+               if (!res.ok) {
+                  console.error(res)
+                  Alert.alert('Error', 'Failed to load workout sessions');
+                  setLoading(false);
+                  return;
+               }
 
-                const {success, userSessions, message} = await res.json();
+               const { success, userSessions, message } = await res.json();
 
-                if (!success) {
-                   Alert.alert('Error', message);
-                   setLoading(false);
-                   return;
-                }
+               if (!success) {
+                  Alert.alert('Error', message);
+                  setLoading(false);
+                  return;
+               }
 
-                setSessions(userSessions);
-                setLoading(false);
-             } catch (error) {
-                console.error('Error fetching sessions:', error);
-                Alert.alert('Error', 'Failed to load workout sessions');
-                setLoading(false);
-             }
-          };
+               setSessions(userSessions);
+               setLoading(false);
+            } catch (error) {
+               console.error('Error fetching sessions:', error);
+               Alert.alert('Error', 'Failed to load workout sessions');
+               setLoading(false);
+            }
+         };
 
-          fetchSessions();
-       }, [currentDate])
+         fetchSessions();
+      }, [currentDate])
    );
 
 
@@ -91,146 +92,146 @@ export default function Sessions() {
    const isToday = currentDate.getTime() === today.getTime();
 
    return (
-       <View style={{flex: 1, backgroundColor: colors.background}}>
-          <View style={{padding: 16}}>
-             <View style={{
-                flexDirection: 'row',
-                justifyContent: "space-between",
-                width: '100%',
-                alignItems: 'center',
-                marginBottom: 8
-             }}>
-                <TouchableOpacity
-                    style={{
-                       padding: 10,
-                       width: 40,
-                       alignItems: 'center',
-                    }}
-                    onPress={goToPreviousDay}
-                >
-                   <MaterialCommunityIcons
-                       name="chevron-left"
-                       size={24}
-                       color={colors.tint}
-                       style={{
-                          shadowColor: "#000",
-                          shadowOffset: {width: 0, height: 1},
-                          shadowOpacity: 0.2,
-                          shadowRadius: 1,
-                          elevation: 2,
-                       }}
-                   />
-                </TouchableOpacity>
-
-                <View style={{alignItems: 'center'}}>
-                   <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.text}}>
-                      {currentDate.toLocaleDateString('en-US', {
-                         weekday: 'short',
-                         month: 'short',
-                         day: 'numeric'
-                      })}
-                   </Text>
-                </View>
-
-                {!isToday ? (
-                    <TouchableOpacity
-                        style={{
-                           padding: 10,
-                           width: 40,
-                           alignItems: 'center',
-                        }}
-                        onPress={goToNextDay}
-                    >
-                       <MaterialCommunityIcons
-                           name="chevron-right"
-                           size={24}
-                           color={colors.tint}
-                           style={{
-                              shadowColor: "#000",
-                              shadowOffset: {width: 0, height: 1},
-                              shadowOpacity: 0.2,
-                              shadowRadius: 1,
-                              elevation: 2,
-                           }}
-                       />
-                    </TouchableOpacity>
-                ) : (
-                    <View style={{width: 40}}/> // Empty view with same width as buttons
-                )}
-             </View>
-
-
-          </View>
-
-          {loading ? (
-              <ActivityIndicator size="large" color={colors.tint}/>
-          ) : (
-              <FlatList
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+         <View style={{ padding: 16 }}>
+            <View style={{
+               flexDirection: 'row',
+               justifyContent: "space-between",
+               width: '100%',
+               alignItems: 'center',
+               marginBottom: 8
+            }}>
+               <TouchableOpacity
                   style={{
-                     marginBottom: 20,
-                     flex: 1,
-                     paddingHorizontal: 20
-                  }} // Added marginBottom to avoid overlap with button
-                  contentContainerStyle={{paddingBottom: 80}} // Added paddingBottom to avoid overlap with button
-                  showsVerticalScrollIndicator={true}
-                  data={sessions}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({item}) => (
-                      <TouchableOpacity
-                          style={{
-                             backgroundColor: colors.tintLighter,
-                             borderRadius: 8,
-                             padding: 16,
-                             marginBottom: 12,
-                             shadowColor: "#000",
-                             shadowOffset: {width: 0, height: 2},
-                             shadowOpacity: 0.1,
-                             shadowRadius: 4,
-                             elevation: 2,
-                             borderLeftWidth: 4,
-                             borderLeftColor: colors.tint,
-                          }}
-                          onPress={() => {
-                             // Navigate to session details
-                             console.log('Navigate to session', item.id);
-                             router.push({
-                                pathname: `${String(routesLink.PROTECTED_SESSION_DETAILS).replace(':sessionId', item.id)}`,
-                             });
-                          }}
-                      >
-                         <Text style={{fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: colors.text}}>
-                            {item.name}
-                         </Text>
-                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <Text style={{fontSize: 14, color: colors.text}}>
-                               {item.note}
-                            </Text>
-                         </View>
-                      </TouchableOpacity>
-                  )}
-                  ListEmptyComponent={
-                     <View style={{alignItems: 'center', marginTop: 40}}>
-                        <Text style={{fontSize: 16, color: '#666'}}>
-                           No workout sessions found
+                     padding: 10,
+                     width: 40,
+                     alignItems: 'center',
+                  }}
+                  onPress={goToPreviousDay}
+               >
+                  <MaterialCommunityIcons
+                     name="chevron-left"
+                     size={24}
+                     color={colors.tint}
+                     style={{
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1,
+                        elevation: 2,
+                     }}
+                  />
+               </TouchableOpacity>
+
+               <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>
+                     {currentDate.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                     })}
+                  </Text>
+               </View>
+
+               {!isToday ? (
+                  <TouchableOpacity
+                     style={{
+                        padding: 10,
+                        width: 40,
+                        alignItems: 'center',
+                     }}
+                     onPress={goToNextDay}
+                  >
+                     <MaterialCommunityIcons
+                        name="chevron-right"
+                        size={24}
+                        color={colors.tint}
+                        style={{
+                           shadowColor: "#000",
+                           shadowOffset: { width: 0, height: 1 },
+                           shadowOpacity: 0.2,
+                           shadowRadius: 1,
+                           elevation: 2,
+                        }}
+                     />
+                  </TouchableOpacity>
+               ) : (
+                  <View style={{ width: 40 }} /> // Empty view with same width as buttons
+               )}
+            </View>
+
+
+         </View>
+
+         {loading ? (
+            <ActivityIndicator size="large" color={colors.tint} />
+         ) : (
+            <FlatList
+               style={{
+                  marginBottom: 20,
+                  flex: 1,
+                  paddingHorizontal: 20
+               }} // Added marginBottom to avoid overlap with button
+               contentContainerStyle={{ paddingBottom: 80 }} // Added paddingBottom to avoid overlap with button
+               showsVerticalScrollIndicator={true}
+               data={sessions}
+               keyExtractor={(item) => item.id.toString()}
+               renderItem={({ item }) => (
+                  <TouchableOpacity
+                     style={{
+                        backgroundColor: colors.tintLighter,
+                        borderRadius: 8,
+                        padding: 16,
+                        marginBottom: 12,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 2,
+                        borderLeftWidth: 4,
+                        borderLeftColor: colors.tint,
+                     }}
+                     onPress={() => {
+                        // Navigate to session details
+                        console.log('Navigate to session', item.id);
+                        router.push({
+                           pathname: `${String(routesLink.PROTECTED_SESSION_DETAILS).replace(':sessionId', item.id)}`,
+                        });
+                     }}
+                  >
+                     <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: colors.text }}>
+                        {item.name}
+                     </Text>
+                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 14, color: colors.text }}>
+                           {item.note}
                         </Text>
                      </View>
-                  }
-              />
-          )}
+                  </TouchableOpacity>
+               )}
+               ListEmptyComponent={
+                  <View style={{ alignItems: 'center', marginTop: 40 }}>
+                     <Text style={{ fontSize: 16, color: '#666' }}>
+                        No workout sessions found
+                     </Text>
+                  </View>
+               }
+            />
+         )}
 
-          <Button
-              text="Start New Session"
-              onClick={() => {
-                 router.push({
-                    pathname: `${routesLink.PROTECTED_NEW_SESSION}`,
-                 });
-              }}
-              type="primary"
-              icon="plus"
-              styles={{
-                 margin: 16,
-              }}
-          />
-       </View>
+         <Button
+            text="Start New Session"
+            onClick={() => {
+               router.push({
+                  pathname: `${routesLink.PROTECTED_NEW_SESSION}`,
+               });
+            }}
+            type="primary"
+            icon="plus"
+            styles={{
+               margin: 16,
+            }}
+         />
+      </View>
    );
 }
