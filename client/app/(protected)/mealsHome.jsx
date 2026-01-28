@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Modal from "react-native-modal";
+import ModalSlideUp from "@/components/ui/ModalSlideUp";
 import React, { useMemo } from "react";
 import Color from "@/constants/Colors.ts";
 import { useState, useEffect } from "react";
@@ -428,7 +429,6 @@ export default function mealsHome() {
     }, []); */
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalVisibleFood, setModalVisibleFood] = useState(true);
   const [search, setSearch] = useState("");
   const [searchForFoodLoading, setSearchForFoodLoading] = useState(false);
   const [nameFood, setNameFood] = useState("");
@@ -1327,7 +1327,10 @@ export default function mealsHome() {
               <Button
                 text="Add New Meal"
                 type="outline"
-                onClick={() => setModalVisible(true)}
+                onClick={() => {
+                  console.log("Button clicked! Setting modal to true");
+                  setModalVisible(true);
+                }}
                 icon="plus"
                 styles={{
                   flex: 1,
@@ -1337,70 +1340,21 @@ export default function mealsHome() {
             </ScrollView>
           </View>
         )}
-        <Modal
+        
+        <ModalSlideUp
           isVisible={modalVisible}
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          onBackdropPress={() => setModalVisible(false)}
-          swipeDirection={additionModalVisible ? [] : ["down"]}
-          propagateSwipe={false}
-          onSwipeComplete={() => setModalVisible(false)}
-          style={{ margin: 0 }}
+          onClose={() => {
+            console.log("Modal closing");
+            setModalVisible(false);
+            setCustomFoodModalVisible(false);
+          }}
+          props={{
+            title: customFoodModalVisible ? "Create Custom Food" : "Add Food"
+          }}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "flex-end",
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: colors.background,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-                padding: 16,
-                height: "90%",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: -3 },
-                shadowOpacity: 0.2,
-                shadowRadius: 5,
-                elevation: 5,
-              }}
-            >
-              {/* Header */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 16,
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: "800",
-                    color: colors.text,
-                    fontSize: 20,
-                  }}
-                >
-                  {customFoodModalVisible ? "Create Custom Food" : "Add Food"}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setModalVisible(false);
-                    setCustomFoodModalVisible(false);
-                  }}
-                >
-                  <MaterialIcons
-                    name="close"
-                    size={24}
-                    color={colors.text}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {/* Content based on current view */}
-              {customFoodModalVisible ? (
+          <ScrollView style={{ flex: 1 }}>
+            {/* Content based on current view */}
+            {customFoodModalVisible ? (
                 // Custom Food Creation Form
                 <>
                   {createFoodLoading ? (
@@ -2244,8 +2198,54 @@ export default function mealsHome() {
                 </>
               )}
 
-              {/* Food Addition Modal - Keep this if it's a separate modal for adding quantities */}
+              {/* Food Addition Modal handled separately below */}
               {renderFoodAdditionModal()}
+          </ScrollView>
+        </ModalSlideUp>
+
+        <Modal
+          isVisible={additionModalVisible}
+          animationIn="slideInUp"
+          animationOut="slideOutDown"
+          onBackdropPress={() => setAdditionModalVisible(false)}
+          swipeDirection={["down"]}
+          propagateSwipe={false}
+          onSwipeComplete={() => setAdditionModalVisible(false)}
+          style={{ margin: 0 }}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modeleContent}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "800",
+                    fontSize: 19,
+                    color: colors.text,
+                  }}
+                >
+                   { selectedAdditionFoodItem?.foodname || "Food Item"}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setAdditionModalVisible(false)}
+                >
+                  <MaterialIcons
+                    name="close"
+                    size={24}
+                    color={colors.tint}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={{ color: colors.text }}>
+                Food addition modal content (if needed)
+              </Text>
             </View>
           </View>
         </Modal>

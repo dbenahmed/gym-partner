@@ -167,6 +167,8 @@ export const AuthProvider = ({ children }) => {
                             },
                         }],
                     );
+                } else {
+                    setSplashLoading(false);
                 }
             }
         }
