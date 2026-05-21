@@ -1,25 +1,20 @@
 import dotenv from "dotenv";
 
 
-export const loadEnvironment = (env) => {
-  const nodeEnv = (env || process.env.NODE_ENV || "development");
-
+export const loadEnvironment = () => {
   dotenv.config({
-    path: `.env.${nodeEnv}`,
+    path: `.env.development`,
   });
 
   return {
-    nodeEnv,
     port: parseInt(process.env.PORT || "3000"),
     databaseUrl: process.env.DATABASE_URL || "",
-    supabaseDatabaseUrl: process.env.SUPABASE_DATABASE_URL || "",
     bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS || "10"),
     jwtSecret: process.env.JWT_SECRET || "",
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
     allowedOrigins: process.env.ALLOWED_ORIGINS || "*",
     secure: process.env.SECURE === "true",
-    isDevelopment: nodeEnv === "development",
-    isProduction: nodeEnv === "production",
+    isDevelopment: true,
   };
 };
 
