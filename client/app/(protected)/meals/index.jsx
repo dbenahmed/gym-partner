@@ -18,6 +18,7 @@ import NutritionSummary from "@/features/meal-tracking/components/NutritionSumma
 import DateNavigator from "@/features/meal-tracking/components/DateNavigator";
 import FoodSearchModal from "@/features/meal-tracking/components/FoodSearchModal";
 import FoodAdditionModal from "@/features/meal-tracking/components/FoodAdditionModal";
+import CustomFoodModal from "@/features/meal-tracking/components/CustomFoodModal";
 
 export default function Index() {
   const { colors } = useThemeContext();
@@ -47,8 +48,9 @@ export default function Index() {
   const [error, setError] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [additionModalVisible, setAdditionModalVisible] = useState(false);
+  const [customFoodModalVisible, setCustomFoodModalVisible] = useState(false);
   const [selectedAdditionFoodItem, setSelectedAdditionFoodItem] = useState(null);
 
   const renderUserMealsOnDate = async () => {
@@ -162,7 +164,7 @@ export default function Index() {
             <Button
               text="Add New Meal"
               type="outline"
-              onClick={() => setModalVisible(true)}
+              onClick={() => setSearchModalVisible(true)}
               icon="plus"
               styles={{ flex: 1, marginTop: 10 }}
             />
@@ -170,13 +172,31 @@ export default function Index() {
         </View>
       )}
 
-      {/* Modals extracted into features directory */}
       <FoodSearchModal
-        isVisible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        isVisible={searchModalVisible}
+        onClose={() => setSearchModalVisible(false)}
+        onCustomFoodPress={() => {
+          setSearchModalVisible(false);
+          // Wait for modal to close before opening the next
+          setTimeout(() => setCustomFoodModalVisible(true), 100);
+        }}
         onFoodSelect={(item) => {
+          setSearchModalVisible(false);
           setSelectedAdditionFoodItem(item);
-          setAdditionModalVisible(true);
+          // Wait for modal to close before opening the next
+          setTimeout(() => setAdditionModalVisible(true), 100);
+        }}
+      />
+
+      <CustomFoodModal
+        isVisible={customFoodModalVisible}
+        onClose={() => {
+          setCustomFoodModalVisible(false);
+          setTimeout(() => setSearchModalVisible(true), 100);
+        }}
+        onFoodCreated={() => {
+          setCustomFoodModalVisible(false);
+          setTimeout(() => setSearchModalVisible(true), 100);
         }}
       />
 
@@ -185,6 +205,7 @@ export default function Index() {
         onClose={() => {
           setAdditionModalVisible(false);
           setSelectedAdditionFoodItem(null);
+          setTimeout(() => setSearchModalVisible(true), 100);
         }}
         foodItem={selectedAdditionFoodItem}
         currentDate={currentDate}
