@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Modal from "react-native-modal";
-import Color from "@/constants/Colors";
+import React from "react";
+import { View, Text, TouchableOpacity, Modal } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import useThemeContext from "@/context/themeContext";
 
@@ -9,7 +7,7 @@ interface SlideDownModalProps {
   children?: React.ReactNode;
   isVisible: boolean;
   onClose?: () => void;
-  props: any; // Add this line to include props
+  props: any;
 }
 
 export default function ModalSlideUp({
@@ -18,24 +16,21 @@ export default function ModalSlideUp({
   onClose,
   props,
 }: SlideDownModalProps) {
-  const { theme, colors } = useThemeContext();
+  const { colors } = useThemeContext();
 
   return (
     <Modal
-      isVisible={isVisible}
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      onBackdropPress={onClose ? onClose : () => {}}
-      swipeDirection="down"
-      onSwipeComplete={onClose ? onClose : () => {}}
-      style={{ margin: 0 }}
-      avoidKeyboard={true}
+      visible={isVisible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
     >
       <View
         style={{
           flex: 1,
-          justifyContent: "flex-end",
-          backgroundColor: colors.background,
+          justifyContent: "flex-end", // Anchor to bottom
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
       >
         <View
@@ -43,11 +38,12 @@ export default function ModalSlideUp({
             backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            padding: 16,
-            height: "90%",
+            padding: 20,
+            width: "100%",
+            height: "90%", // Take up 90% of screen height exactly like before
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -3 },
-            shadowOpacity: 0.2,
+            shadowOpacity: 0.25,
             shadowRadius: 5,
             elevation: 5,
           }}
@@ -68,7 +64,7 @@ export default function ModalSlideUp({
                 fontSize: 20,
               }}
             >
-              {props.title ? props.title : "Modal Has No Title"}
+              {props.title ? props.title : "Test Modal"}
             </Text>
             {onClose && (
               <TouchableOpacity onPress={() => onClose()}>

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import SetsContainer from '@/features/training/components/setsContainer';
 import useAuth from "@/context/authContext";
 import Colors from "@/constants/Colors";
 import { defaultUrl } from "@/constants/constants";

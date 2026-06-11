@@ -11,7 +11,7 @@ import {
 import { useRouter } from "expo-router";
 import { useState, useContext, useMemo } from "react";
 import useAuth from "@/context/authContext";
-import SplashScreen from "@/components/SplashScreen";
+import SplashScreen from "@/components/ui/SplashScreen";
 import { Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import useThemeContext from "@/context/themeContext";
@@ -64,7 +64,7 @@ export default function TabTwoScreen() {
     setSplashLoading(true);
     const res = await login(username, password);
     if (res.success) {
-      router.replace("/(protected)/mealsHome"); //todo :  should use REDIRECT
+      router.replace("/(protected)/meals"); //todo :  should use REDIRECT
     } else {
       Alert.alert("Error", res.message);
     }

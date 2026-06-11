@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import SessionExerciseContainer from '@/components/sessionExerciseContainer';
+import SessionExerciseContainer from '@/features/training/components/sessionExerciseContainer';
 import { defaultUrl } from '@/constants/constants';
 import useAuth from '@/context/authContext';
 import { ActivityIndicator } from 'react-native';
@@ -22,7 +22,7 @@ import { validateName, validateString, validateNumber } from '@/utils/validation
 import Button from '@/components/ui/Button';
 import ModalSlideUp from '@/components/ui/ModalSlideUp';
 import { Stack } from "expo-router";
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/ui/Spinner';
 import useThemeContext from '@/context/themeContext';
 import { useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import { router } from "expo-router"
 import routesLink from "@/constants/routes";
 import { Ionicons } from "@expo/vector-icons";
-import AnimatedCard from "@/components/AnimatedCard";
+import AnimatedCard from "@/components/ui/AnimatedCard";
 import useThemeContext from "@/context/themeContext";
 import Colors from "@/constants/Colors";
 import { Dimensions } from "react-native";
