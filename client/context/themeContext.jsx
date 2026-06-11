@@ -26,7 +26,7 @@ export const ThemeProvider = ({ children }) => {
     };
 
 
-    
+
 
     const colors = Colors[`${theme === "device" ? deviceTheme : theme}`];
 
@@ -37,4 +37,4 @@ export const ThemeProvider = ({ children }) => {
     );
 }
 
-export default useThemeContext = () => { return useContext(themeContext); }
+export default function useThemeContext() { return useContext(themeContext); }

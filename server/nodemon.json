@@ -1,5 +1,5 @@
 {
-  "watch": ["./src", "./**/*.ts", "./**/*.js"],
+  "watch": ["./src", "./", "./routes"],
   "ext": "ts,js,json",
   "ignore": [
     "node_modules/**/*",
@@ -8,5 +8,5 @@
     "*.log",
     "C:\\DumpStack.log.tmp"
   ],
-  "exec": "tsx app.ts"
+  "exec": "tsx"
 }

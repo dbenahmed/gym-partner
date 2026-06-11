@@ -5,6 +5,7 @@ import useAuth from "@/context/authContext";
 import SplashScreen from "@/components/SplashScreen";
 import useTheme from "@/context/themeContext";
 import { StyleSheet, Text, View } from "react-native";
+import routes from "@/constants/routes";
 
 export default function Index() {
 
@@ -17,15 +18,16 @@ export default function Index() {
     return <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background }}>
       <SplashScreen hideLogo={false}>
         <Text style={[styles.title, { color: colors.text }]}>Gym Partner</Text>
+        <Text style={[styles.description, { color: colors.text }]}>Loading... Please wait</Text>
       </SplashScreen>
     </View>
   }
 
   if (authenticated) { // logged in 
-    return <Redirect href="/(protected)/mealsHome" />;
+    return <Redirect href={routes.PROTECTED_HOME} />;
   }
 
-  return <Redirect href="/(auth)/landing" />;
+  return <Redirect href={routes.LANDING} />;
 }
 
 
@@ -33,6 +35,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
+  },
+  description: {
+    fontSize: 13,
+    fontWeight: "300",
     marginBottom: 20,
   },
 });

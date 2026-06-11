@@ -9,8 +9,8 @@ export const users = pgTable("users", {
 	password: varchar({ length: 72 }).notNull(),
 	salt: varchar({ length: 255 }),
 	refreshtoken: varchar({ length: 255 }),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	avatar: varchar({ length: 255 }),
 	email: varchar({ length: 100 }),
 	firstname: varchar({ length: 50 }),
@@ -27,8 +27,8 @@ export const collections = pgTable("collections", {
 	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	description: text(),
 }, (table) => [
 	foreignKey({
@@ -56,8 +56,8 @@ export const foods = pgTable("foods", {
 	brand: varchar({ length: 255 }),
 	custom: boolean().default(false),
 	createdBy: integer("created_by"),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	likes: integer().default(0),
 	dislikes: integer().default(0),
 	status: varchar({ length: 50 }).default("pending")
@@ -85,8 +85,8 @@ export const foodsLogs = pgTable("foods_logs", {
 	id: serial().primaryKey().notNull(),
 	foodId: integer("food_id").notNull(),
 	userId: integer("user_id").notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updateddate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updateddate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	description: text(),
 	servingsizeG: integer("servingsize_g"),
 	date: date().notNull(),
@@ -108,8 +108,8 @@ export const plans = pgTable("plans", {
 	id: serial().primaryKey().notNull(),
 	collectionId: integer("collection_id").notNull(),
 	title: varchar({ length: 100 }).notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	foreignKey({
 		columns: [table.collectionId],
@@ -123,8 +123,8 @@ export const plansExercises = pgTable("plans_exercises", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	order: integer().notNull(),
 }, (table) => [
 	foreignKey({
@@ -151,8 +151,8 @@ export const exercises = pgTable("exercises", {
 	instructions: text().array().notNull(),
 	category: varchar({ length: 30 }).notNull(),
 	images: text().array().notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	check("exercises_category_check", sql`(category)::text = ANY (ARRAY[('powerlifting'::character varying)::text, ('strength'::character varying)::text, ('stretching'::character varying)::text, ('cardio'::character varying)::text, ('olympic weightlifting'::character varying)::text, ('strongman'::character varying)::text, ('plyometrics'::character varying)::text])`),
 	check("exercises_equipment_check", sql`(equipment)::text = ANY (ARRAY[('medicine ball'::character varying)::text, ('dumbbell'::character varying)::text, ('body only'::character varying)::text, ('bands'::character varying)::text, ('kettlebells'::character varying)::text, ('foam roll'::character varying)::text, ('cable'::character varying)::text, ('machine'::character varying)::text, ('barbell'::character varying)::text, ('exercise ball'::character varying)::text, ('e-z curl bar'::character varying)::text, ('other'::character varying)::text])`),
@@ -164,10 +164,9 @@ export const exercises = pgTable("exercises", {
 export const sessions = pgTable("sessions", {
 	id: serial().primaryKey().notNull(),
 	planId: integer("plan_id"),
-	duedate: date().notNull(),
 	name: varchar({ length: 100 }).notNull(),
-	starttime: time(),
-	endtime: time(),
+	starttime: timestamp({ withTimezone: true, mode: 'date' }).notNull(),
+	endtime: timestamp({ withTimezone: true, mode: 'date' }),
 	note: text(),
 	rating: integer(),
 	createdBy: integer("created_by").notNull(),
@@ -190,7 +189,7 @@ export const setsOfSessionsExercises = pgTable("sets_of_sessions_exercises", {
 	id: serial().primaryKey().notNull(),
 	sessionId: integer("session_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	order: integer().notNull(),
 	weight: integer().array().notNull(),
 	unit: varchar({ length: 10 }).array().notNull(),
@@ -212,8 +211,8 @@ export const templatesExercises = pgTable("templates_exercises", {
 	id: serial().primaryKey().notNull(),
 	templateId: integer("template_id").notNull(),
 	exerciseId: integer("exercise_id").notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	order: integer().notNull(),
 }, (table) => [
 	foreignKey({
@@ -231,8 +230,8 @@ export const templatesExercises = pgTable("templates_exercises", {
 export const templates = pgTable("templates", {
 	id: serial().primaryKey().notNull(),
 	title: varchar({ length: 100 }).notNull(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	check("templates_title_check", sql`length((title)::text) >= 1`),
 ]);
@@ -241,8 +240,8 @@ export const weightsLogs = pgTable("weights_logs", {
 	id: serial().primaryKey().notNull(),
 	userId: integer("user_id").notNull(),
 	weight: integer(),
-	creationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updationdate: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	creationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updationdate: timestamp({ withTimezone: true, mode: 'date' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	unit: varchar({ length: 3 }),
 }, (table) => [
 	foreignKey({

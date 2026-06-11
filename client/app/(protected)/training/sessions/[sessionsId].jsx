@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import { Stack } from "expo-router";
 import useThemeContext from "@/context/themeContext";
 
 export default function SessionDetails() {
+
+
 
   const { colors, theme } = useThemeContext();
 
@@ -232,13 +234,11 @@ export default function SessionDetails() {
         }
 
         const { success, message, session, exercises } = await response.json();
-        console.log(session, exercises);
         if (!success) {
           Alert.alert("Error", message);
           setLoading(false);
           return;
         }
-        console.log(exercises[0]);
         setSession(session);
         setExercises(exercises);
         setLoading(false);
@@ -287,7 +287,13 @@ export default function SessionDetails() {
           <View style={styles.sessionHeader}>
             <Text style={styles.sessionName}>{session.name}</Text>
             <Text style={styles.sessionDate}>
-              {formatDate(session.duedate)}
+              {session.starttime && `${formatDate(session.starttime)} ${
+                // display the hour, min, sec of start time
+                new Date(session.starttime).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                }`}
             </Text>
             {session.note && (
               <Text style={styles.sessionNote}>Note: {session.note}</Text>
@@ -302,8 +308,9 @@ export default function SessionDetails() {
                 size={24}
                 color={colors.tint}
               />
-              <Text style={styles.statValue}>{exercises.length}</Text>
               <Text style={styles.statLabel}>Exercises</Text>
+
+              <Text style={styles.statValue}>{exercises.length}</Text>
             </View>
 
             <View style={styles.statItem}>
@@ -312,13 +319,20 @@ export default function SessionDetails() {
                 size={24}
                 color={colors.tint}
               />
+              <Text style={styles.statLabel}>Duration</Text>
               <Text style={styles.statValue}>
                 {session.starttime && session.endtime
-                  ? `${new Date(session.endtime) - new Date(session.starttime)
-                  }min`
+                  ?
+                  `${Math.floor((new Date(session.endtime) - new Date(session.starttime)) / 3600000)
+                    .toString()
+                    .padStart(2, '0')}:${Math.floor((new Date(session.endtime) - new Date(session.starttime) / 60000) % 60)
+                      .toString()
+                      .padStart(2, '0')}:${Math.floor((new Date(session.endtime) - new Date(session.starttime) / 1000) % 60)
+                        .toString()
+                        .padStart(2, '0')}`
                   : "N/A"}
               </Text>
-              <Text style={styles.statLabel}>Duration</Text>
+
             </View>
 
             <View style={styles.statItem}>
@@ -327,8 +341,9 @@ export default function SessionDetails() {
                 size={24}
                 color={colors.tint}
               />
-              <Text style={styles.statValue}>{session.rating || "N/A"}</Text>
               <Text style={styles.statLabel}>Rating</Text>
+
+              <Text style={styles.statValue}>{session.rating || "N/A"}</Text>
             </View>
           </View>
 

@@ -98,6 +98,7 @@ if (isServeonet) {
     })
 } else  */
 if (isLocal) {
+  console.log("starting server in local mode");
   app.listen(port, async () => {
     // get the local IP address
     const localIp = OS.networkInterfaces()["Wi-Fi"]![1].address;
@@ -106,6 +107,7 @@ if (isLocal) {
     );
   });
 } else {
+  console.log("starting server in production mode");
   app.listen(port, "0.0.0.0", async () => {
     console.log(`server started on port ${port}`);
   });

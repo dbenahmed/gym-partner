@@ -3,44 +3,59 @@ import { Redirect } from "expo-router";
 import useAuth from "@/context/authContext";
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Colors from "@/constants/Colors.ts";
-import { Platform } from "react-native";
-import TabBarBackground from "@/components/ui/TabBarBackground";
+import { Platform, View } from "react-native";
 import useThemeContext from "@/context/themeContext";
-
+import { LinearGradient } from 'expo-linear-gradient';
+import { useCallback, useState } from "react";
+import { BlurView } from 'expo-blur';
+import routesLinks from "@/constants/routes";
+import { useSharedValue } from "react-native-reanimated";
+import { useAnimatedStyle } from "react-native-reanimated";
 
 
 export default function Layout() {
 
-  const { authenticated } = useAuth();
+
+  const { authenticated, theme } = useAuth();
 
 
   const { colors } = useThemeContext();
-
   if (authenticated) {
     // logged in
     return (
+
       <Tabs
         screenOptions={{
           lazy: false, // Load all tabs at once when the app starts instead of on first access
           tabBarActiveTintColor: colors.tint,
           headerShown: false,
-          tabBarBackground: TabBarBackground,
+          // this animation makes a bug in the the tabs navigation
+          //animation: "shift", 
+          /* tabBarBackground: () => {
+            return (
+              <View style={{ backgroundColor: "red" }} />
+            )
+          }, */
+
+
+
           tabBarStyle: Platform.select({
             ios: {
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
-              backgroundColor: colors.background,
-              borderTopColor: "transparent",
               borderTopWidth: 0,
+              marginLeft: 20,
+              marginRight: 20,
+              backgroundColor: colors.tintLighter,
+              borderRadius: 20,
             },
             android: {
               // Use a solid background on Android
               height: 60, // reduce height
               paddingBottom: 5,
               paddingTop: 5,
-              backgroundColor: colors.background, // solid white
+              backgroundColor: "transparent", // solid white
               borderTopColor: "transparent", // remove border
               borderTopWidth: 0,
             },
@@ -48,20 +63,22 @@ export default function Layout() {
           }),
         }}
       >
-        {/* <Tabs.Screen name="home" options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="home" color={color} size={size} />
-                    ),
-                    tabBarLabel: 'Home',
-                    
-                }} /> */}
+
+        <Tabs.Screen name="home" options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home-outline" color={colors.icon} size={size} />
+          ),
+          tabBarLabel: "Home",
+        }} />
+
+
         <Tabs.Screen
           name="mealsHome"
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="food-apple"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),
@@ -70,31 +87,19 @@ export default function Layout() {
         />
 
 
-        <Tabs.Screen
-          name="sessions"
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="history"
-                color={color}
-                size={size}
-              />
-            ),
-            tabBarLabel: "Sessions",
-          }}
-        />
+
 
         <Tabs.Screen
-          name="collections"
+          name="training"
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
-                name="clipboard-list"
-                color={color}
+                name="dumbbell"
+                color={colors.icon}
                 size={size}
               />
             ),
-            tabBarLabel: "Collections",
+            tabBarLabel: "Training",
           }}
         />
 
@@ -104,7 +109,7 @@ export default function Layout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="magnify"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),
@@ -117,7 +122,7 @@ export default function Layout() {
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="account-circle"
-                color={color}
+                color={colors.icon}
                 size={size}
               />
             ),
@@ -127,6 +132,6 @@ export default function Layout() {
       </Tabs>
     );
   } else {
-    return <Redirect href="/(auth)/landing" />;
+    return <Redirect href={routesLinks.LANDING} />;
   }
 }

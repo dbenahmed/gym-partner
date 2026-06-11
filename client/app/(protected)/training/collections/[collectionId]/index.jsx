@@ -25,7 +25,6 @@ const Plans = () => {
       backgroundColor: colors.tintLighter,
       borderRadius: 12,
       padding: 20,
-      marginHorizontal: 16,
       marginVertical: 10,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
@@ -187,7 +186,7 @@ const Plans = () => {
 
           <View style={{ marginVertical: 10 }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Description</Text>
-            <Text>{description}</Text>
+            <Text style={{ color: colors.text }}>{description}</Text>
           </View>
 
           {/* <Text style={{ marginVertical: 10, fontSize: 18, fontWeight: 'bold' }}>Plans:</Text> */}
@@ -214,7 +213,6 @@ const Plans = () => {
               setModalVisible(true)
             }}
             styles={{
-              marginHorizontal: 16,
               marginTop: 16,
             }}
           />

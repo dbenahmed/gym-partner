@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: lenovo
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3232:3232"
+    environment:
+      - PORT=3232
+      - DATABASE_URL=postgresql://postgres:lenovo@db:5432/postgres
+      - BCRYPT_SALT_ROUNDS=5
+      - JWT_SECRET=your-secret-key
+      - JWT_EXPIRES_IN=30d
+      - ALLOWED_ORIGINS=http://localhost:8081
+      - SECURE=false
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

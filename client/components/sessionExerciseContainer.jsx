@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SetsContainer from './setsContainer';
@@ -14,7 +14,7 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
             backgroundColor: colors.tintLighter,
             borderRadius: 10,
             padding: 15,
-            marginBottom: 15,
+            width: "100%",
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -57,11 +57,21 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
     }), [colors, theme]);
 
 
+    useEffect(() => {
+        console.log("itemeolieo", item)
+    }, [item])
+
+
     return (
         <View style={styles.exerciseCard}>
             <View style={styles.exerciseHeader}>
                 <Text style={styles.exerciseName}>{item.name}</Text>
-                <TouchableOpacity onPress={() => removeExercise(item.id)}>
+                <TouchableOpacity
+                    hitSlop={20}
+                    onPress={() => {
+                        console.log("removing")
+                        removeExercise(item.id)
+                    }}>
                     <MaterialCommunityIcons name="close" size={20} color={colors.red} />
                 </TouchableOpacity>
             </View>
@@ -72,13 +82,17 @@ export default function SessionExerciseContainer({ item, removeExercise, updateE
                     <Text style={styles.setsTitle}>Sets</Text>
                     <TouchableOpacity
                         style={styles.addSetButton}
+                        hitSlop={15}
                         onPress={() => {
+                            console.log("item", item)
                             const updatedSets = Array.isArray(item.sets) ? [...item.sets] : [];
                             updatedSets.push({ reps: 0, weight: 0, unit: 'kg' });
+                            console.log("updatedSets", updatedSets)
+                            console.log("hihi")
                             updateExerciseData(item.id, 'sets', updatedSets);
                         }}
                     >
-                        <MaterialCommunityIcons  name="plus" size={20} color="#4CAF50" />
+                        <MaterialCommunityIcons name="plus" size={20} color="#4CAF50" />
                     </TouchableOpacity>
                 </View>
 

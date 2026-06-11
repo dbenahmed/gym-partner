@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { defaultUrl } from "@/constants/constants";
 import axios from "axios";
 import { handleError } from "@/lib/handleError";
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 import * as SecureStore from 'expo-secure-store';
 
 
@@ -124,12 +124,12 @@ export const AuthProvider = ({ children }) => {
                     Authorization: `Bearer ${token}`
                 }
             }
-            console.log('sending')
-            const { data } = await axios.get(`${defaultUrl}/auth/check`, {}, {
+            console.log('sending is logged in request to check if user is logged in')
+            const { data } = await axios.get(`${defaultUrl}/auth/check`, {
+                timeout: 5000, // 5 seconds timeout 
                 withCredentials: true,
-                headers: header
-            })
-            console.log('sent')
+                headers: header,
+            });
             console.log('data', data)
             if (data.success) {
                 let userId = await parseInt(await SecureStore.getItemAsync('user-id'));
@@ -151,7 +151,26 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const run = async () => {
             const loggedIn = await isLoggedIn();
-            setSplashLoading(false);
+            if (loggedIn.success) {
+                console.log('user is logged in');
+                setSplashLoading(false);
+            } else {
+                if (loggedIn.status === 408) {
+                    console.log("haha")
+                    Alert.alert(
+                        "Session Timeout",
+                        "Your session has timed out. Please log in again.",
+                        [{
+                            text: "Retry",
+                            onPress: async () => {
+                                run();
+                            },
+                        }],
+                    );
+                } else {
+                    setSplashLoading(false);
+                }
+            }
         }
         run();
     }, []);
@@ -163,4 +182,4 @@ export const AuthProvider = ({ children }) => {
     )
 }
 
-export default useAuth = () => { return useContext(AuthContext) }
+export default function useAuth() { return useContext(AuthContext) }
