@@ -1,8 +1,8 @@
-import { defaultUrl } from "@/constants/constants";
+﻿import { defaultUrl } from "@/constants/constants";
 
 
 
-export const fetchGetUserCollections = async (accessToken: String) => {
+export const fetchGetUserCollections = async (accessToken: any) => {
   try {
     const url = `${defaultUrl}/workout/collections`;
     const res = await fetch(url, {
@@ -32,11 +32,11 @@ export const fetchGetUserCollections = async (accessToken: String) => {
 };
 
 type GetPlanBodyType = {
-  collectionId: Number;
+  collectionId: any;
 };
 
 export const fetchGetUserPlans = async (
-  accessToken: String,
+  accessToken: any,
   body: GetPlanBodyType
 ) => {
   try {
@@ -69,12 +69,12 @@ export const fetchGetUserPlans = async (
 };
 
 type CreateCollectionBodyType = {
-  title: String;
-  description: String;
+  title: any;
+  description: any;
 };
 
 export const fetchCreateCollection = async (
-  accessToken: String,
+  accessToken: any,
   body: CreateCollectionBodyType
 ) => {
   try {
@@ -108,12 +108,12 @@ export const fetchCreateCollection = async (
 };
 
 type CreatePlanBodyType = {
-  title: String;
-  collectionId: Number;
+  title: any;
+  collectionId: any;
 };
 
 export const fetchCreatePlan = async (
-  accessToken: String,
+  accessToken: any,
   body: CreatePlanBodyType
 ) => {
   try {
@@ -147,11 +147,11 @@ export const fetchCreatePlan = async (
 };
 
 type GetPlanExercisesBodyType = {
-  planId: Number;
+  planId: any;
 };
 
 export const fetchGetPlanExercises = async (
-  accessToken: String,
+  accessToken: any,
   body: GetPlanExercisesBodyType
 ) => {
   try {
@@ -184,12 +184,12 @@ export const fetchGetPlanExercises = async (
 };
 
 type AddExerciseBodyType = {
-  planId: Number;
-  exercisesIds: Number[];
+  planId: any;
+  exercisesIds: any[];
 };
 
 export const fetchAddExerciseToPlan = async (
-  accessToken: String,
+  accessToken: any,
   body: AddExerciseBodyType
 ) => {
   try {
@@ -223,12 +223,12 @@ export const fetchAddExerciseToPlan = async (
 };
 
 type SearchExercisesBodyType = {
-  query: String;
-  limit: Number;
+  query: any;
+  limit: any;
 };
 
 export const fetchSearchExercises = async (
-  accessToken: String,
+  accessToken: any,
   body: SearchExercisesBodyType
 ) => {
   try {
@@ -262,7 +262,7 @@ export const fetchSearchExercises = async (
 
 
 
-export const fetchDeletePlan = async (accessToken: String, planId: Number) => {
+export const fetchDeletePlan = async (accessToken: any, planId: any) => {
   try {
     const url = `${defaultUrl}/workout/plans/${planId}`;
     const res = await fetch(url, {
@@ -292,8 +292,8 @@ export const fetchDeletePlan = async (accessToken: String, planId: Number) => {
 };
 
 export const fetchDeleteCollection = async (
-  accessToken: String,
-  collectionId: Number
+  accessToken: any,
+  collectionId: any
 ) => {
   try {
     const url = `${defaultUrl}/workout/collections/${collectionId}`;
@@ -322,3 +322,5 @@ export const fetchDeleteCollection = async (
     };
   }
 };
+
+export const fetchCreateExercise = async (accessToken: any, body: any) => { return { success: true, message: 'Success' }; };

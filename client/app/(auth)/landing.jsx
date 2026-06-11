@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import Color from "@/constants/Colors.ts";
+import Color from "@/constants/Colors";
 import { useRouter } from "expo-router";
 import CheckBox from "react-native-check-box";
 import { useMemo, useState } from "react";
