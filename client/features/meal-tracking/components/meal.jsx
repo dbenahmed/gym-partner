@@ -644,7 +644,7 @@ export default function Meal({ data, onDelete, onUpdate }) {
             text="View Details"
             type="outline"
             onClick={() => {
-              router.push(`/Explore/meals/${data.food.id}`);
+              router.push(`/explore/meals/${data.food.id}`);
             }}
             styles={{ flex: 1 }}
           />

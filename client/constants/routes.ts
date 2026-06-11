@@ -12,18 +12,18 @@ export default {
   PROTECTED_COLLECTION_PLANS: "/(protected)/training/collections/:collectionId",
   PROTECTED_COLLECTION_PLAN_EXERCISES:
     "/(protected)/training/collections/:collectionId/:planId",
-  PROTECTED_EXERCISE_DETAILS: "/(protected)/Explore/exercise",
+  PROTECTED_EXERCISE_DETAILS: "/(protected)/explore/exercise",
 
   PROTECTED_SESSIONS: "(protected)/training/sessions",
   PROTECTED_SESSION_DETAILS: "(protected)/training/sessions/:sessionId",
   PROTECTED_NEW_SESSION: "(protected)/training/sessions/newSession",
   // FOOD
-  PROTECTED_MEALS: "/(protected)/mealsHome",
-  PROTECTED_FOOD_DETAILS: "/(protected)/Explore/meals",
+  PROTECTED_MEALS: "/(protected)/meals",
+  PROTECTED_FOOD_DETAILS: "/(protected)/explore/meals",
 
   // MISC
   PROTECTED_HOME: "/(protected)/home", //"/(protected)/home",
-  PROTECTED_PROFILE: "/(protected)/Profile",
+  PROTECTED_PROFILE: "/(protected)/profile",
   PROTECTED_PROFILE_BODY_WEIGHT_TRACKING:
-    "/(protected)/Profile/body-weight-tracking",
+    "/(protected)/profile/body-weight-tracking",
 };

@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import AnimatedCard from "@/components/AnimatedCard";
+import AnimatedCard from "@/components/ui/AnimatedCard";
 import useThemeContext from "@/context/themeContext";
 
 export default function HomePage() {

@@ -10,7 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import useAuth from "@/context/authContext";
-import SplashScreen from "@/components/SplashScreen";
+import SplashScreen from "@/components/ui/SplashScreen";
 import { Alert } from "react-native";
 import { validatePassword, validateUsername, validateName } from "@/utils/validation";
 import { ImageBackground } from "react-native";

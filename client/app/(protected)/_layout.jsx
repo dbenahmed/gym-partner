@@ -64,6 +64,13 @@ export default function Layout() {
         }}
       >
 
+        <Tabs.Screen
+          name="index"
+          options={{
+            href: null,
+          }}
+        />
+
         <Tabs.Screen name="home" options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home-outline" color={colors.icon} size={size} />
@@ -73,7 +80,7 @@ export default function Layout() {
 
 
         <Tabs.Screen
-          name="mealsHome"
+          name="meals"
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
@@ -104,7 +111,7 @@ export default function Layout() {
         />
 
         <Tabs.Screen
-          name="Explore"
+          name="explore"
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
@@ -117,7 +124,7 @@ export default function Layout() {
           }}
         />
         <Tabs.Screen
-          name="Profile"
+          name="profile"
           options={{
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
