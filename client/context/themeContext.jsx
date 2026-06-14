@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { useColorScheme } from 'react-native';
-import Colors from '@/constants/Colors.ts';
+import Colors from '@/constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const themeContext = React.createContext();
 

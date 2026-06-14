@@ -9,7 +9,7 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-import { fetchGetUserCollections, fetchCreateCollection } from "@/features/training/api/collectionsApi";
+import { fetchGetUserCollections, fetchCreateCollection } from "@/features/training";
 import useAuth from "@/context/authContext";
 import { ActivityIndicator } from "react-native";
 import Colors from "@/constants/Colors";
