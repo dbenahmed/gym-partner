@@ -6,7 +6,7 @@ import Colors from '@/constants/Colors';
 import { router, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { defaultUrl } from '@/constants/constants';
-import Button from '@/components/ui/Button.jsx';
+import Button from '@/components/ui/Button';
 import routesLink from '@/constants/routes';
 
 import useThemeContext from '@/context/themeContext';
