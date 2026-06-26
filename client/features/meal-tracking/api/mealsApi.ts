@@ -1,8 +1,8 @@
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 export const fetchUserMealsOnDate = async (accessToken: any, dateStr: any) => {
   try {
-    const url = `${defaultUrl}/meals?date=${dateStr}`;
+    const url = `${API_ENDPOINTS.MEALS}?date=${dateStr}`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -37,7 +37,7 @@ export const fetchAddFoodToUser = async (
   accessToken: any
 ) => {
   try {
-    const url = `${defaultUrl}/meals`;
+    const url = API_ENDPOINTS.MEALS;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -73,7 +73,7 @@ export const fetchAddFoodToUser = async (
 
 export const fetchUpdateMeal = async (accessToken: any, id: any, body: any) => {
   try {
-    const url = `${defaultUrl}/meals/${id}`;
+    const url = API_ENDPOINTS.MEAL_BY_ID(id);
     const res = await fetch(url, {
       method: "PUT",
       headers: {
@@ -103,7 +103,7 @@ export const fetchUpdateMeal = async (accessToken: any, id: any, body: any) => {
 
 export const fetchDeleteMeal = async (accessToken: any, id: any) => {
   try {
-    const url = `${defaultUrl}/meals/${id}`;
+    const url = API_ENDPOINTS.MEAL_BY_ID(id);
     const res = await fetch(url, {
       method: "DELETE",
       headers: {

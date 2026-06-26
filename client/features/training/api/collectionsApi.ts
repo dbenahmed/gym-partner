@@ -1,8 +1,8 @@
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 export const fetchGetUserCollections = async (accessToken: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/workout/collections`, {
+    const response = await fetch(API_ENDPOINTS.WORKOUT_COLLECTIONS, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
@@ -27,7 +27,7 @@ export const fetchGetUserCollections = async (accessToken: any) => {
 
 export const fetchCreateCollection = async (accessToken: any, body: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/workout/collections`, {
+    const response = await fetch(API_ENDPOINTS.WORKOUT_COLLECTIONS, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

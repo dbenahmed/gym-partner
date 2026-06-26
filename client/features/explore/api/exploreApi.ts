@@ -1,9 +1,9 @@
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 export const fetchExploreExercises = async (accessToken: any, queryParams: any) => {
   try {
     const searchParams = new URLSearchParams(queryParams);
-    const response = await fetch(`${defaultUrl}/explore/exercises?${searchParams.toString()}`, {
+    const response = await fetch(`${API_ENDPOINTS.EXPLORE_EXERCISES}?${searchParams.toString()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export const fetchExploreFoods = async (accessToken: any, query: any) => {
   try {
     const queries = { name: query };
     const searchParams = new URLSearchParams(queries);
-    const response = await fetch(`${defaultUrl}/explore/meals?${searchParams.toString()}`, {
+    const response = await fetch(`${API_ENDPOINTS.EXPLORE_MEALS}?${searchParams.toString()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

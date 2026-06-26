@@ -13,7 +13,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SetsContainer } from "@/features/training";
 import useAuth from "@/context/authContext";
 import Colors from "@/constants/Colors";
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 import { router } from "expo-router";
 import { Stack } from "expo-router";
 import useThemeContext from "@/context/themeContext";
@@ -182,7 +182,7 @@ export default function SessionDetails() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${defaultUrl}/workout/sessions/${sessionId}`,
+        API_ENDPOINTS.WORKOUT_SESSION_BY_ID(sessionId),
         {
           method: "DELETE",
           headers: {
@@ -220,7 +220,7 @@ export default function SessionDetails() {
       try {
         // In a real app, you would use something like:
         const response = await fetch(
-          `${defaultUrl}/workout/sessions/${sessionsId}`,
+          API_ENDPOINTS.WORKOUT_SESSION_BY_ID(sessionsId as string),
           {
             method: "GET",
             headers: {

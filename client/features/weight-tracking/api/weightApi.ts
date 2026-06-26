@@ -1,8 +1,8 @@
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 export const fetchWeights = async (accessToken: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/weight`, {
+    const response = await fetch(API_ENDPOINTS.WEIGHT, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
@@ -24,7 +24,7 @@ export const fetchWeights = async (accessToken: any) => {
 
 export const fetchLogWeight = async (accessToken: any, weight: any, unit: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/weight`, {
+    const response = await fetch(API_ENDPOINTS.WEIGHT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export const fetchLogWeight = async (accessToken: any, weight: any, unit: any) =
 
 export const fetchUpdateWeight = async (accessToken: any, id: any, weight: any, unit: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/weight/${id}`, {
+    const response = await fetch(API_ENDPOINTS.WEIGHT_BY_ID(id), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export const fetchUpdateWeight = async (accessToken: any, id: any, weight: any, 
 
 export const fetchDeleteWeight = async (accessToken: any, id: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/weight/${id}`, {
+    const response = await fetch(API_ENDPOINTS.WEIGHT_BY_ID(id), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
