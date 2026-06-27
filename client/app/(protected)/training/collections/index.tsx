@@ -18,6 +18,7 @@ import { validateName } from "@/utils/validation";
 import useThemeContext from "@/context/themeContext";
 import Button from "@/components/ui/Button";
 import ModalSlideUp from "@/components/ui/ModalSlideUp";
+import routes from "@/constants/routes";
 
 type Collection = {
   collectionId: number;
@@ -161,13 +162,10 @@ const Collections = () => {
                   console.log("item.collectionId", item.collectionId);
                   router.push(
                     {
-                      pathname: `./${item.collectionId}`,
+                      pathname: routes.PROTECTED_COLLECTION_PLANS.replace(':collectionId', item.collectionId.toString()) as any,
                       params: {
                         ...item,
                       },
-                    },
-                    {
-                      relativeToDirectory: true,
                     }
                   );
                 }}

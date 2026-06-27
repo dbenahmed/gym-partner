@@ -14,9 +14,9 @@ export default {
     "/(protected)/training/collections/:collectionId/:planId",
   PROTECTED_EXERCISE_DETAILS: "/(protected)/explore/exercise",
 
-  PROTECTED_SESSIONS: "(protected)/training/sessions",
-  PROTECTED_SESSION_DETAILS: "(protected)/training/sessions/:sessionId",
-  PROTECTED_NEW_SESSION: "(protected)/training/sessions/newSession",
+  PROTECTED_SESSIONS: "/(protected)/training/sessions",
+  PROTECTED_SESSION_DETAILS: "/(protected)/training/sessions/:sessionId",
+  PROTECTED_NEW_SESSION: "/(protected)/training/sessions/newSession",
   // FOOD
   PROTECTED_MEALS: "/(protected)/meals",
   PROTECTED_FOOD_DETAILS: "/(protected)/explore/meals",

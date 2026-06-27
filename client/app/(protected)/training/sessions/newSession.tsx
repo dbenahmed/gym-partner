@@ -14,7 +14,7 @@ import {
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SessionExerciseContainer } from '@/features/training';
-import { defaultUrl } from '@/constants/constants';
+import API_ENDPOINTS from '@/constants/apiEndpoints';
 import useAuth from '@/context/authContext';
 import { ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
@@ -516,7 +516,7 @@ export default function StartSession() {
       setIsLoadingPlans(true);
       // fetch the plans for the selected collection
       try {
-         const res = await fetch(`${defaultUrl}/workout/plans/${collection.collectionId}`, {
+         const res = await fetch(API_ENDPOINTS.WORKOUT_PLANS_BY_COLLECTION(collection.collectionId), {
             headers: {
                'Content-Type': 'application/json',
                'Authorization': `Bearer ${authenticated}`
@@ -544,7 +544,7 @@ export default function StartSession() {
 
    const fetchExercisesPreview = async (planId: any) => {
       try {
-         const res = await fetch(`${defaultUrl}/workout/plans/${planId}/exercises`, {
+         const res = await fetch(API_ENDPOINTS.WORKOUT_PLAN_EXERCISES(planId), {
             headers: {
                'Content-Type': 'application/json',
                'Authorization': `Bearer ${authenticated}`
@@ -610,7 +610,7 @@ export default function StartSession() {
       setIsLoadingCollections(true);
       setImportFromCollectionModalVisible(true);
       try {
-         const res = await fetch(`${defaultUrl}/workout/collections`, {
+         const res = await fetch(API_ENDPOINTS.WORKOUT_COLLECTIONS, {
             headers: {
                'Content-Type': 'application/json',
                'Authorization': `Bearer ${authenticated}`
@@ -676,7 +676,7 @@ export default function StartSession() {
          }
 
 
-         const response = await fetch(`${defaultUrl}/exercise/statistics/${exercise.id}`, {
+         const response = await fetch(API_ENDPOINTS.EXERCISE_STATISTICS(exercise.id), {
             headers: {
                'Content-Type': 'application/json',
                'Authorization': `Bearer ${authenticated}`
@@ -792,8 +792,8 @@ export default function StartSession() {
          }));
          const endTime = new Date();
          console.log('fetching session')
-         console.log("def", defaultUrl)
-         const res = await fetch(`${defaultUrl}/workout/sessions`, {
+         console.log("def", API_ENDPOINTS)
+         const res = await fetch(API_ENDPOINTS.WORKOUT_SESSIONS, {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
@@ -863,7 +863,7 @@ export default function StartSession() {
          return;
       }
       setIsLoadingSearchExercises(true);
-      const res = await fetch(`${defaultUrl}/explore/exercises?name=${query}&sets=true`, {
+      const res = await fetch(`${API_ENDPOINTS.EXPLORE_EXERCISES}?name=${query}&sets=true`, {
          headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authenticated}`

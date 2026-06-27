@@ -4,6 +4,7 @@ import Color from "@/constants/Colors";
 import { router } from "expo-router";
 import { useState } from "react";
 import useAuth from "@/context/authContext";
+import routes from "@/constants/routes";
 
 import useThemeContext from '@/context/themeContext';
 import { useMemo } from 'react';
@@ -644,7 +645,7 @@ export default function Meal({ data, onDelete, onUpdate }: any) {
             text="View Details"
             type="outline"
             onClick={() => {
-              router.push(`/explore/meals/${data.food.id}`);
+              router.push(`${routes.PROTECTED_FOOD_DETAILS}/${data.food.id}` as any);
             }}
             styles={{ flex: 1 }}
           />

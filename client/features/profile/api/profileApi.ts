@@ -1,8 +1,8 @@
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 export const fetchUserProfile = async (accessToken: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/auth/me`, {
+    const response = await fetch(API_ENDPOINTS.AUTH_ME, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export const fetchUserProfile = async (accessToken: any) => {
 
 export const fetchUpdateProfile = async (accessToken: any, body: any) => {
   try {
-    const response = await fetch(`${defaultUrl}/auth/me`, {
+    const response = await fetch(API_ENDPOINTS.AUTH_ME, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

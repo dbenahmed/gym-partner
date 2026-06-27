@@ -1,8 +1,8 @@
-import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 export const fetchSearchFood = async (accessToken: any, body: any) => {
   try {
-    const url = `${defaultUrl}/explore/meals?name=${body.name}`;
+    const url = `${API_ENDPOINTS.EXPLORE_MEALS}?name=${body.name}`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -35,7 +35,7 @@ export const fetchSearchFood = async (accessToken: any, body: any) => {
 
 export const fetchCreateCustomMeal = async (accessToken: any, body: any) => {
   try {
-    const url = `${defaultUrl}/meals/custom`;
+    const url = API_ENDPOINTS.MEALS_CUSTOM;
     const res = await fetch(url, {
       method: "POST",
       headers: {

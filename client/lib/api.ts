@@ -1,10 +1,10 @@
-﻿import { defaultUrl } from "@/constants/constants";
+import API_ENDPOINTS from "@/constants/apiEndpoints";
 
 
 
 export const fetchGetUserCollections = async (accessToken: any) => {
   try {
-    const url = `${defaultUrl}/workout/collections`;
+    const url = API_ENDPOINTS.WORKOUT_COLLECTIONS;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -40,7 +40,7 @@ export const fetchGetUserPlans = async (
   body: GetPlanBodyType
 ) => {
   try {
-    const url = `${defaultUrl}/workout/plans/${body.collectionId}`;
+    const url = API_ENDPOINTS.WORKOUT_PLANS_BY_COLLECTION(body.collectionId);
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -78,7 +78,7 @@ export const fetchCreateCollection = async (
   body: CreateCollectionBodyType
 ) => {
   try {
-    const url = `${defaultUrl}/workout/collections`;
+    const url = API_ENDPOINTS.WORKOUT_COLLECTIONS;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -117,7 +117,7 @@ export const fetchCreatePlan = async (
   body: CreatePlanBodyType
 ) => {
   try {
-    const url = `${defaultUrl}/workout/plans`;
+    const url = API_ENDPOINTS.WORKOUT_PLANS;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -155,7 +155,7 @@ export const fetchGetPlanExercises = async (
   body: GetPlanExercisesBodyType
 ) => {
   try {
-    const url = `${defaultUrl}/workout/plans/${body.planId}/exercises`;
+    const url = API_ENDPOINTS.WORKOUT_PLAN_EXERCISES(body.planId);
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -193,7 +193,7 @@ export const fetchAddExerciseToPlan = async (
   body: AddExerciseBodyType
 ) => {
   try {
-    const url = `${defaultUrl}/workout/plans/${body.planId}/exercises`;
+    const url = API_ENDPOINTS.WORKOUT_PLAN_EXERCISES(body.planId);
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -232,7 +232,7 @@ export const fetchSearchExercises = async (
   body: SearchExercisesBodyType
 ) => {
   try {
-    const url = `${defaultUrl}/explore/exercises?name=${body.query}&limit=${body.limit}`;
+    const url = `${API_ENDPOINTS.EXPLORE_EXERCISES}?name=${body.query}&limit=${body.limit}`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -264,7 +264,7 @@ export const fetchSearchExercises = async (
 
 export const fetchDeletePlan = async (accessToken: any, planId: any) => {
   try {
-    const url = `${defaultUrl}/workout/plans/${planId}`;
+    const url = API_ENDPOINTS.WORKOUT_PLAN_BY_ID(planId);
     const res = await fetch(url, {
       method: "DELETE",
       headers: {
@@ -296,7 +296,7 @@ export const fetchDeleteCollection = async (
   collectionId: any
 ) => {
   try {
-    const url = `${defaultUrl}/workout/collections/${collectionId}`;
+    const url = API_ENDPOINTS.WORKOUT_COLLECTION_BY_ID(collectionId);
     const res = await fetch(url, {
       method: "DELETE",
       headers: {

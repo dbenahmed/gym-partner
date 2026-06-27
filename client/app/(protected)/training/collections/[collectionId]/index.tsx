@@ -10,7 +10,7 @@ import useThemeContext from '@/context/themeContext';
 import Button from '@/components/ui/Button';
 import ModalSlideUp from '@/components/ui/ModalSlideUp';
 import { fetchGetUserPlans, fetchCreatePlan } from '@/lib/api';
-
+import routes from '@/constants/routes';
 
 
 const Plans = () => {
@@ -94,17 +94,14 @@ const Plans = () => {
   const handlePlanPress = (plan: any) => {
     // Navigate to the specific plan's page
     router.push({
-      pathname: `./${plan.id}`,
+      pathname: routes.PROTECTED_COLLECTION_PLAN_EXERCISES.replace(':collectionId', plan.collectionId.toString()).replace(':planId', plan.id.toString()) as any,
       params: {
         collectionId: plan.collectionId,
         planId: plan.id,
         title: plan.title,
         description: plan.description,
       },
-    },
-      {
-        relativeToDirectory: true
-      });
+    });
   };
 
   const handleCreatePlan = async () => {

@@ -5,7 +5,7 @@ import useAuth from '@/context/authContext';
 import Colors from '@/constants/Colors';
 import { router, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { defaultUrl } from '@/constants/constants';
+import API_ENDPOINTS from '@/constants/apiEndpoints';
 import Button from '@/components/ui/Button';
 import routesLink from '@/constants/routes';
 
@@ -33,7 +33,7 @@ export default function Sessions() {
                // Replace with actual API call when available
                // Example: const response = await fetchGetUserSessions(authenticated);
 
-               const res = await fetch(`${defaultUrl}/workout/sessions?date=${currentDate.toISOString().split('T')[0]}`, {
+               const res = await fetch(`${API_ENDPOINTS.WORKOUT_SESSIONS}?date=${currentDate.toISOString().split('T')[0]}`, {
                   method: 'GET',
                   headers: {
                      'Content-Type': 'application/json',
