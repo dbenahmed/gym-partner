@@ -1,11 +1,12 @@
-import {config} from "../config/env";
+import { config } from "../config/env";
 import * as authService from "../services/authServices";
-import {Request, Response} from 'express';
-import {HttpError} from "../errors/errors";
+import { Request, Response } from 'express';
+import { HttpError } from "../errors/errors";
+import { AuthenticatedRequest } from "../types/auth.types";
 
 
 //the registration controller 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (req: AuthenticatedRequest, res: Response) => {
     try {
         await authService.registerUserService(req.body);
         res.status(201).send({
@@ -23,9 +24,9 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 //THE LOGIN CONTROLLER 
-export const loginUser = async (req : Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response) => {
     try {
-        const {user, token} = await authService.loginUserService(req.body);
+        const { user, token } = await authService.loginUserService(req.body);
 
         res.cookie("access_token", token, {
             httpOnly: true,                // Prevents XSS attacks
@@ -43,9 +44,9 @@ export const loginUser = async (req : Request, res: Response) => {
             }
         });
     } catch (err) {
-        const status = err instanceof HttpError ? err.status : 500;
-        const message = err instanceof   HttpError ? err.message : "Internal Server Error";
-        res.status(status|| 500).json({
+        const status: number = err instanceof HttpError ? err.status : 500;
+        const message: string = err instanceof HttpError ? err.message : "Internal Server Error";
+        res.status(status || 500).json({
             success: false,
             message: message
         });
@@ -53,9 +54,11 @@ export const loginUser = async (req : Request, res: Response) => {
 };
 
 // Get the authenticated user's profile data
-export const getUserProfile = async (req: Request, res:Response) => {
+export const getUserProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const userId = req.user;
+
+
         const user = await authService.getUserProfileService(userId);
 
         console.log(user);
@@ -71,17 +74,22 @@ export const getUserProfile = async (req: Request, res:Response) => {
                 lastname: user.lastname
             }
         });
-    } catch (error) {
-        console.log(error);
-        res.status(error.status || 500).json({message: 'Error retrieving user profile', error: error.message});
+    } catch (err) {
+        console.log(err);
+        const status: number = err instanceof HttpError ? err.status : 500;
+        const message: string = err instanceof HttpError ? err.message : "Error";
+        res.status(status || 500).json({
+            success: false,
+            message: message
+        });
     }
 };
 
 // Update the authenticated user's profile
-export const updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const userId = req.user;
-        const {username, avatar, email, firstname, lastname} = req.body;
+        const { username, avatar, email, firstname, lastname } = req.body;
 
         await authService.updateUserProfileService(userId, {
             username,
@@ -95,14 +103,19 @@ export const updateUserProfile = async (req, res) => {
             success: true,
             message: 'User`s data updated successfully'
         });
-    } catch (error) {
-        console.log(error);
-        res.status(error.status || 500).json({message: 'Error updating user profile', error: error.message});
+    } catch (err) {
+        console.log(err);
+        const status: number = err instanceof HttpError ? err.status : 500;
+        const message: string = err instanceof HttpError ? err.message : "Error updating user profile";
+        res.status(status || 500).json({
+            success: false,
+            message: message
+        });
     }
 };
 
 // Log out the user for the web version which does not exist so..
-export const logoutUser = (req, res) => {
+export const logoutUser = (req: AuthenticatedRequest, res: Response) => {
     try {
         res.clearCookie("access_token", {
             httpOnly: true,
@@ -115,12 +128,17 @@ export const logoutUser = (req, res) => {
             success: true,
             message: 'The user is logged out successfully'
         });
-    } catch (error) {
-        res.status(500).json({message: 'Error updating user profile', error: error.message});
+    } catch (err) {
+        const status: number = err instanceof HttpError ? err.status : 500;
+        const message: string = err instanceof HttpError ? err.message : "Error updating user profile";
+        res.status(status || 500).json({
+            success: false,
+            message: message
+        });
     }
 };
 
-export const checkAuth = async (req, res) => {
+export const checkAuth = async (req: AuthenticatedRequest, res: Response) => {
     try {
         return res.status(200).json({
             success: true,
@@ -128,6 +146,11 @@ export const checkAuth = async (req, res) => {
             accessToken: req.token
         });
     } catch (err) {
-        res.status(500).json({message: 'Error checking authentication', error: err.message});
+        const status: number = err instanceof HttpError ? err.status : 500;
+        const message: string = err instanceof HttpError ? err.message : "Error checking authentication";
+        res.status(status || 500).json({
+            success: false,
+            message: message
+        });
     }
 };

@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.js';
+import authMiddleware from '../middleware/authMiddlewares.ts';
 const router = express.Router();
 import { getNutritionGoals, setNutritionGoals, getRemainingNutrition } from '../controllers/nutritionGoalsControllers.js';
 

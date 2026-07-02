@@ -15,7 +15,7 @@ import {
     removeExerciseFromPlan,
     getExercisesForPlan
 } from '../controllers/workoutPlansControllers.js'
-import authMiddleware from '../middleware/authMiddlewares.js';
+import authMiddleware from '../middleware/authMiddlewares.ts';
 
 
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.js';
+import authMiddleware from '../middleware/authMiddlewares.ts';
 const router = express.Router();
 import { createNewExercise, deleteExercise, getAllExercises, getExerciseDetails, updateExercise, getLatestExerciseStats } from '../controllers/exerciseDatabaseControllers.js';
 
