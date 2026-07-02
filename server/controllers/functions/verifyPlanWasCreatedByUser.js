@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import db from "../../db/index.js";
-import { plans, collections } from "../../db/schemas/schema.js";
+import { plans, collections } from "../../db/schemas/schema.ts";
 
 export default async function verifyPlanCreatedByUser(planId, userId) {
     const plan = await db.query.plans.findFirst({

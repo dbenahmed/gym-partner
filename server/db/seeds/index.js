@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import db from "../index.js";
-import * as schema from "../schemas/schema.js";
-import { config } from "../../config/env.js"
+import * as schema from "../schemas/schema.ts";
+import { config } from "../../config/env.ts"
 
 
 const main = async () => {

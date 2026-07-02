@@ -34,9 +34,11 @@
     "serveonet": "^0.0.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.7",
     "drizzle-kit": "^0.30.4",
     "nodemon": "^3.1.9",

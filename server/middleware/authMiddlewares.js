@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 import db from '../db/index.js';
-import { users } from '../db/schemas/schema.js';
+import { users } from '../db/schemas/schema.ts';
 import { eq } from 'drizzle-orm';
-import { config } from "../config/env.js"
+import { config } from "../config/env.ts"
 
 
 export const getAccessToken = async (req, res) => {

@@ -1,5 +1,5 @@
 import db from "../index.js";
-import * as schema from "../schemas/schema.js";
+import * as schema from "../schemas/schema.ts";
 import fs from 'fs/promises';
 
 const exercisesData = JSON.parse(await fs.readFile(new URL('./data/exercises.json', import.meta.url)));

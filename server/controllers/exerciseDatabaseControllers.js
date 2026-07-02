@@ -1,5 +1,5 @@
 import db from "../db/index.js";
-import { collections, exercises, plans, sessions, setsOfSessionsExercises, users } from "../db/schemas/schema.js";
+import { collections, exercises, plans, sessions, setsOfSessionsExercises, users } from "../db/schemas/schema.ts";
 import { and, eq, ilike, like, inArray, sql, desc } from "drizzle-orm";
 
 
