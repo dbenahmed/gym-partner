@@ -23,13 +23,15 @@ const authMiddleware = async (req: UnauthenticatedRequest, res: Response, next: 
         // get the token from the request
         const token = await getAccessToken(req, res);
         if (!token) {
+            console.log("No token provided or invalid format")
             return res.status(401).json({ message: 'No token provided or invalid format' });
         }
         // Verify the token using your secret key
         const decoded = jwt.verify(token, config.jwtSecret || 'your-secret-key') as JwtCustomPayloadInterface;
-
+        console.log(decoded)
         // verify userId is inside the decoded access token, and backward compatibility for old tokens
-        if (!decoded.id || !decoded.username) {
+        if (!decoded.id) {
+            console.log("Access token outdated or invalid. Please log in again.")
             res.status(401).json({ success: false, message: "Access token outdated or invalid. Please log in again." })
             return;
         }
@@ -44,7 +46,7 @@ const authMiddleware = async (req: UnauthenticatedRequest, res: Response, next: 
         };
         req.token = token;
         next();
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof jwt.JsonWebTokenError) {
             if (error.name === 'TokenExpiredError') {
                 return res.status(401).json({ message: 'Token has expired' });

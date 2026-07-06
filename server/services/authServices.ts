@@ -53,7 +53,12 @@ export const loginUserService = async ({ username, password }: LoginUserServiceR
     }
 
     const jwtPayload: JwtCustomPayloadInterface = {
-        id: user.id
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+        email: user.email,
+        firstname: user.firstname,
+        lastname: user.lastname
     }
     const jwtOptions: SignOptions = {
         expiresIn: config.jwtExpiresIn || "1d"
