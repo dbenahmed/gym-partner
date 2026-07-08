@@ -1,9 +1,10 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.ts';
-const router = express.Router();
+import { Router } from 'express';
+import authMiddleware from '../middleware/authMiddlewares.js';
 import WeightController from '../controllers/weightTrackingControllers.js';
 
+const router: Router = Router();
 const { getWeightLogs, logWeightEntry, updateWeightEntry, deleteWeightEntry } = new WeightController();
+
 // Get a history of the user's weight logs
 router.get('/weight', authMiddleware, getWeightLogs);
 
@@ -16,4 +17,4 @@ router.put('/weight/:entryId', authMiddleware, updateWeightEntry);
 // Delete a specific weight entry
 router.delete('/weight/:entryId', authMiddleware, deleteWeightEntry);
 
-export default router; 
+export default router;

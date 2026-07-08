@@ -8,12 +8,12 @@ export default class WeightController {
 
   // Get a history of the user's weight logs
   getWeightLogs = async (
-    req: Request & { user: number },
+    req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const userId = req.user;
+      const userId = req.user as number;
       console.log(userId);
       console.log(this.weightLogsServices.hi);
       const weights = await this.weightLogsServices.getUserWeights({ userId });
@@ -29,14 +29,14 @@ export default class WeightController {
 
   // Log a new weight entry
   logWeightEntry = async (
-    req: Request & { user: number },
+    req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const newWeight = await this.weightLogsServices.insertUserWeight({
         ...req.body,
-        userId: req.user,
+        userId: req.user as number,
       });
       return res.status(200).json({
         success: true,
@@ -51,11 +51,11 @@ export default class WeightController {
 
   // Update a specific weight entry
   updateWeightEntry = async (
-    req: Request & { user: number },
+    req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    const userId = req.user;
+    const userId = req.user as number;
     const { entryId } = req.params;
 
     try {
@@ -75,11 +75,11 @@ export default class WeightController {
 
   // Delete a specific weight entry
   deleteWeightEntry = async (
-    req: Request & { user: number },
+    req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    const userId = req.user;
+    const userId = req.user as number;
     const { entryId } = req.params;
     try {
       const deletedWeight = await this.weightLogsServices.deleteWeight({

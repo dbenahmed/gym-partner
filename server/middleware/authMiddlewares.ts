@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken'
 
 import { config } from "../config/env"
 import { NextFunction, Request, Response } from 'express';
-import { AuthenticatedRequest, UnauthenticatedRequest, JwtCustomPayloadInterface } from '../types/auth.types';
+import { JwtCustomPayloadInterface } from '../types/auth.types';
 
 
-export const getAccessToken = async (req: UnauthenticatedRequest, res: Response) => {
+export const getAccessToken = async (req: Request, res: Response) => {
     // Try cookie (web)
     const cookieToken = req.cookies?.access_token;
 
@@ -18,7 +18,7 @@ export const getAccessToken = async (req: UnauthenticatedRequest, res: Response)
     return cookieToken || bearerToken || null;
 }
 
-const authMiddleware = async (req: UnauthenticatedRequest, res: Response, next: NextFunction) => {
+const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // get the token from the request
         const token = await getAccessToken(req, res);

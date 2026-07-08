@@ -1,6 +1,6 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.ts';
-const router = express.Router();
+import { Router } from 'express';
+import authMiddleware from '../middleware/authMiddlewares.js';
+const router: Router = Router();
 import { getNutritionGoals, setNutritionGoals, getRemainingNutrition } from '../controllers/nutritionGoalsControllers.js';
 
 // Get the user's daily nutrition goals

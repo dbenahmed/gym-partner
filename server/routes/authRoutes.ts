@@ -1,15 +1,8 @@
-import express from 'express';
-import { registerUser, loginUser, getUserProfile, updateUserProfile, logoutUser, checkAuth } from '../controllers/authControllers.ts'
-import authMiddleware from '../middleware/authMiddlewares.ts';
+import { Router } from 'express';
+import { registerUser, loginUser, getUserProfile, updateUserProfile, logoutUser, checkAuth } from '../controllers/authControllers.js';
+import authMiddleware from '../middleware/authMiddlewares.js';
 
-
-const router = express.Router();
-
-
-
-
-
-
+const router: Router = Router();
 
 // Registration
 router.route('/auth/register').post(registerUser);
@@ -29,4 +22,4 @@ router.post('/auth/logout', authMiddleware, logoutUser);
 // Check the authentication
 router.get('/auth/check', authMiddleware, checkAuth);
 
-export default router
+export default router;

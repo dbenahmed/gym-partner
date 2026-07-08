@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import * as customFoodTrackingService from "../services/customFoodTrackingServices.js";
-import { AuthenticatedRequest } from "../types/auth.types.js";
 
 // Create a new custom meal
-export const createCustomMeal = async (req: AuthenticatedRequest, res: Response) => {
+export const createCustomMeal = async (req: Request, res: Response) => {
     try {
         const { foodname, calories, proteinper100g, carbohydratesper100g, fatper100g } = req.body;
-        const userId = req.user;
+        const userId = req.user as number;
 
         const newMeal = await customFoodTrackingService.createCustomMealService(
             { foodname, calories, proteinper100g, carbohydratesper100g, fatper100g },
@@ -29,9 +28,9 @@ export const createCustomMeal = async (req: AuthenticatedRequest, res: Response)
 };
 
 // Get a list of all custom meals created by the user
-export const getCustomMeals = async (req: AuthenticatedRequest, res: Response) => {
+export const getCustomMeals = async (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = req.user as number;
         const meals = await customFoodTrackingService.getAllCustomMealsService(userId);
 
         return res.status(200).json({
@@ -49,10 +48,10 @@ export const getCustomMeals = async (req: AuthenticatedRequest, res: Response) =
 };
 
 // Delete a custom meal
-export const deleteCustomMeal = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteCustomMeal = async (req: Request, res: Response) => {
     try {
         const mealId = parseInt(req.params.mealId, 10);
-        const userId = req.user;
+        const userId = req.user as number;
 
         if (isNaN(mealId)) {
             return res.status(400).json({

@@ -1,5 +1,5 @@
-import express from 'express';
-const router = express.Router();
+import { Router } from 'express';
+const router: Router = Router();
 import {
     getWorkoutCollections,
     createWorkoutCollection,
@@ -15,7 +15,7 @@ import {
     removeExerciseFromPlan,
     getExercisesForPlan
 } from '../controllers/workoutPlansControllers.js'
-import authMiddleware from '../middleware/authMiddlewares.ts';
+import authMiddleware from '../middleware/authMiddlewares.js';
 
 
 

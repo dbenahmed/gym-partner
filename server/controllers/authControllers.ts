@@ -2,11 +2,9 @@ import { config } from "../config/env";
 import * as authService from "../services/authServices";
 import { Request, Response } from 'express';
 import { HttpError } from "../errors/errors";
-import { AuthenticatedRequest } from "../types/auth.types";
-
 
 //the registration controller 
-export const registerUser = async (req: AuthenticatedRequest, res: Response) => {
+export const registerUser = async (req: Request, res: Response) => {
     try {
         await authService.registerUserService(req.body);
         res.status(201).send({
@@ -54,9 +52,9 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 // Get the authenticated user's profile data
-export const getUserProfile = async (req: AuthenticatedRequest, res: Response) => {
+export const getUserProfile = async (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = req.user as number;
 
 
         const user = await authService.getUserProfileService(userId);
@@ -86,9 +84,9 @@ export const getUserProfile = async (req: AuthenticatedRequest, res: Response) =
 };
 
 // Update the authenticated user's profile
-export const updateUserProfile = async (req: AuthenticatedRequest, res: Response) => {
+export const updateUserProfile = async (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = req.user as number;
         const { username, avatar, email, firstname, lastname } = req.body;
 
         await authService.updateUserProfileService(userId, {
@@ -115,7 +113,7 @@ export const updateUserProfile = async (req: AuthenticatedRequest, res: Response
 };
 
 // Log out the user for the web version which does not exist so..
-export const logoutUser = (req: AuthenticatedRequest, res: Response) => {
+export const logoutUser = (req: Request, res: Response) => {
     try {
         res.clearCookie("access_token", {
             httpOnly: true,
@@ -138,7 +136,7 @@ export const logoutUser = (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const checkAuth = async (req: AuthenticatedRequest, res: Response) => {
+export const checkAuth = async (req: Request, res: Response) => {
     try {
         return res.status(200).json({
             success: true,

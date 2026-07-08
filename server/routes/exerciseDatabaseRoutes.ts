@@ -1,8 +1,8 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.ts';
-const router = express.Router();
+import { Router } from 'express';
+import authMiddleware from '../middleware/authMiddlewares.js';
 import { createNewExercise, deleteExercise, getAllExercises, getExerciseDetails, updateExercise, getLatestExerciseStats } from '../controllers/exerciseDatabaseControllers.js';
 
+const router: Router = Router();
 
 //* done
 // Get a list of all available exercises
@@ -24,4 +24,4 @@ router.delete('/explore/exercises/:exerciseId', authMiddleware, deleteExercise);
 // Get latest data of an exercise ( latest reps sets weights sessions ...)
 router.get('/exercise/statistics/:exerciseId', authMiddleware, getLatestExerciseStats);
 
-export default router; 
+export default router;

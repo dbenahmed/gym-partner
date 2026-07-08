@@ -1,6 +1,6 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.ts';
-const router = express.Router();
+import { Router } from 'express';
+import authMiddleware from '../middleware/authMiddlewares.js';
+const router: Router = Router();
 import { getAllMeals, getMealDetails } from '../controllers/mealDatabaseControllers.js';
 
 // Get a list of all available meals

@@ -3,7 +3,7 @@ import * as exerciseDatabaseService from "../services/exerciseDatabaseServices.j
 import { AuthenticatedRequest } from "../types/auth.types.js";
 
 // Get a list of all available exercises
-export const getAllExercises = async (req: AuthenticatedRequest, res: Response) => {
+export const getAllExercises = async (req: Request, res: Response) => {
     try {
         const queries = {
             name: req.query.name as string,
@@ -37,7 +37,7 @@ export const getAllExercises = async (req: AuthenticatedRequest, res: Response) 
 };
 
 // Get details for a specific exercise
-export const getExerciseDetails = async (req: AuthenticatedRequest, res: Response) => {
+export const getExerciseDetails = async (req: Request, res: Response) => {
     try {
         const exerciseId = parseInt(req.params.exerciseId, 10);
 
@@ -62,9 +62,9 @@ export const getExerciseDetails = async (req: AuthenticatedRequest, res: Respons
 };
 
 // Create a new exercise inside exercises database
-export const createNewExercise = (req: AuthenticatedRequest, res: Response) => {
+export const createNewExercise = (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = (req as AuthenticatedRequest).user;
         // To be implemented
     } catch (error: any) {
         res.status(500).json({ message: 'Error creating a new exercise', error: error.message });
@@ -72,9 +72,9 @@ export const createNewExercise = (req: AuthenticatedRequest, res: Response) => {
 };
 
 // Update an existing exercise
-export const updateExercise = (req: AuthenticatedRequest, res: Response) => {
+export const updateExercise = (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = (req as AuthenticatedRequest).user;
         const exerciseId = parseInt(req.params.exerciseId, 10);
         const updatedData = req.body;
 
@@ -85,9 +85,9 @@ export const updateExercise = (req: AuthenticatedRequest, res: Response) => {
 };
 
 // Delete an existing exercise
-export const deleteExercise = (req: AuthenticatedRequest, res: Response) => {
+export const deleteExercise = (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = (req as AuthenticatedRequest).user;
         const exerciseId = parseInt(req.params.exerciseId, 10);
 
         res.status(200).json({ message: 'Exercise deleted successfully' });
@@ -96,9 +96,9 @@ export const deleteExercise = (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const getLatestExerciseStats = async (req: AuthenticatedRequest, res: Response) => {
+export const getLatestExerciseStats = async (req: Request, res: Response) => {
     try {
-        const userId = req.user;
+        const userId = (req as AuthenticatedRequest).user;
         const exerciseId = parseInt(req.params.exerciseId, 10);
 
         if (isNaN(exerciseId)) {

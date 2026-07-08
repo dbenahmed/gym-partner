@@ -1,6 +1,6 @@
-import express from 'express';
-import authMiddleware from '../middleware/authMiddlewares.ts';
-const router = express.Router();
+import { Router } from 'express';
+import authMiddleware from '../middleware/authMiddlewares.js';
+const router: Router = Router();
 import { voteForMeal, getMealVotes } from '../controllers/mealVotingControllers.js';
 
 // Vote for a meal
