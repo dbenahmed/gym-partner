@@ -1,4 +1,4 @@
-import db from "@/db/seeds/index.js";
+import db from "@/db/index.js";
 import * as schema from "../schemas/schema.ts";
 import fs from 'fs/promises';
 

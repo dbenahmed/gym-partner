@@ -1,4 +1,4 @@
-import db from "@/db/seeds/index.js";
+import db from "@/db/index.js";
 import { reset } from "drizzle-seed";
 import { schema } from "../../config/database"
 

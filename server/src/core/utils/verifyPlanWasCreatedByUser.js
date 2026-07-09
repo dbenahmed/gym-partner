@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import db from "@/db/seeds/index.js";
+import db from "@/db/index.js";
 import { plans, collections } from "../../db/schemas/schema.ts";
 
 export default async function verifyPlanCreatedByUser(planId, userId) {
