@@ -5,15 +5,14 @@
   "scripts": {
     "test": "npx tsx watch playground.ts",
     "build": "tsc",
-    "dev": "tsx watch ./src/server.ts --local",
-    "drizzle:generate": "drizzle-kit generate ",
-    "drizzle:migrate": "drizzle-kit migrate ",
-    "drizzle:push": "drizzle-kit push ",
-    "drizzle:pull": "drizzle-kit pull ",
-    "drizzle:seed": "node db/seeds/index.js",
-    "drizzle:seed:mock": "node db/seeds/seedMockData.js",
-    "drizzle:clearseed": "node ./db/seeds/clearSeeds.js",
-    "drizzle:studio": "npx drizzle-kit studio --port 3000 --verbose"
+    "dev": "tsx watch ./src/server.ts",
+    "get:ip": "node get-ip.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node db/seeds/seedDummyData.js",
+    "db:seed:realistic": "node db/seeds/seedRealisticDummyData.js",
+    "db:seed:clear": "node ./db/seeds/clearSeeds.js",
+    "db:studio": "npx drizzle-kit studio --port 3000 --verbose"
   },
   "author": "",
   "license": "ISC",
@@ -30,8 +29,7 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.3",
-    "serveonet": "^0.0.2",
-    "ts-morph": "^28.0.0"
+    "serveonet": "^0.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
