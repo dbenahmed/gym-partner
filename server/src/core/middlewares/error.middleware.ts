@@ -3,13 +3,12 @@ import config from "@/config/env.js";
 import Errors from "@/core/errors/errors.js";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  console.error("Error", err);
 
   if (err instanceof Errors.HttpError) {
     if (config.isDevelopment) {
-      console.error(err);
+      console.error("Error", err);
       res
-        .status(500)
+        .status(err.status)
         .json({ success: false, message: err.message, error: err });
       return;
     }

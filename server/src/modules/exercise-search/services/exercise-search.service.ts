@@ -2,6 +2,7 @@ import * as exerciseSearchRepo from "@/modules/exercise-search/repositories/exer
 import { exercises } from "@/db/schemas/schema.js";
 import { and, eq, ilike, sql, SQL } from "drizzle-orm";
 import { BadRequestError, NotFoundError } from "@/core/errors/errors.js";
+import Errors from "@/core/errors/errors.js";
 
 interface GetExercisesQueries {
     name?: string;
@@ -75,7 +76,7 @@ export const getLatestExerciseStatsService = async (exerciseId: number, userId: 
     const foundStats = await exerciseSearchRepo.getLatestExerciseStats(exerciseId, userId);
 
     if (!foundStats) {
-        throw new Error("ERROR: error retreiving latest exercise stats");
+        throw new Errors.InternalServerError("ERROR: error retreiving latest exercise stats");
     }
 
     return foundStats.map(stat => ({

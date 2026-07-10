@@ -1,92 +1,72 @@
 import { Request, Response } from "express";
 import * as exerciseSearchService from "@/modules/exercise-search/services/exercise-search.service.js";
 import { AuthenticatedRequest } from "@/core/types/auth.types.js";
+import asyncHandler from "express-async-handler";
 
 // Get a list of all available exercises
-export const searchExercisesByQueries = async (req: Request, res: Response) => {
-    try {
-        const queries = {
-            name: req.query.name as string,
-            force: req.query.force as string,
-            level: req.query.level as string,
-            mechanic: req.query.mechanic as string,
-            equipment: req.query.equipment as string,
-            primarymuscles: req.query.primarymuscle as string | string[],
-            secondarymuscles: req.query.secondarymuscle as string | string[],
-            category: req.query.category as string,
-        };
+export const searchExercisesByQueries = asyncHandler(async (req: Request, res: Response) => {
 
-        const page = parseInt(req.query.page as string) || 0;
-        const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+                const queries = {
+                    name: req.query.name as string,
+                    force: req.query.force as string,
+                    level: req.query.level as string,
+                    mechanic: req.query.mechanic as string,
+                    equipment: req.query.equipment as string,
+                    primarymuscles: req.query.primarymuscle as string | string[],
+                    secondarymuscles: req.query.secondarymuscle as string | string[],
+                    category: req.query.category as string,
+                };
 
-        const data = await exerciseSearchService.searchExercisesByQueriesService(queries, page, limit);
+                const page = parseInt(req.query.page as string) || 0;
+                const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
 
-        res.status(200).json({
-            success: true,
-            data: data
+                const data = await exerciseSearchService.searchExercisesByQueriesService(queries, page, limit);
+
+                res.status(200).json({
+                    success: true,
+                    data: data
+                });
         });
-    } catch (error: any) {
-        console.error(error);
-        const status = error.status || 500;
-        res.status(status).json({
-            success: false,
-            message: error.message || 'Error retrieving all exercises',
-            error: error.message
-        });
-    }
-};
 
 // Get details for a specific exercise
-export const getExerciseDetails = async (req: Request, res: Response) => {
-    try {
-        const exerciseId = parseInt(req.params.exerciseId, 10);
+export const getExerciseDetails = asyncHandler(async (req: Request, res: Response) => {
 
-        if (isNaN(exerciseId)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid exercise ID'
-            });
-        }
+                const exerciseId = parseInt(req.params.exerciseId, 10);
 
-        const data = await exerciseSearchService.getExerciseDetailsService(exerciseId);
+                if (isNaN(exerciseId)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Invalid exercise ID'
+                    });
+                }
 
-        return res.status(200).json({
-            success: true,
-            data: data
+                const data = await exerciseSearchService.getExerciseDetailsService(exerciseId);
+
+                return res.status(200).json({
+                    success: true,
+                    data: data
+                });
         });
 
-    } catch (error: any) {
-        const status = error.status || 500;
-        res.status(status).json({ message: error.message || 'Error retrieving exercise details', error: error.message });
-    }
-};
+export const getLatestExerciseStats = asyncHandler(async (req: Request, res: Response) => {
 
-export const getLatestExerciseStats = async (req: Request, res: Response) => {
-    try {
-        const userId = (req as AuthenticatedRequest).user;
-        const exerciseId = parseInt(req.params.exerciseId, 10);
+                const userId = (req as AuthenticatedRequest).user;
+                const exerciseId = parseInt(req.params.exerciseId, 10);
 
-        if (isNaN(exerciseId)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid exercise ID'
-            });
-        }
+                if (isNaN(exerciseId)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Invalid exercise ID'
+                    });
+                }
 
-        console.log("GETTING STATISTICS FOR EXERCISE: ", exerciseId, "USER ID: ", userId);
+                console.log("GETTING STATISTICS FOR EXERCISE: ", exerciseId, "USER ID: ", userId);
 
-        const data = await exerciseSearchService.getLatestExerciseStatsService(exerciseId, userId);
+                const data = await exerciseSearchService.getLatestExerciseStatsService(exerciseId, userId);
 
-        res.status(200).json({
-            message: 'Latest Exercise Stats',
-            success: true,
-            data: data
+                res.status(200).json({
+                    message: 'Latest Exercise Stats',
+                    success: true,
+                    data: data
+                });
         });
-    } catch (error: any) {
-        const status = error.status || 500;
-        res.status(status).json({
-            success: false,
-            message: error.message || 'ERROR: error retreiving latest exercise stats'
-        });
-    }
-};

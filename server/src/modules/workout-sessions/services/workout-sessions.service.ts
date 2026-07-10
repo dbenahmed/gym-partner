@@ -1,5 +1,6 @@
 import * as repo from '@/modules/workout-sessions/repositories/workout-sessions.repository.js';
 import verifyPlanCreatedByUser from "@/core/utils/verifyPlanWasCreatedByUser.js";
+import Errors from "@/core/errors/errors.js";
 
 export const createWorkoutSessionService = async (userId: number, planId: number | undefined, name: string, note: string | undefined, rating: number | undefined, startTime: Date, endTime: Date | undefined, exercisesArray: any[]) => {
     const dateString = startTime.toISOString().split('T')[0];
@@ -46,7 +47,7 @@ export const getUserWorkoutSessionsByDateService = async (userId: number, startT
     const dateStringDayEnd = new Date(startTime.setHours(23, 59, 59, 999));
     const foundSessions = await repo.findSessionsByDateRange(userId, dateStringDayStart, dateStringDayEnd);
     if (!foundSessions) {
-        throw new Error("ERROR: SERVER ERROR WHILE GETTING WORKOUT SESSIONS");
+        throw new Errors.InternalServerError("ERROR: SERVER ERROR WHILE GETTING WORKOUT SESSIONS");
     }
     return foundSessions;
 };
@@ -54,7 +55,7 @@ export const getUserWorkoutSessionsByDateService = async (userId: number, startT
 export const getWorkoutSessionDetailsService = async (sessionId: number, userId: number) => {
     const foundSession = await repo.findSessionByIdAndUserId(sessionId, userId);
     if (!foundSession) {
-        throw new Error("Session not found");
+        throw new Errors.NotFoundError("Session not found");
     }
 
     const responseSessions = {
@@ -85,7 +86,7 @@ export const getWorkoutSessionDetailsService = async (sessionId: number, userId:
 export const updateWorkoutSessionService = async (sessionId: number, newSessionName: string | undefined, newExercises: any[]) => {
     const checkTheSession = await repo.findSessionById(sessionId);
     if (checkTheSession.length === 0) {
-        throw new Error("the session is not exist verify the id !");
+        throw new Errors.BadRequestError("the session is not exist verify the id !");
     }
 
     if (newSessionName) {
@@ -99,7 +100,7 @@ export const updateWorkoutSessionService = async (sessionId: number, newSessionN
 export const deleteWorkoutSessionService = async (sessionId: number) => {
     const checkTheSession = await repo.findSessionById(sessionId);
     if (checkTheSession.length === 0) {
-        throw new Error("the session is not deleted verify the id !");
+        throw new Errors.BadRequestError("the session is not deleted verify the id !");
     }
     await repo.deleteSessionTransaction(sessionId);
 };
