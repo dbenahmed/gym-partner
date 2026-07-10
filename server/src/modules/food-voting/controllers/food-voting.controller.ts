@@ -1,21 +1,14 @@
+import { Request, Response } from "express";
+
 // Vote for a meal
 // todo : to be implemented
-export const voteForFood = (req, res) => {
-  try {
-    const { userId } = req.user;
-    // ... existing code ...
-  } catch (error) {
-    res.status(500).json({ message: 'Error voting for meal', error: error.message });
-  }
+export const voteForFood = (req: Request, res: Response) => {
+  res.status(200).json({});
 };
 
 // Get the total votes for a specific meal
 // todo : to be implemented
-export const getFoodVotes = (req, res) => {
-  try {
-    const { userId } = req.user;
-    // ... existing code ...
-  } catch (error) {
-    res.status(500).json({ message: 'Error retrieving meal votes', error: error.message });
-  }
+export const getFoodVotes = (req: Request, res: Response) => {
+  res.status(200).json({});
+
 }; 

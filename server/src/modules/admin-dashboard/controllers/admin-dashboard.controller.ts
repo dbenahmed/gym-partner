@@ -1,10 +1,7 @@
+import { Request, Response } from "express";
+
 // Get dashboard data
 // todo : to be implemented
-export const getDashboardData = (req, res) => {
-  try {
-    const { userId } = req.user;
-    // ... existing code ...
-  } catch (error) {
-    res.status(500).json({ message: 'Error retrieving dashboard data', error: error.message });
-  }
+export const getDashboardData = (req: Request, res: Response) => {
+    return res.status(200).json({});
 }; 
