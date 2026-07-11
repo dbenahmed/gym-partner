@@ -1,6 +1,6 @@
-import { config } from "./config/env.js";
+import { config } from "./src/config/env.js";
 
-const migrationOutput = config.nodeEnv === "development" ? "/main" : "/dev";
+const migrationOutput = config.nodeEnv === "development" ? "/dev" : "/main";
 
 export default {
   out: `./drizzle/${migrationOutput}`,
